@@ -3,16 +3,20 @@ import SummaryCards from "@/components/SummaryCards";
 import CashFlowChart from "@/components/CashFlowChart";
 import TransactionsTable from "@/components/TransactionsTable";
 import UserMenu from "@/components/UserMenu";
+import DemoBanner from "@/components/DemoBanner";
 import { Bell, Search } from "lucide-react";
 
 export default function Home() {
   return (
     <div className="min-h-screen" style={{ background: "#FDFBF7" }}>
+      {/* Demo Banner */}
+      <DemoBanner />
+
       {/* Sidebar */}
       <Sidebar />
 
       {/* Main Content */}
-      <main className="ml-64 p-8 transition-all duration-300">
+      <main className="ml-64 p-8 transition-all duration-300 pt-24">{/* pt-24 para acomodar o banner */}
         {/* Header */}
         <header className="flex items-center justify-between mb-8">
           <div>
