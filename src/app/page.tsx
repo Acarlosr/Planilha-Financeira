@@ -2,7 +2,8 @@ import Sidebar from "@/components/Sidebar";
 import SummaryCards from "@/components/SummaryCards";
 import CashFlowChart from "@/components/CashFlowChart";
 import TransactionsTable from "@/components/TransactionsTable";
-import { Bell, Search, User } from "lucide-react";
+import UserMenu from "@/components/UserMenu";
+import { Bell, Search } from "lucide-react";
 
 export default function Home() {
   return (
@@ -48,26 +49,8 @@ export default function Home() {
               <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-purple-500 rounded-full border-2 border-white" />
             </button>
 
-            {/* User Profile */}
-            <div
-              className="flex items-center gap-3 px-3 py-2 bg-white rounded-xl cursor-pointer transition-all hover:shadow-md"
-              style={{
-                boxShadow: "0 2px 10px rgba(0, 0, 0, 0.04)",
-              }}
-            >
-              <div
-                className="w-9 h-9 rounded-xl flex items-center justify-center"
-                style={{
-                  background: "linear-gradient(135deg, #A855F7 0%, #C084FC 100%)",
-                }}
-              >
-                <User size={18} className="text-white" />
-              </div>
-              <div className="hidden md:block">
-                <p className="text-sm font-medium text-gray-800">Carlos R.</p>
-                <p className="text-xs text-gray-500">Administrador</p>
-              </div>
-            </div>
+            {/* User Profile with Dropdown */}
+            <UserMenu />
           </div>
         </header>
 
