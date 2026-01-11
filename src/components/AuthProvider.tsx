@@ -14,15 +14,12 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
         const checkSession = async () => {
             const { data: { session } } = await supabase.auth.getSession();
 
-            // Rotas públicas (não precisam de autenticação)
-            const publicRoutes = ["/login", "/cadastro"];
-            const isPublicRoute = publicRoutes.includes(pathname);
+            // Rotas de autenticação
+            const authRoutes = ["/login", "/cadastro"];
+            const isAuthRoute = authRoutes.includes(pathname);
 
-            if (!session && !isPublicRoute) {
-                // Não está logado e tentando acessar rota protegida
-                router.push("/login");
-            } else if (session && isPublicRoute) {
-                // Está logado e tentando acessar login/cadastro
+            // Se está logado e tentando acessar login/cadastro, redireciona para dashboard
+            if (session && isAuthRoute) {
                 router.push("/");
             }
 
@@ -33,12 +30,11 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 
         // Listener para mudanças de autenticação
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            const publicRoutes = ["/login", "/cadastro"];
-            const isPublicRoute = publicRoutes.includes(pathname);
+            const authRoutes = ["/login", "/cadastro"];
+            const isAuthRoute = authRoutes.includes(pathname);
 
-            if (!session && !isPublicRoute) {
-                router.push("/login");
-            } else if (session && isPublicRoute) {
+            // Se está logado e tentando acessar login/cadastro, redireciona para dashboard
+            if (session && isAuthRoute) {
                 router.push("/");
             }
         });
