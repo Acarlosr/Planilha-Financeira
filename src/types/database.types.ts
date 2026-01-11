@@ -118,6 +118,11 @@ export interface Database {
                     valor: number
                     data: string
                     categoria_id: string
+                    cartao_id: string | null
+                    parcelada: boolean
+                    parcela_atual: number | null
+                    parcela_total: number | null
+                    parcela_grupo_id: string | null
                     created_at: string
                     updated_at: string
                 }
@@ -128,6 +133,11 @@ export interface Database {
                     valor: number
                     data: string
                     categoria_id: string
+                    cartao_id?: string | null
+                    parcelada?: boolean
+                    parcela_atual?: number | null
+                    parcela_total?: number | null
+                    parcela_grupo_id?: string | null
                     created_at?: string
                     updated_at?: string
                 }
@@ -138,6 +148,11 @@ export interface Database {
                     valor?: number
                     data?: string
                     categoria_id?: string
+                    cartao_id?: string | null
+                    parcelada?: boolean
+                    parcela_atual?: number | null
+                    parcela_total?: number | null
+                    parcela_grupo_id?: string | null
                     created_at?: string
                     updated_at?: string
                 }
@@ -242,6 +257,41 @@ export interface Database {
                     valor_meta?: number
                     valor_atual?: number
                     icone?: string
+                    cor?: string
+                    created_at?: string
+                    updated_at?: string
+                }
+            }
+            cartoes: {
+                Row: {
+                    id: string
+                    user_id: string
+                    nome: string
+                    banco: string
+                    bandeira: 'Visa' | 'Mastercard' | 'Amex' | 'Elo'
+                    ultimos_digitos: string | null
+                    cor: string
+                    created_at: string
+                    updated_at: string
+                }
+                Insert: {
+                    id?: string
+                    user_id: string
+                    nome: string
+                    banco: string
+                    bandeira: 'Visa' | 'Mastercard' | 'Amex' | 'Elo'
+                    ultimos_digitos?: string | null
+                    cor: string
+                    created_at?: string
+                    updated_at?: string
+                }
+                Update: {
+                    id?: string
+                    user_id?: string
+                    nome?: string
+                    banco?: string
+                    bandeira?: 'Visa' | 'Mastercard' | 'Amex' | 'Elo'
+                    ultimos_digitos?: string | null
                     cor?: string
                     created_at?: string
                     updated_at?: string
