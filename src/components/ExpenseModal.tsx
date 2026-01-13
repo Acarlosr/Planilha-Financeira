@@ -17,9 +17,10 @@ interface ExpenseModalProps {
     onSave: () => void;
     cartoes: Cartao[];
     categorias: Categoria[];
+    onSaveLocal?: (expenses: any[]) => void;
 }
 
-export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categorias }: ExpenseModalProps) {
+export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categorias, onSaveLocal }: ExpenseModalProps) {
     const [loading, setLoading] = useState(false);
 
     // Dados básicos
@@ -59,15 +60,22 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
         setLoading(true);
 
         try {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) throw new Error("Usuário não autenticado");
+            // Se tiver onSaveLocal, ignoramos Auth/Supabase por enquanto (modo preview)
+            let userId = "user_preview_id";
+
+            if (!onSaveLocal) {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) throw new Error("Usuário não autenticado");
+                userId = user.id;
+            }
 
             const valorTotal = parseFloat(amount.replace(/\./g, '').replace(',', '.'));
             if (isNaN(valorTotal)) throw new Error("Valor inválido");
 
+            const novasDespesas = [];
+
             if (installmentsData.parcelada) {
                 // Lógica de Parcelas
-                const parcelas = [];
                 const valorParcela = parseFloat((valorTotal / installmentsData.numeroParcelas).toFixed(2));
                 const grupoId = uuidv4();
 
@@ -83,11 +91,16 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                         ? parseFloat((valorParcela + diferenca).toFixed(2))
                         : valorParcela;
 
-                    parcelas.push({
-                        user_id: user.id,
+                    novasDespesas.push({
+                        id: Math.random(), // ID temporário para local
+                        user_id: userId,
                         descricao: `${description} (${i + 1}/${installmentsData.numeroParcelas})`,
+                        description: `${description} (${i + 1}/${installmentsData.numeroParcelas})`, // Compatibilidade com frontend
                         valor: valorFinal,
-                        data: format(dataParcela, 'yyyy-MM-dd'),
+                        value: valorFinal, // Compatibilidade com frontend
+                        data: format(dataParcela, 'yyyy-MM-dd'), // Formato banco import
+                        date: format(dataParcela, 'dd/MM/yyyy'), // Formato frontend
+                        category: categoryId, // Compatibilidade com frontend
                         categoria_id: categoryId,
                         cartao_id: installmentsData.cartaoId || null,
                         parcelada: true,
@@ -96,25 +109,46 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                         parcela_grupo_id: grupoId,
                     });
                 }
-
-                const { error } = await supabase.from("despesas").insert(parcelas);
-                if (error) throw error;
-
             } else {
                 // Despesa única
-                const { error } = await supabase.from("despesas").insert({
-                    user_id: user.id,
+                novasDespesas.push({
+                    id: Math.random(),
+                    user_id: userId,
                     descricao: description,
+                    description: description,
                     valor: valorTotal,
+                    value: valorTotal,
                     data: date,
+                    date: format(new Date(date), 'dd/MM/yyyy'),
+                    category: categoryId,
                     categoria_id: categoryId,
                     cartao_id: installmentsData.cartaoId || null,
                     parcelada: false,
                 });
-                if (error) throw error;
             }
 
-            onSave();
+            if (onSaveLocal) {
+                // Modo Local: Apenas devolve os objetos
+                onSaveLocal(novasDespesas);
+            } else {
+                // Modo Real: Salva no Supabase (apenas campos oficiais)
+                const despesasParaSalvar = novasDespesas.map(d => ({
+                    user_id: d.user_id,
+                    descricao: d.descricao,
+                    valor: d.valor,
+                    data: d.data,
+                    categoria_id: d.categoria_id,
+                    cartao_id: d.cartao_id,
+                    parcelada: d.parcelada,
+                    parcela_atual: d.parcela_atual,
+                    parcela_total: d.parcela_total,
+                    parcela_grupo_id: d.parcela_grupo_id
+                }));
+                const { error } = await supabase.from("despesas").insert(despesasParaSalvar);
+                if (error) throw error;
+                onSave();
+            }
+
             onClose();
         } catch (error) {
             console.error("Erro ao salvar despesa:", error);

@@ -11,6 +11,7 @@ import {
     PiggyBank,
     ChevronLeft,
     ChevronRight,
+    Bitcoin,
 } from "lucide-react";
 
 interface NavItem {
@@ -29,6 +30,7 @@ export default function Sidebar() {
         { icon: <TrendingDown size={22} />, label: "Despesas", href: "/despesas" },
         { icon: <LineChart size={22} />, label: "Aplicação", href: "/aplicacao" },
         { icon: <PiggyBank size={22} />, label: "Poupança", href: "/poupanca" },
+        { icon: <Bitcoin size={22} />, label: "Criptomoedas", href: "/criptomoedas" },
     ];
 
     const isActive = (href: string) => {

@@ -1,7 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
+import MonthYearPicker from "@/components/MonthYearPicker";
+import ExpenseModal from "@/components/ExpenseModal";
 import {
     Plus,
     Calendar,
@@ -63,20 +66,98 @@ const expenseData: ExpenseItem[] = [
     { id: 23, description: "Mercado Livre - Acessórios", value: 95.0, date: "09/01/2026", category: "compras" },
 ];
 
-export default function DespesasPage() {
+// Mock Data for UI Testing
+const mockCartoes = [
+    {
+        id: "1",
+        nome: "Nubank",
+        banco: "Nubank",
+        bandeira: "Mastercard" as "Mastercard",
+        ultimos_digitos: "1234",
+        cor: "purple",
+        limite: 5000,
+        dia_fechamento: 1,
+        dia_vencimento: 10,
+        user_id: "1",
+        created_at: "",
+        updated_at: ""
+    },
+    {
+        id: "2",
+        nome: "XP Visa",
+        banco: "XP",
+        bandeira: "Visa" as "Visa",
+        ultimos_digitos: "5678",
+        cor: "black",
+        limite: 15000,
+        dia_fechamento: 5,
+        dia_vencimento: 15,
+        user_id: "1",
+        created_at: "",
+        updated_at: ""
+    },
+];
+
+const mockCategoriasDB = [
+    { id: "moradia", nome: "Moradia", icone: "Home", cor: "blue", tipo: "despesa", user_id: "1", created_at: "" },
+    { id: "alimentacao", nome: "Alimentação", icone: "Utensils", cor: "orange", tipo: "despesa", user_id: "1", created_at: "" },
+    { id: "transporte", nome: "Transporte", icone: "Car", cor: "purple", tipo: "despesa", user_id: "1", created_at: "" },
+    { id: "saude", nome: "Saúde", icone: "Heart", cor: "red", tipo: "despesa", user_id: "1", created_at: "" },
+    { id: "educacao", nome: "Educação", icone: "GraduationCap", cor: "green", tipo: "despesa", user_id: "1", created_at: "" },
+    { id: "lazer", nome: "Lazer", icone: "Smartphone", cor: "pink", tipo: "despesa", user_id: "1", created_at: "" },
+    { id: "vestuario", nome: "Vestuário", icone: "Shirt", cor: "indigo", tipo: "despesa", user_id: "1", created_at: "" },
+    { id: "compras", nome: "Compras", icone: "ShoppingCart", cor: "teal", tipo: "despesa", user_id: "1", created_at: "" },
+] as any[]; // Type mocking
+
+function DespesasContent() {
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+
+    // Get date from URL or default to current date
+    const currentMonth = searchParams.get("month") ? parseInt(searchParams.get("month")!) : new Date().getMonth() + 1;
+    const currentYear = searchParams.get("year") ? parseInt(searchParams.get("year")!) : new Date().getFullYear();
+
     const [activeCategory, setActiveCategory] = useState<string | null>(null);
+    const [expenses, setExpenses] = useState<ExpenseItem[]>(expenseData);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const handleDateChange = (newDate: { month: number; year: number }) => {
+        const params = new URLSearchParams(searchParams);
+        params.set("month", newDate.month.toString());
+        params.set("year", newDate.year.toString());
+        router.push(`${pathname}?${params.toString()}`);
+    };
+
+    const handleSaveExpense = (newExpenses: any[]) => {
+        // Add new expenses to the beginning of the list
+        const formattedExpenses = newExpenses.map(e => ({
+            id: e.id,
+            description: e.description,
+            value: e.value,
+            date: e.date,
+            category: e.category,
+        }));
+        setExpenses(prev => [...formattedExpenses, ...prev]);
+    };
+
+    // Filter items by selected month/year
+    const filteredExpenses = expenses.filter(item => {
+        const [day, month, year] = item.date.split('/').map(Number);
+        return month === currentMonth && year === currentYear;
+    });
 
     const getItemsByCategory = (categoryId: string) => {
-        return expenseData.filter((item) => item.category === categoryId);
+        return filteredExpenses.filter((item) => item.category === categoryId);
     };
 
     const getTotalByCategory = (categoryId: string) => {
-        return expenseData
+        return filteredExpenses
             .filter((item) => item.category === categoryId)
             .reduce((sum, item) => sum + item.value, 0);
     };
 
-    const totalDespesas = expenseData.reduce((sum, item) => sum + item.value, 0);
+    const totalDespesas = filteredExpenses.reduce((sum, item) => sum + item.value, 0);
 
     const getCategoryById = (id: string) => {
         return categoriasDespesa.find((c) => c.id === id);
@@ -97,6 +178,7 @@ export default function DespesasPage() {
                             </p>
                         </div>
                         <button
+                            onClick={() => setIsModalOpen(true)}
                             className="flex items-center gap-2 px-5 py-3 text-white font-medium rounded-xl transition-all hover:shadow-lg"
                             style={{
                                 background: "linear-gradient(135deg, #EF4444 0%, #F87171 100%)",
@@ -117,9 +199,11 @@ export default function DespesasPage() {
                                     R$ {totalDespesas.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                                 </h2>
                             </div>
-                            <div className="flex items-center gap-2 text-red-500">
-                                <Calendar size={18} />
-                                <span className="text-sm font-medium">Janeiro 2026</span>
+                            <div className="flex items-center gap-2">
+                                <MonthYearPicker
+                                    date={{ month: currentMonth, year: currentYear }}
+                                    onChange={handleDateChange}
+                                />
                             </div>
                         </div>
                     </div>
@@ -181,7 +265,7 @@ export default function DespesasPage() {
                     <div className="space-y-3">
                         {(activeCategory
                             ? getItemsByCategory(activeCategory)
-                            : expenseData
+                            : filteredExpenses
                         ).map((item) => {
                             const cat = getCategoryById(item.category);
                             const IconComponent = cat?.icone;
@@ -225,13 +309,35 @@ export default function DespesasPage() {
                     </div>
 
                     {/* Empty State */}
-                    {activeCategory && getItemsByCategory(activeCategory).length === 0 && (
+                    {filteredExpenses.length === 0 && (
+                        <div className="text-center py-12">
+                            <p className="text-gray-400">Nenhuma despesa encontrada para este período.</p>
+                        </div>
+                    )}
+                    {filteredExpenses.length > 0 && activeCategory && getItemsByCategory(activeCategory).length === 0 && (
                         <div className="text-center py-12">
                             <p className="text-gray-400">Nenhuma despesa nesta categoria</p>
                         </div>
                     )}
                 </div>
             </main>
+
+            <ExpenseModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSave={() => { }}
+                onSaveLocal={handleSaveExpense}
+                cartoes={mockCartoes}
+                categorias={mockCategoriasDB}
+            />
         </div>
+    );
+}
+
+export default function DespesasPage() {
+    return (
+        <Suspense fallback={<div>Carregando...</div>}>
+            <DespesasContent />
+        </Suspense>
     );
 }
