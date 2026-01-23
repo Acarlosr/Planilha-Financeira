@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { User, LogOut, ChevronDown, LogIn } from "lucide-react";
+import { User, LogOut, ChevronDown } from "lucide-react";
 
 export default function UserMenu() {
     const router = useRouter();
@@ -65,16 +65,16 @@ export default function UserMenu() {
             <div className="flex items-center gap-3">
                 <Link
                     href="/login"
-                    className="px-4 py-2 text-gray-700 font-medium hover:bg-gray-100 rounded-xl transition-colors"
+                    className="px-4 py-2 text-gray-400 font-medium hover:text-white hover:bg-white/5 rounded-xl transition-colors"
                 >
                     Entrar
                 </Link>
                 <Link
                     href="/cadastro"
-                    className="px-4 py-2 text-white font-medium rounded-xl transition-all hover:shadow-lg"
+                    className="px-4 py-2 text-white font-medium rounded-xl transition-all hover:brightness-110"
                     style={{
-                        background: "linear-gradient(135deg, #A855F7 0%, #C084FC 100%)",
-                        boxShadow: "0 4px 15px rgba(168, 85, 247, 0.4)",
+                        background: "linear-gradient(135deg, #7CFF6B 0%, #6FEB5A 100%)",
+                        boxShadow: "0 4px 15px rgba(30, 64, 175, 0.4)",
                     }}
                 >
                     Criar Conta
@@ -88,22 +88,22 @@ export default function UserMenu() {
         <div className="relative" ref={menuRef}>
             <div
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center gap-3 px-3 py-2 bg-white rounded-xl cursor-pointer transition-all hover:shadow-md"
+                className="flex items-center gap-3 px-3 py-2 rounded-xl cursor-pointer transition-all hover:bg-white/10 border border-white/10"
                 style={{
-                    boxShadow: "0 2px 10px rgba(0, 0, 0, 0.04)",
+                    background: "rgba(255, 255, 255, 0.05)",
                 }}
             >
                 <div
                     className="w-9 h-9 rounded-xl flex items-center justify-center"
                     style={{
-                        background: "linear-gradient(135deg, #A855F7 0%, #C084FC 100%)",
+                        background: "linear-gradient(135deg, #7CFF6B 0%, #6FEB5A 100%)",
                     }}
                 >
                     <User size={18} className="text-white" />
                 </div>
                 <div className="hidden md:block">
-                    <p className="text-sm font-medium text-gray-800">{userName}</p>
-                    <p className="text-xs text-gray-500">{userEmail}</p>
+                    <p className="text-sm font-medium text-white">{userName}</p>
+                    <p className="text-xs text-gray-400">{userEmail}</p>
                 </div>
                 <ChevronDown
                     size={16}
@@ -114,22 +114,24 @@ export default function UserMenu() {
             {/* Dropdown Menu */}
             {isOpen && (
                 <div
-                    className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg overflow-hidden z-50"
+                    className="absolute right-0 mt-2 w-56 rounded-xl overflow-hidden z-50 border border-white/10"
                     style={{
-                        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+                        background: "rgba(10, 22, 40, 0.95)",
+                        backdropFilter: "blur(20px)",
+                        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
                     }}
                 >
-                    <div className="p-3 border-b border-gray-100">
-                        <p className="text-sm font-medium text-gray-800">{userName}</p>
-                        <p className="text-xs text-gray-500 mt-0.5">{userEmail}</p>
+                    <div className="p-3 border-b border-white/10">
+                        <p className="text-sm font-medium text-white">{userName}</p>
+                        <p className="text-xs text-gray-400 mt-0.5">{userEmail}</p>
                     </div>
 
                     <button
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors"
+                        className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-white/5 transition-colors"
                     >
-                        <LogOut size={18} className="text-red-500" />
-                        <span className="text-sm font-medium text-gray-700">Sair</span>
+                        <LogOut size={18} className="text-red-400" />
+                        <span className="text-sm font-medium text-gray-300">Sair</span>
                     </button>
                 </div>
             )}

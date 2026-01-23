@@ -3,25 +3,23 @@ import SummaryCards from "@/components/SummaryCards";
 import CashFlowChart from "@/components/CashFlowChart";
 import TransactionsTable from "@/components/TransactionsTable";
 import UserMenu from "@/components/UserMenu";
-import DemoBanner from "@/components/DemoBanner";
+import ThemeToggle from "@/components/ThemeToggle";
+import TrialBanner from "@/components/TrialBanner";
 import { Bell, Search } from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="min-h-screen" style={{ background: "#FDFBF7" }}>
-      {/* Demo Banner */}
-      <DemoBanner />
-
+    <div className="min-h-screen">
       {/* Sidebar */}
       <Sidebar />
 
       {/* Main Content */}
-      <main className="ml-64 p-8 transition-all duration-300 pt-24">{/* pt-24 para acomodar o banner */}
+      <main className="ml-64 p-8 transition-all duration-300">
         {/* Header */}
         <header className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
-            <p className="text-gray-500 mt-1">
+            <h1 className="text-3xl font-bold text-white">Dashboard</h1>
+            <p className="text-gray-400 mt-1">
               Bem-vindo de volta! Aqui está o resumo das suas finanças.
             </p>
           </div>
@@ -29,34 +27,41 @@ export default function Home() {
           <div className="flex items-center gap-4">
             {/* Search */}
             <div
-              className="flex items-center gap-3 px-4 py-2.5 bg-white rounded-xl"
+              className="flex items-center gap-3 px-4 py-2.5 rounded-xl border border-white/10"
               style={{
-                boxShadow: "0 2px 10px rgba(0, 0, 0, 0.04)",
+                background: "rgba(255, 255, 255, 0.05)",
+                backdropFilter: "blur(10px)",
               }}
             >
               <Search size={18} className="text-gray-400" />
               <input
                 type="text"
                 placeholder="Buscar transações..."
-                className="bg-transparent outline-none text-sm text-gray-600 w-48 placeholder:text-gray-400"
+                className="bg-transparent outline-none text-sm text-white w-48 placeholder:text-gray-500"
               />
             </div>
 
             {/* Notifications */}
             <button
-              className="relative w-11 h-11 bg-white rounded-xl flex items-center justify-center transition-all hover:shadow-md"
+              className="relative w-11 h-11 rounded-xl flex items-center justify-center transition-all hover:bg-white/10 border border-white/10"
               style={{
-                boxShadow: "0 2px 10px rgba(0, 0, 0, 0.04)",
+                background: "rgba(255, 255, 255, 0.05)",
               }}
             >
-              <Bell size={20} className="text-gray-600" />
-              <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-purple-500 rounded-full border-2 border-white" />
+              <Bell size={20} className="text-gray-400" />
+              <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-[#7CFF6B] rounded-full border-2 border-[#0a1628]" />
             </button>
+
+            {/* Theme Toggle */}
+            <ThemeToggle />
 
             {/* User Profile with Dropdown */}
             <UserMenu />
           </div>
         </header>
+
+        {/* Trial Banner */}
+        <TrialBanner />
 
         {/* Summary Cards */}
         <section className="mb-8">
@@ -74,7 +79,7 @@ export default function Home() {
         </section>
 
         {/* Footer */}
-        <footer className="text-center py-6 text-gray-400 text-sm">
+        <footer className="text-center py-6 text-gray-500 text-sm">
           © 2026 FinançasPro. Desenvolvido com ❤️ para suas finanças.
         </footer>
       </main>

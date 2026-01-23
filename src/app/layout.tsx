@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import AuthProvider from "@/components/AuthProvider";
+import { ThemeProvider } from "@/contexts/ThemeContext";
+import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -10,8 +12,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Dashboard Financeiro | Soft UI",
-  description: "Dashboard financeiro moderno com design Soft UI para gerenciar suas finanças pessoais",
+  title: "Dashboard Financeiro | Neon Green",
+  description: "Dashboard financeiro moderno para gerenciar suas finanças pessoais",
 };
 
 export default function RootLayout({
@@ -22,9 +24,13 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={`${inter.variable} antialiased`}>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <SubscriptionProvider>
+              {children}
+            </SubscriptionProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -8,7 +8,6 @@ import {
     CartesianGrid,
     Tooltip,
     ResponsiveContainer,
-    Legend,
 } from "recharts";
 
 const data = [
@@ -40,15 +39,14 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
     if (active && payload && payload.length) {
         return (
             <div
-                className="p-4 rounded-xl"
+                className="p-4 rounded-xl border border-white/20"
                 style={{
-                    background: "rgba(255, 255, 255, 0.95)",
+                    background: "rgba(10, 22, 40, 0.95)",
                     backdropFilter: "blur(10px)",
-                    boxShadow: "0 10px 40px rgba(0, 0, 0, 0.1)",
-                    border: "1px solid rgba(255, 255, 255, 0.5)",
+                    boxShadow: "0 10px 40px rgba(0, 0, 0, 0.3)",
                 }}
             >
-                <p className="font-semibold text-gray-800 mb-2">{label}</p>
+                <p className="font-semibold text-white mb-2">{label}</p>
                 {payload.map((entry, index) => (
                     <p key={index} className="text-sm" style={{ color: entry.color }}>
                         <span className="font-medium">
@@ -65,20 +63,20 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
 
 export default function CashFlowChart() {
     return (
-        <div className="soft-card p-6">
+        <div className="glass-card p-6">
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h2 className="text-xl font-bold text-gray-800">Fluxo de Caixa</h2>
-                    <p className="text-gray-500 text-sm">Evolução mensal de entradas e saídas</p>
+                    <h2 className="text-xl font-bold text-white">Fluxo de Caixa</h2>
+                    <p className="text-gray-400 text-sm">Evolução mensal de entradas e saídas</p>
                 </div>
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
                         <div className="w-3 h-3 rounded-full bg-emerald-500" />
-                        <span className="text-sm text-gray-600">Entradas</span>
+                        <span className="text-sm text-gray-400">Entradas</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <div className="w-3 h-3 rounded-full bg-red-400" />
-                        <span className="text-sm text-gray-600">Saídas</span>
+                        <span className="text-sm text-gray-400">Saídas</span>
                     </div>
                 </div>
             </div>
@@ -91,30 +89,30 @@ export default function CashFlowChart() {
                     >
                         <defs>
                             <linearGradient id="colorEntradas" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#10B981" stopOpacity={0.3} />
+                                <stop offset="5%" stopColor="#10B981" stopOpacity={0.4} />
                                 <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
                             </linearGradient>
                             <linearGradient id="colorSaidas" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#F87171" stopOpacity={0.3} />
+                                <stop offset="5%" stopColor="#F87171" stopOpacity={0.4} />
                                 <stop offset="95%" stopColor="#F87171" stopOpacity={0} />
                             </linearGradient>
                         </defs>
                         <CartesianGrid
                             strokeDasharray="3 3"
-                            stroke="#E5E7EB"
+                            stroke="rgba(255, 255, 255, 0.1)"
                             vertical={false}
                         />
                         <XAxis
                             dataKey="month"
                             axisLine={false}
                             tickLine={false}
-                            tick={{ fill: "#6B7280", fontSize: 12 }}
+                            tick={{ fill: "#94a3b8", fontSize: 12 }}
                             dy={10}
                         />
                         <YAxis
                             axisLine={false}
                             tickLine={false}
-                            tick={{ fill: "#6B7280", fontSize: 12 }}
+                            tick={{ fill: "#94a3b8", fontSize: 12 }}
                             tickFormatter={(value) => `${value / 1000}k`}
                             dx={-10}
                         />

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Sidebar from "@/components/Sidebar";
+import InvestmentModal from "@/components/InvestmentModal";
 import {
     Plus,
     TrendingUp,
@@ -21,86 +22,38 @@ import {
     ResponsiveContainer,
 } from "recharts";
 
-// Dados do gráfico de rentabilidade
-const rentabilidadeData = [
-    { mes: "Jul", valor: 42000 },
-    { mes: "Ago", valor: 43200 },
-    { mes: "Set", valor: 43800 },
-    { mes: "Out", valor: 44100 },
-    { mes: "Nov", valor: 44900 },
-    { mes: "Dez", valor: 45800 },
-    { mes: "Jan", valor: 47200 },
-];
+import { aplicacaoData } from "@/constants/financialData";
 
-// Tipos de investimento
-const tiposInvestimento = [
-    {
-        id: "tesouro",
-        nome: "Tesouro Direto",
-        saldo: 18500.0,
-        rentabilidade: 12.5,
-        cor: "from-blue-500 to-blue-400",
-        icone: "🏛️",
-    },
-    {
-        id: "acoes",
-        nome: "Ações",
-        saldo: 15200.0,
-        rentabilidade: 18.3,
-        cor: "from-green-500 to-green-400",
-        icone: "📈",
-    },
-    {
-        id: "fiis",
-        nome: "Fundos Imobiliários",
-        saldo: 8900.0,
-        rentabilidade: 9.7,
-        cor: "from-purple-500 to-purple-400",
-        icone: "🏢",
-    },
-    {
-        id: "cdb",
-        nome: "CDB/LCI/LCA",
-        saldo: 3200.0,
-        rentabilidade: 11.2,
-        cor: "from-amber-500 to-amber-400",
-        icone: "💰",
-    },
-];
-
-interface TransactionItem {
-    id: number;
-    tipo: "aporte" | "resgate";
-    descricao: string;
-    valor: number;
-    data: string;
-    investimento: string;
-}
-
-const transacoes: TransactionItem[] = [
-    { id: 1, tipo: "aporte", descricao: "Aporte mensal - Tesouro Selic", valor: 1000.0, data: "05/01/2026", investimento: "tesouro" },
-    { id: 2, tipo: "aporte", descricao: "Compra ITSA4 - 100 ações", valor: 850.0, data: "08/01/2026", investimento: "acoes" },
-    { id: 3, tipo: "aporte", descricao: "Aporte FII HGLG11", valor: 500.0, data: "10/01/2026", investimento: "fiis" },
-    { id: 4, tipo: "resgate", descricao: "Resgate parcial CDB", valor: 2000.0, data: "12/01/2026", investimento: "cdb" },
-    { id: 5, tipo: "aporte", descricao: "Compra PETR4 - 50 ações", valor: 1200.0, data: "15/12/2025", investimento: "acoes" },
-    { id: 6, tipo: "aporte", descricao: "Aporte Tesouro IPCA+", valor: 1500.0, data: "20/12/2025", investimento: "tesouro" },
-    { id: 7, tipo: "aporte", descricao: "Aporte FII MXRF11", valor: 600.0, data: "22/12/2025", investimento: "fiis" },
-    { id: 8, tipo: "resgate", descricao: "Venda VALE3 - 80 ações", valor: 3500.0, data: "28/12/2025", investimento: "acoes" },
-];
+// Dados vindos da constant
+const { rentabilidade: rentabilidadeData, tipos: tiposInvestimento, transacoes } = aplicacaoData;
 
 export default function AplicacaoPage() {
     const [activeFilter, setActiveFilter] = useState<string | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [transacoesData, setTransacoesData] = useState(transacoes);
 
     const totalInvestido = tiposInvestimento.reduce((sum, inv) => sum + inv.saldo, 0);
     const rentabilidadeMedia = (tiposInvestimento.reduce((sum, inv) => sum + inv.rentabilidade, 0) / tiposInvestimento.length).toFixed(1);
 
     const getTransacoesFiltradas = () => {
-        if (!activeFilter) return transacoes;
-        return transacoes.filter((t) => t.investimento === activeFilter);
+        if (!activeFilter) return transacoesData;
+        return transacoesData.filter((t) => t.investimento === activeFilter);
+    };
+
+    const handleSaveInvestment = (investment: any) => {
+        const newTransaction = {
+            id: Date.now(),
+            descricao: investment.description,
+            valor: investment.value,
+            data: investment.date,
+            tipo: investment.type,
+            investimento: investment.investmentType,
+        };
+        setTransacoesData(prev => [newTransaction, ...prev]);
     };
 
     return (
-        <div className="min-h-screen" style={{ background: "#FDFBF7" }}>
+        <div className="min-h-screen">
             <Sidebar />
 
             <main className="ml-64 p-8 transition-all duration-300">
@@ -108,15 +61,16 @@ export default function AplicacaoPage() {
                 <header className="mb-8">
                     <div className="flex items-center justify-between">
                         <div>
-                            <h1 className="text-3xl font-bold text-gray-800">Aplicações</h1>
-                            <p className="text-gray-500 mt-1">
+                            <h1 className="text-3xl font-bold text-white">Aplicações</h1>
+                            <p className="text-gray-400 mt-1">
                                 Acompanhe seus investimentos e rentabilidade
                             </p>
                         </div>
                         <button
+                            onClick={() => setIsModalOpen(true)}
                             className="flex items-center gap-2 px-5 py-3 text-white font-medium rounded-xl transition-all hover:shadow-lg"
                             style={{
-                                background: "linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%)",
+                                background: "linear-gradient(135deg, #FFD700 0%, #FFC700 100%)",
                                 boxShadow: "0 4px 15px rgba(59, 130, 246, 0.4)",
                             }}
                         >
@@ -127,22 +81,22 @@ export default function AplicacaoPage() {
 
                     {/* Summary Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-                        <div className="soft-card p-6">
+                        <div className="glass-card p-6">
                             <div className="flex items-center gap-3 mb-2">
                                 <div
                                     className="w-10 h-10 rounded-lg flex items-center justify-center"
-                                    style={{ background: "linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%)" }}
+                                    style={{ background: "linear-gradient(135deg, #FFD700 0%, #FFC700 100%)" }}
                                 >
                                     <DollarSign size={20} className="text-white" />
                                 </div>
-                                <p className="text-gray-500 text-sm font-medium">Total Investido</p>
+                                <p className="text-gray-400 text-sm font-medium">Total Investido</p>
                             </div>
-                            <h2 className="text-3xl font-bold text-gray-800">
+                            <h2 className="text-3xl font-bold text-white">
                                 R$ {totalInvestido.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                             </h2>
                         </div>
 
-                        <div className="soft-card p-6">
+                        <div className="glass-card p-6">
                             <div className="flex items-center gap-3 mb-2">
                                 <div
                                     className="w-10 h-10 rounded-lg flex items-center justify-center"
@@ -150,14 +104,14 @@ export default function AplicacaoPage() {
                                 >
                                     <Percent size={20} className="text-white" />
                                 </div>
-                                <p className="text-gray-500 text-sm font-medium">Rentabilidade Média</p>
+                                <p className="text-gray-400 text-sm font-medium">Rentabilidade Média</p>
                             </div>
-                            <h2 className="text-3xl font-bold text-emerald-600">
+                            <h2 className="text-3xl font-bold text-emerald-400">
                                 {rentabilidadeMedia}% a.a.
                             </h2>
                         </div>
 
-                        <div className="soft-card p-6">
+                        <div className="glass-card p-6">
                             <div className="flex items-center gap-3 mb-2">
                                 <div
                                     className="w-10 h-10 rounded-lg flex items-center justify-center"
@@ -165,9 +119,9 @@ export default function AplicacaoPage() {
                                 >
                                     <TrendingUp size={20} className="text-white" />
                                 </div>
-                                <p className="text-gray-500 text-sm font-medium">Rendimento (7 dias)</p>
+                                <p className="text-gray-400 text-sm font-medium">Rendimento (7 dias)</p>
                             </div>
-                            <h2 className="text-3xl font-bold text-purple-600">
+                            <h2 className="text-3xl font-bold text-[#FFD700]">
                                 + R$ 1.420,00
                             </h2>
                         </div>
@@ -182,7 +136,7 @@ export default function AplicacaoPage() {
                             <div
                                 key={inv.id}
                                 onClick={() => setActiveFilter(isActive ? null : inv.id)}
-                                className={`soft-card p-5 cursor-pointer transition-all duration-300 ${isActive ? "ring-2 ring-blue-400 ring-offset-2 scale-105" : "hover:scale-102"
+                                className={`glass-card p-5 cursor-pointer transition-all duration-300 ${isActive ? "ring-2 ring-blue-400 ring-offset-2 scale-105" : "hover:scale-102"
                                     }`}
                             >
                                 <div className="flex items-start justify-between mb-3">
@@ -192,13 +146,13 @@ export default function AplicacaoPage() {
                                     >
                                         {inv.icone}
                                     </div>
-                                    <div className="flex items-center gap-1 text-emerald-600">
+                                    <div className="flex items-center gap-1 text-emerald-400">
                                         <ArrowUpRight size={16} />
                                         <span className="text-sm font-bold">{inv.rentabilidade}%</span>
                                     </div>
                                 </div>
-                                <h3 className="text-gray-600 text-sm font-medium mb-1">{inv.nome}</h3>
-                                <p className="text-2xl font-bold text-gray-800">
+                                <h3 className="text-gray-400 text-sm font-medium mb-1">{inv.nome}</h3>
+                                <p className="text-2xl font-bold text-white">
                                     R$ {inv.saldo.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                                 </p>
                             </div>
@@ -207,13 +161,13 @@ export default function AplicacaoPage() {
                 </div>
 
                 {/* Chart */}
-                <div className="soft-card p-6 mb-8">
+                <div className="glass-card p-6 mb-8">
                     <div className="flex items-center justify-between mb-6">
                         <div>
-                            <h2 className="text-xl font-bold text-gray-800">Evolução do Patrimônio</h2>
-                            <p className="text-gray-500 text-sm mt-1">Últimos 7 meses</p>
+                            <h2 className="text-xl font-bold text-white">Evolução do Patrimônio</h2>
+                            <p className="text-gray-400 text-sm mt-1">Últimos 7 meses</p>
                         </div>
-                        <div className="flex items-center gap-2 text-blue-500">
+                        <div className="flex items-center gap-2 text-[#FFD700]">
                             <Calendar size={18} />
                             <span className="text-sm font-medium">Jul 2025 - Jan 2026</span>
                         </div>
@@ -222,25 +176,26 @@ export default function AplicacaoPage() {
                         <AreaChart data={rentabilidadeData}>
                             <defs>
                                 <linearGradient id="colorValor" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3} />
-                                    <stop offset="95%" stopColor="#3B82F6" stopOpacity={0} />
+                                    <stop offset="5%" stopColor="#2D5F3F" stopOpacity={0.4} />
+                                    <stop offset="95%" stopColor="#2D5F3F" stopOpacity={0} />
                                 </linearGradient>
                             </defs>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                            <XAxis dataKey="mes" stroke="#9CA3AF" style={{ fontSize: "12px" }} />
-                            <YAxis stroke="#9CA3AF" style={{ fontSize: "12px" }} />
+                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                            <XAxis dataKey="mes" stroke="#94a3b8" style={{ fontSize: "12px" }} />
+                            <YAxis stroke="#94a3b8" style={{ fontSize: "12px" }} />
                             <Tooltip
                                 contentStyle={{
-                                    backgroundColor: "#FFFFFF",
-                                    border: "none",
+                                    backgroundColor: "rgba(10, 22, 40, 0.95)",
+                                    border: "1px solid rgba(255,255,255,0.1)",
                                     borderRadius: "12px",
-                                    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+                                    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
+                                    color: "#fff"
                                 }}
                             />
                             <Area
                                 type="monotone"
                                 dataKey="valor"
-                                stroke="#3B82F6"
+                                stroke="#C7FF3D"
                                 strokeWidth={3}
                                 fillOpacity={1}
                                 fill="url(#colorValor)"
@@ -250,9 +205,9 @@ export default function AplicacaoPage() {
                 </div>
 
                 {/* Transactions */}
-                <div className="soft-card p-6">
+                <div className="glass-card p-6">
                     <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-xl font-bold text-gray-800">
+                        <h2 className="text-xl font-bold text-white">
                             {activeFilter
                                 ? `Transações - ${tiposInvestimento.find((i) => i.id === activeFilter)?.nome}`
                                 : "Todas as Transações"}
@@ -260,7 +215,7 @@ export default function AplicacaoPage() {
                         {activeFilter && (
                             <button
                                 onClick={() => setActiveFilter(null)}
-                                className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                                className="text-sm text-[#FFD700] hover:text-[#FFC700] font-medium"
                             >
                                 Ver todas
                             </button>
@@ -273,32 +228,32 @@ export default function AplicacaoPage() {
                             return (
                                 <div
                                     key={transacao.id}
-                                    className="flex items-center justify-between p-4 rounded-xl bg-gray-50/50 hover:bg-gray-100/50 transition-colors"
+                                    className="flex items-center justify-between p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
                                 >
                                     <div className="flex items-center gap-4">
                                         <div
-                                            className={`w-11 h-11 rounded-lg flex items-center justify-center ${isAporte ? "bg-emerald-100" : "bg-red-100"
+                                            className={`w-11 h-11 rounded-lg flex items-center justify-center ${isAporte ? "bg-emerald-500/20" : "bg-red-500/20"
                                                 }`}
                                         >
                                             {isAporte ? (
-                                                <ArrowUpRight size={20} className="text-emerald-600" />
+                                                <ArrowUpRight size={20} className="text-emerald-400" />
                                             ) : (
-                                                <ArrowDownRight size={20} className="text-red-600" />
+                                                <ArrowDownRight size={20} className="text-red-400" />
                                             )}
                                         </div>
                                         <div>
-                                            <p className="font-medium text-gray-800">{transacao.descricao}</p>
+                                            <p className="font-medium text-white">{transacao.descricao}</p>
                                             <div className="flex items-center gap-2 mt-0.5">
-                                                <span className="text-xs text-gray-500">{transacao.data}</span>
-                                                <span className="text-xs text-gray-400">•</span>
-                                                <span className={`text-xs px-2 py-0.5 rounded-full ${isAporte ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"
+                                                <span className="text-xs text-gray-400">{transacao.data}</span>
+                                                <span className="text-xs text-gray-500">•</span>
+                                                <span className={`text-xs px-2 py-0.5 rounded-full ${isAporte ? "bg-emerald-500/20 text-emerald-400" : "bg-red-500/20 text-red-400"
                                                     }`}>
                                                     {isAporte ? "Aporte" : "Resgate"}
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
-                                    <span className={`font-bold text-lg ${isAporte ? "text-emerald-600" : "text-red-600"}`}>
+                                    <span className={`font-bold text-lg ${isAporte ? "text-emerald-400" : "text-red-400"}`}>
                                         {isAporte ? "+" : "-"} R$ {transacao.valor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                                     </span>
                                 </div>
@@ -308,11 +263,17 @@ export default function AplicacaoPage() {
 
                     {activeFilter && getTransacoesFiltradas().length === 0 && (
                         <div className="text-center py-12">
-                            <p className="text-gray-400">Nenhuma transação neste investimento</p>
+                            <p className="text-gray-500">Nenhuma transação neste investimento</p>
                         </div>
                     )}
                 </div>
             </main>
+
+            <InvestmentModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSave={handleSaveInvestment}
+            />
         </div>
     );
 }

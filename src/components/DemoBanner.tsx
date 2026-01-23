@@ -28,16 +28,20 @@ export default function DemoBanner() {
 
     return (
         <div
-            className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-purple-600 to-purple-500 text-white py-3 px-4 shadow-lg"
+            className="fixed top-0 left-0 right-0 z-50 py-3 px-4 border-b border-white/10"
+            style={{
+                background: "linear-gradient(135deg, #7CFF6B 0%, #6FEB5A 50%, #FFD700 100%)",
+                boxShadow: "0 4px 20px rgba(30, 64, 175, 0.3)",
+            }}
         >
             <div className="max-w-7xl mx-auto flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
-                        <LogIn size={18} />
+                    <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                        <LogIn size={18} className="text-white" />
                     </div>
                     <div>
-                        <p className="font-medium">Modo Demonstração</p>
-                        <p className="text-sm text-purple-100">
+                        <p className="font-medium text-white">Modo Demonstração</p>
+                        <p className="text-sm text-cyan-100">
                             Você está visualizando dados de exemplo. Faça login para gerenciar suas finanças.
                         </p>
                     </div>
@@ -46,13 +50,13 @@ export default function DemoBanner() {
                 <div className="flex items-center gap-3">
                     <Link
                         href="/login"
-                        className="px-4 py-2 bg-white text-purple-600 rounded-lg font-medium hover:bg-purple-50 transition-colors"
+                        className="px-4 py-2 bg-white text-blue-600 rounded-lg font-medium hover:bg-blue-50 transition-colors"
                     >
                         Fazer Login
                     </Link>
                     <Link
                         href="/cadastro"
-                        className="px-4 py-2 bg-purple-700 text-white rounded-lg font-medium hover:bg-purple-800 transition-colors"
+                        className="px-4 py-2 bg-white/10 text-white rounded-lg font-medium hover:bg-white/20 transition-colors border border-white/20"
                     >
                         Criar Conta
                     </Link>
@@ -60,7 +64,7 @@ export default function DemoBanner() {
                         onClick={() => setShowBanner(false)}
                         className="p-2 hover:bg-white/10 rounded-lg transition-colors"
                     >
-                        <X size={20} />
+                        <X size={20} className="text-white" />
                     </button>
                 </div>
             </div>

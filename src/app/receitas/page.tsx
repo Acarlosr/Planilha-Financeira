@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Sidebar from "@/components/Sidebar";
+import PrintExportButtons from "@/components/PrintExportButtons";
+import IncomeModal from "@/components/IncomeModal";
 import {
     Plus,
     Calendar,
@@ -28,7 +30,7 @@ interface IncomeItem {
     category: string;
 }
 
-const incomeData: IncomeItem[] = [
+const initialIncomeData: IncomeItem[] = [
     { id: 1, description: "Saldo conta corrente", value: 5200.0, date: "01/01/2026", category: "anterior" },
     { id: 2, description: "Saldo poupança transferido", value: 3800.0, date: "01/01/2026", category: "anterior" },
     { id: 3, description: "Salário Janeiro", value: 8500.0, date: "05/01/2026", category: "salario" },
@@ -45,6 +47,16 @@ const incomeData: IncomeItem[] = [
 
 export default function ReceitasPage() {
     const [activeCategory, setActiveCategory] = useState<string | null>(null);
+    const [incomeData, setIncomeData] = useState<IncomeItem[]>(initialIncomeData);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const handleSaveIncome = (newIncome: { description: string; value: number; date: string; category: string }) => {
+        const newItem: IncomeItem = {
+            id: Date.now(),
+            ...newIncome,
+        };
+        setIncomeData(prev => [newItem, ...prev]);
+    };
 
     const getItemsByCategory = (categoryId: string) => {
         return incomeData.filter((item) => item.category === categoryId);
@@ -70,7 +82,7 @@ export default function ReceitasPage() {
     };
 
     return (
-        <div className="min-h-screen" style={{ background: "#FDFBF7" }}>
+        <div className="min-h-screen">
             <Sidebar />
 
             <main className="ml-64 p-8 transition-all duration-300">
@@ -78,33 +90,37 @@ export default function ReceitasPage() {
                 <header className="mb-8">
                     <div className="flex items-center justify-between">
                         <div>
-                            <h1 className="text-3xl font-bold text-gray-800">Receitas</h1>
-                            <p className="text-gray-500 mt-1">
+                            <h1 className="text-3xl font-bold text-white">Receitas</h1>
+                            <p className="text-gray-400 mt-1">
                                 Gerencie suas fontes de renda e receitas
                             </p>
                         </div>
-                        <button
-                            className="flex items-center gap-2 px-5 py-3 text-white font-medium rounded-xl transition-all hover:shadow-lg"
-                            style={{
-                                background: "linear-gradient(135deg, #A855F7 0%, #C084FC 100%)",
-                                boxShadow: "0 4px 15px rgba(168, 85, 247, 0.4)",
-                            }}
-                        >
-                            <Plus size={20} />
-                            Nova Receita
-                        </button>
+                        <div className="flex items-center gap-3">
+                            <PrintExportButtons title="Receitas" period="Janeiro 2026" />
+                            <button
+                                onClick={() => setIsModalOpen(true)}
+                                className="flex items-center gap-2 px-5 py-3 text-white font-medium rounded-xl transition-all hover:shadow-lg no-print"
+                                style={{
+                                    background: "linear-gradient(135deg, #10B981 0%, #34D399 100%)",
+                                    boxShadow: "0 4px 15px rgba(16, 185, 129, 0.4)",
+                                }}
+                            >
+                                <Plus size={20} />
+                                Nova Receita
+                            </button>
+                        </div>
                     </div>
 
                     {/* Total Summary */}
-                    <div className="mt-6 soft-card p-6">
+                    <div className="mt-6 glass-card p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-gray-500 text-sm font-medium">Total de Receitas</p>
-                                <h2 className="text-3xl font-bold text-emerald-600 mt-1">
+                                <p className="text-gray-400 text-sm font-medium">Total de Receitas</p>
+                                <h2 className="text-3xl font-bold text-emerald-400 mt-1">
                                     R$ {totalReceitas.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                                 </h2>
                             </div>
-                            <div className="flex items-center gap-2 text-emerald-500">
+                            <div className="flex items-center gap-2 text-emerald-400">
                                 <Calendar size={18} />
                                 <span className="text-sm font-medium">Janeiro 2026</span>
                             </div>
@@ -135,8 +151,8 @@ export default function ReceitasPage() {
                                         {renderIcon(cat.icone)}
                                     </div>
                                     <div>
-                                        <p className="text-gray-600 text-xs font-medium leading-tight">{cat.label}</p>
-                                        <h3 className="text-lg font-bold text-gray-800 mt-1">
+                                        <p className="text-gray-400 text-xs font-medium leading-tight">{cat.label}</p>
+                                        <h3 className="text-lg font-bold text-white mt-1">
                                             R$ {total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                                         </h3>
                                     </div>
@@ -147,9 +163,9 @@ export default function ReceitasPage() {
                 </div>
 
                 {/* Items List */}
-                <div className="soft-card p-6">
+                <div className="glass-card p-6">
                     <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-xl font-bold text-gray-800">
+                        <h2 className="text-xl font-bold text-white">
                             {activeCategory
                                 ? getCategoryById(activeCategory)?.label
                                 : "Todas as Receitas"}
@@ -157,7 +173,7 @@ export default function ReceitasPage() {
                         {activeCategory && (
                             <button
                                 onClick={() => setActiveCategory(null)}
-                                className="text-sm text-purple-600 hover:text-purple-700 font-medium"
+                                className="text-sm text-[#7CFF6B] hover:text-[#6FEB5A] font-medium"
                             >
                                 Ver todas
                             </button>
@@ -173,7 +189,7 @@ export default function ReceitasPage() {
                             return (
                                 <div
                                     key={item.id}
-                                    className="flex items-center justify-between p-4 rounded-xl bg-gray-50/50 hover:bg-gray-100/50 transition-colors group"
+                                    className="flex items-center justify-between p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors group"
                                 >
                                     <div className="flex items-center gap-4">
                                         <div
@@ -190,24 +206,24 @@ export default function ReceitasPage() {
                                             )}
                                         </div>
                                         <div>
-                                            <p className="font-medium text-gray-800">{item.description}</p>
+                                            <p className="font-medium text-white">{item.description}</p>
                                             <div className="flex items-center gap-2 mt-0.5">
-                                                <span className="text-xs text-gray-500">{item.date}</span>
-                                                <span className="text-xs text-gray-400">•</span>
-                                                <span className="text-xs text-gray-500">{cat?.label}</span>
+                                                <span className="text-xs text-gray-400">{item.date}</span>
+                                                <span className="text-xs text-gray-500">•</span>
+                                                <span className="text-xs text-gray-400">{cat?.label}</span>
                                             </div>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-4">
-                                        <span className="font-bold text-emerald-600 text-lg">
+                                        <span className="font-bold text-emerald-400 text-lg">
                                             + R$ {item.value.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                                         </span>
                                         <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <button className="p-2 hover:bg-gray-200 rounded-lg transition-colors">
-                                                <Edit size={16} className="text-gray-500" />
+                                            <button className="p-2 hover:bg-white/10 rounded-lg transition-colors">
+                                                <Edit size={16} className="text-gray-400" />
                                             </button>
-                                            <button className="p-2 hover:bg-red-100 rounded-lg transition-colors">
-                                                <Trash2 size={16} className="text-red-500" />
+                                            <button className="p-2 hover:bg-red-500/20 rounded-lg transition-colors">
+                                                <Trash2 size={16} className="text-red-400" />
                                             </button>
                                         </div>
                                     </div>
@@ -219,11 +235,17 @@ export default function ReceitasPage() {
                     {/* Empty State */}
                     {activeCategory && getItemsByCategory(activeCategory).length === 0 && (
                         <div className="text-center py-12">
-                            <p className="text-gray-400">Nenhuma receita nesta categoria</p>
+                            <p className="text-gray-500">Nenhuma receita nesta categoria</p>
                         </div>
                     )}
                 </div>
             </main>
+
+            <IncomeModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSave={handleSaveIncome}
+            />
         </div>
     );
 }

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Sidebar from "@/components/Sidebar";
+import SavingsModal from "@/components/SavingsModal";
 import {
     Plus,
     Target,
@@ -21,69 +22,15 @@ import {
     ResponsiveContainer,
 } from "recharts";
 
-// Dados do gráfico de evolução
-const evolucaoData = [
-    { mes: "Jul", valor: 10200 },
-    { mes: "Ago", valor: 10850 },
-    { mes: "Set", valor: 11100 },
-    { mes: "Out", valor: 11450 },
-    { mes: "Nov", valor: 11900 },
-    { mes: "Dez", valor: 12450 },
-    { mes: "Jan", valor: 13100 },
-];
+import { poupancaData } from "@/constants/financialData";
 
-// Metas de poupança
-const metas = [
-    {
-        id: "emergencia",
-        nome: "Reserva de Emergência",
-        valorAtual: 8500.0,
-        valorMeta: 15000.0,
-        cor: "from-red-500 to-red-400",
-        icone: "🚨",
-    },
-    {
-        id: "viagem",
-        nome: "Viagem Europa",
-        valorAtual: 3200.0,
-        valorMeta: 12000.0,
-        cor: "from-blue-500 to-blue-400",
-        icone: "✈️",
-    },
-    {
-        id: "carro",
-        nome: "Carro Novo",
-        valorAtual: 1400.0,
-        valorMeta: 30000.0,
-        cor: "from-purple-500 to-purple-400",
-        icone: "🚗",
-    },
-];
-
-interface TransactionItem {
-    id: number;
-    tipo: "deposito" | "retirada";
-    descricao: string;
-    valor: number;
-    data: string;
-    meta?: string;
-}
-
-const transacoes: TransactionItem[] = [
-    { id: 1, tipo: "deposito", descricao: "Depósito mensal - Reserva", valor: 650.0, data: "05/01/2026", meta: "emergencia" },
-    { id: 2, tipo: "deposito", descricao: "Extra freelance - Viagem", valor: 800.0, data: "08/01/2026", meta: "viagem" },
-    { id: 3, tipo: "deposito", descricao: "Economia do mês", valor: 500.0, data: "10/01/2026" },
-    { id: 4, tipo: "retirada", descricao: "Emergência médica", valor: 450.0, data: "12/01/2026", meta: "emergencia" },
-    { id: 5, tipo: "deposito", descricao: "13º salário - Carro", valor: 1000.0, data: "20/12/2025", meta: "carro" },
-    { id: 6, tipo: "deposito", descricao: "Depósito mensal - Reserva", valor: 650.0, data: "05/12/2025", meta: "emergencia" },
-    { id: 7, tipo: "deposito", descricao: "Bônus trabalho - Viagem", valor: 1200.0, data: "15/12/2025", meta: "viagem" },
-    { id: 8, tipo: "deposito", descricao: "Economia do mês", valor: 550.0, data: "28/12/2025" },
-    { id: 9, tipo: "retirada", descricao: "Conserto carro", valor: 380.0, data: "10/12/2025" },
-    { id: 10, tipo: "deposito", descricao: "Venda de item - Viagem", valor: 450.0, data: "18/11/2025", meta: "viagem" },
-];
+// Dados do gráfico de evolução e metas vindos da constant
+const { evolucao: evolucaoData, metas, transacoes } = poupancaData;
 
 export default function PoupancaPage() {
     const [activeMeta, setActiveMeta] = useState<string | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [transacoesData, setTransacoesData] = useState(transacoes);
 
     const totalPoupanca = evolucaoData[evolucaoData.length - 1].valor;
     const totalMetas = metas.reduce((sum, meta) => sum + meta.valorMeta, 0);
@@ -91,8 +38,20 @@ export default function PoupancaPage() {
     const progressoGeral = ((totalEconomizado / totalMetas) * 100).toFixed(1);
 
     const getTransacoesFiltradas = () => {
-        if (!activeMeta) return transacoes;
-        return transacoes.filter((t) => t.meta === activeMeta);
+        if (!activeMeta) return transacoesData;
+        return transacoesData.filter((t) => t.meta === activeMeta);
+    };
+
+    const handleSaveSaving = (saving: any) => {
+        const newTransaction = {
+            id: Date.now(),
+            descricao: saving.description,
+            valor: saving.value,
+            data: saving.date,
+            tipo: saving.type,
+            meta: saving.meta,
+        };
+        setTransacoesData(prev => [newTransaction, ...prev]);
     };
 
     const calcularProgresso = (atual: number, meta: number) => {
@@ -100,7 +59,7 @@ export default function PoupancaPage() {
     };
 
     return (
-        <div className="min-h-screen" style={{ background: "#FDFBF7" }}>
+        <div className="min-h-screen">
             <Sidebar />
 
             <main className="ml-64 p-8 transition-all duration-300">
@@ -108,12 +67,13 @@ export default function PoupancaPage() {
                 <header className="mb-8">
                     <div className="flex items-center justify-between">
                         <div>
-                            <h1 className="text-3xl font-bold text-gray-800">Poupança</h1>
-                            <p className="text-gray-500 mt-1">
+                            <h1 className="text-3xl font-bold text-white">Poupança</h1>
+                            <p className="text-gray-400 mt-1">
                                 Acompanhe suas economias e metas financeiras
                             </p>
                         </div>
                         <button
+                            onClick={() => setIsModalOpen(true)}
                             className="flex items-center gap-2 px-5 py-3 text-white font-medium rounded-xl transition-all hover:shadow-lg"
                             style={{
                                 background: "linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)",
@@ -127,7 +87,7 @@ export default function PoupancaPage() {
 
                     {/* Summary Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-                        <div className="soft-card p-6">
+                        <div className="glass-card p-6">
                             <div className="flex items-center gap-3 mb-2">
                                 <div
                                     className="w-10 h-10 rounded-lg flex items-center justify-center"
@@ -135,14 +95,14 @@ export default function PoupancaPage() {
                                 >
                                     <PiggyBank size={20} className="text-white" />
                                 </div>
-                                <p className="text-gray-500 text-sm font-medium">Total Poupado</p>
+                                <p className="text-gray-400 text-sm font-medium">Total Poupado</p>
                             </div>
-                            <h2 className="text-3xl font-bold text-gray-800">
+                            <h2 className="text-3xl font-bold text-white">
                                 R$ {totalPoupanca.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                             </h2>
                         </div>
 
-                        <div className="soft-card p-6">
+                        <div className="glass-card p-6">
                             <div className="flex items-center gap-3 mb-2">
                                 <div
                                     className="w-10 h-10 rounded-lg flex items-center justify-center"
@@ -150,14 +110,14 @@ export default function PoupancaPage() {
                                 >
                                     <Target size={20} className="text-white" />
                                 </div>
-                                <p className="text-gray-500 text-sm font-medium">Progresso das Metas</p>
+                                <p className="text-gray-400 text-sm font-medium">Progresso das Metas</p>
                             </div>
-                            <h2 className="text-3xl font-bold text-emerald-600">
+                            <h2 className="text-3xl font-bold text-emerald-400">
                                 {progressoGeral}%
                             </h2>
                         </div>
 
-                        <div className="soft-card p-6">
+                        <div className="glass-card p-6">
                             <div className="flex items-center gap-3 mb-2">
                                 <div
                                     className="w-10 h-10 rounded-lg flex items-center justify-center"
@@ -165,9 +125,9 @@ export default function PoupancaPage() {
                                 >
                                     <TrendingUp size={20} className="text-white" />
                                 </div>
-                                <p className="text-gray-500 text-sm font-medium">Crescimento (30d)</p>
+                                <p className="text-gray-400 text-sm font-medium">Crescimento (30d)</p>
                             </div>
-                            <h2 className="text-3xl font-bold text-purple-600">
+                            <h2 className="text-3xl font-bold text-[#FFD700]">
                                 + R$ 650,00
                             </h2>
                         </div>
@@ -185,7 +145,7 @@ export default function PoupancaPage() {
                             <div
                                 key={meta.id}
                                 onClick={() => setActiveMeta(isActive ? null : meta.id)}
-                                className={`soft-card p-5 cursor-pointer transition-all duration-300 ${isActive ? "ring-2 ring-amber-400 ring-offset-2 scale-105" : "hover:scale-102"
+                                className={`glass-card p-5 cursor-pointer transition-all duration-300 ${isActive ? "ring-2 ring-amber-400 ring-offset-2 scale-105" : "hover:scale-102"
                                     }`}
                             >
                                 <div className="flex items-start justify-between mb-4">
@@ -196,36 +156,36 @@ export default function PoupancaPage() {
                                         {meta.icone}
                                     </div>
                                     <div className="text-right">
-                                        <p className="text-xs text-gray-500">Progresso</p>
-                                        <p className="text-lg font-bold text-gray-800">{progresso}%</p>
+                                        <p className="text-xs text-gray-400">Progresso</p>
+                                        <p className="text-lg font-bold text-white">{progresso}%</p>
                                     </div>
                                 </div>
 
-                                <h3 className="text-gray-800 font-bold mb-2">{meta.nome}</h3>
+                                <h3 className="text-white font-bold mb-2">{meta.nome}</h3>
 
                                 <div className="space-y-1 mb-3">
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-gray-500">Atual</span>
-                                        <span className="font-semibold text-gray-800">
+                                        <span className="text-gray-400">Atual</span>
+                                        <span className="font-semibold text-white">
                                             R$ {meta.valorAtual.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                                         </span>
                                     </div>
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-gray-500">Meta</span>
-                                        <span className="font-semibold text-gray-800">
+                                        <span className="text-gray-400">Meta</span>
+                                        <span className="font-semibold text-white">
                                             R$ {meta.valorMeta.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                                         </span>
                                     </div>
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-gray-500">Faltam</span>
-                                        <span className="font-semibold text-amber-600">
+                                        <span className="text-gray-400">Faltam</span>
+                                        <span className="font-semibold text-amber-400">
                                             R$ {faltante.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                                         </span>
                                     </div>
                                 </div>
 
                                 {/* Progress Bar */}
-                                <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                                <div className="h-3 bg-white/10 rounded-full overflow-hidden">
                                     <div
                                         className="h-full rounded-full transition-all duration-500"
                                         style={{
@@ -240,11 +200,11 @@ export default function PoupancaPage() {
                 </div>
 
                 {/* Chart */}
-                <div className="soft-card p-6 mb-8">
+                <div className="glass-card p-6 mb-8">
                     <div className="flex items-center justify-between mb-6">
                         <div>
-                            <h2 className="text-xl font-bold text-gray-800">Evolução da Poupança</h2>
-                            <p className="text-gray-500 text-sm mt-1">Últimos 7 meses</p>
+                            <h2 className="text-xl font-bold text-white">Evolução da Poupança</h2>
+                            <p className="text-gray-400 text-sm mt-1">Últimos 7 meses</p>
                         </div>
                         <div className="flex items-center gap-2 text-amber-500">
                             <Calendar size={18} />
@@ -255,25 +215,26 @@ export default function PoupancaPage() {
                         <AreaChart data={evolucaoData}>
                             <defs>
                                 <linearGradient id="colorPoupanca" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.3} />
-                                    <stop offset="95%" stopColor="#F59E0B" stopOpacity={0} />
+                                    <stop offset="5%" stopColor="#2D5F3F" stopOpacity={0.4} />
+                                    <stop offset="95%" stopColor="#2D5F3F" stopOpacity={0} />
                                 </linearGradient>
                             </defs>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                            <XAxis dataKey="mes" stroke="#9CA3AF" style={{ fontSize: "12px" }} />
-                            <YAxis stroke="#9CA3AF" style={{ fontSize: "12px" }} />
+                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                            <XAxis dataKey="mes" stroke="#94a3b8" style={{ fontSize: "12px" }} />
+                            <YAxis stroke="#94a3b8" style={{ fontSize: "12px" }} />
                             <Tooltip
                                 contentStyle={{
-                                    backgroundColor: "#FFFFFF",
-                                    border: "none",
+                                    backgroundColor: "rgba(10, 22, 40, 0.95)",
+                                    border: "1px solid rgba(255,255,255,0.1)",
                                     borderRadius: "12px",
-                                    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+                                    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
+                                    color: "#fff"
                                 }}
                             />
                             <Area
                                 type="monotone"
                                 dataKey="valor"
-                                stroke="#F59E0B"
+                                stroke="#C7FF3D"
                                 strokeWidth={3}
                                 fillOpacity={1}
                                 fill="url(#colorPoupanca)"
@@ -283,9 +244,9 @@ export default function PoupancaPage() {
                 </div>
 
                 {/* Transactions */}
-                <div className="soft-card p-6">
+                <div className="glass-card p-6">
                     <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-xl font-bold text-gray-800">
+                        <h2 className="text-xl font-bold text-white">
                             {activeMeta
                                 ? `Transações - ${metas.find((m) => m.id === activeMeta)?.nome}`
                                 : "Todas as Transações"}
@@ -293,7 +254,7 @@ export default function PoupancaPage() {
                         {activeMeta && (
                             <button
                                 onClick={() => setActiveMeta(null)}
-                                className="text-sm text-amber-600 hover:text-amber-700 font-medium"
+                                className="text-sm text-[#FFD700] hover:text-[#FFC700] font-medium"
                             >
                                 Ver todas
                             </button>
@@ -306,32 +267,32 @@ export default function PoupancaPage() {
                             return (
                                 <div
                                     key={transacao.id}
-                                    className="flex items-center justify-between p-4 rounded-xl bg-gray-50/50 hover:bg-gray-100/50 transition-colors"
+                                    className="flex items-center justify-between p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
                                 >
                                     <div className="flex items-center gap-4">
                                         <div
-                                            className={`w-11 h-11 rounded-lg flex items-center justify-center ${isDeposito ? "bg-emerald-100" : "bg-red-100"
+                                            className={`w-11 h-11 rounded-lg flex items-center justify-center ${isDeposito ? "bg-emerald-500/20" : "bg-red-500/20"
                                                 }`}
                                         >
                                             {isDeposito ? (
-                                                <ArrowUpRight size={20} className="text-emerald-600" />
+                                                <ArrowUpRight size={20} className="text-emerald-400" />
                                             ) : (
-                                                <ArrowDownRight size={20} className="text-red-600" />
+                                                <ArrowDownRight size={20} className="text-red-400" />
                                             )}
                                         </div>
                                         <div>
-                                            <p className="font-medium text-gray-800">{transacao.descricao}</p>
+                                            <p className="font-medium text-white">{transacao.descricao}</p>
                                             <div className="flex items-center gap-2 mt-0.5">
-                                                <span className="text-xs text-gray-500">{transacao.data}</span>
-                                                <span className="text-xs text-gray-400">•</span>
-                                                <span className={`text-xs px-2 py-0.5 rounded-full ${isDeposito ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"
+                                                <span className="text-xs text-gray-400">{transacao.data}</span>
+                                                <span className="text-xs text-gray-500">•</span>
+                                                <span className={`text-xs px-2 py-0.5 rounded-full ${isDeposito ? "bg-emerald-500/20 text-emerald-400" : "bg-red-500/20 text-red-400"
                                                     }`}>
                                                     {isDeposito ? "Depósito" : "Retirada"}
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
-                                    <span className={`font-bold text-lg ${isDeposito ? "text-emerald-600" : "text-red-600"}`}>
+                                    <span className={`font-bold text-lg ${isDeposito ? "text-emerald-400" : "text-red-400"}`}>
                                         {isDeposito ? "+" : "-"} R$ {transacao.valor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                                     </span>
                                 </div>
@@ -341,11 +302,18 @@ export default function PoupancaPage() {
 
                     {activeMeta && getTransacoesFiltradas().length === 0 && (
                         <div className="text-center py-12">
-                            <p className="text-gray-400">Nenhuma transação nesta meta</p>
+                            <p className="text-gray-500">Nenhuma transação nesta meta</p>
                         </div>
                     )}
                 </div>
             </main>
+
+            <SavingsModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSave={handleSaveSaving}
+                metas={metas.map(m => ({ id: m.id, nome: m.nome, icone: m.icone }))}
+            />
         </div>
     );
 }

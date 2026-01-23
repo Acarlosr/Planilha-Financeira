@@ -5,6 +5,7 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import MonthYearPicker from "@/components/MonthYearPicker";
 import ExpenseModal from "@/components/ExpenseModal";
+import PrintExportButtons from "@/components/PrintExportButtons";
 import {
     Plus,
     Calendar,
@@ -164,7 +165,7 @@ function DespesasContent() {
     };
 
     return (
-        <div className="min-h-screen" style={{ background: "#FDFBF7" }}>
+        <div className="min-h-screen">
             <Sidebar />
 
             <main className="ml-64 p-8 transition-all duration-300">
@@ -172,30 +173,33 @@ function DespesasContent() {
                 <header className="mb-8">
                     <div className="flex items-center justify-between">
                         <div>
-                            <h1 className="text-3xl font-bold text-gray-800">Despesas</h1>
-                            <p className="text-gray-500 mt-1">
+                            <h1 className="text-3xl font-bold text-white">Despesas</h1>
+                            <p className="text-gray-400 mt-1">
                                 Controle seus gastos e despesas mensais
                             </p>
                         </div>
-                        <button
-                            onClick={() => setIsModalOpen(true)}
-                            className="flex items-center gap-2 px-5 py-3 text-white font-medium rounded-xl transition-all hover:shadow-lg"
-                            style={{
-                                background: "linear-gradient(135deg, #EF4444 0%, #F87171 100%)",
-                                boxShadow: "0 4px 15px rgba(239, 68, 68, 0.4)",
-                            }}
-                        >
-                            <Plus size={20} />
-                            Nova Despesa
-                        </button>
+                        <div className="flex items-center gap-3">
+                            <PrintExportButtons title="Despesas" period={`${currentMonth}/${currentYear}`} />
+                            <button
+                                onClick={() => setIsModalOpen(true)}
+                                className="flex items-center gap-2 px-5 py-3 text-white font-medium rounded-xl transition-all hover:shadow-lg no-print"
+                                style={{
+                                    background: "linear-gradient(135deg, #EF4444 0%, #F87171 100%)",
+                                    boxShadow: "0 4px 15px rgba(239, 68, 68, 0.4)",
+                                }}
+                            >
+                                <Plus size={20} />
+                                Nova Despesa
+                            </button>
+                        </div>
                     </div>
 
                     {/* Total Summary */}
-                    <div className="mt-6 soft-card p-6">
+                    <div className="mt-6 glass-card p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-gray-500 text-sm font-medium">Total de Despesas</p>
-                                <h2 className="text-3xl font-bold text-red-600 mt-1">
+                                <p className="text-gray-400 text-sm font-medium">Total de Despesas</p>
+                                <h2 className="text-3xl font-bold text-red-400 mt-1">
                                     R$ {totalDespesas.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                                 </h2>
                             </div>
@@ -233,8 +237,8 @@ function DespesasContent() {
                                         <IconComponent size={24} className="text-white" />
                                     </div>
                                     <div>
-                                        <p className="text-gray-600 text-xs font-medium leading-tight">{cat.label}</p>
-                                        <h3 className="text-lg font-bold text-gray-800 mt-1">
+                                        <p className="text-gray-400 text-xs font-medium leading-tight">{cat.label}</p>
+                                        <h3 className="text-lg font-bold text-white mt-1">
                                             R$ {total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                                         </h3>
                                     </div>
@@ -245,9 +249,9 @@ function DespesasContent() {
                 </div>
 
                 {/* Items List */}
-                <div className="soft-card p-6">
+                <div className="glass-card p-6">
                     <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-xl font-bold text-gray-800">
+                        <h2 className="text-xl font-bold text-white">
                             {activeCategory
                                 ? getCategoryById(activeCategory)?.label
                                 : "Todas as Despesas"}
@@ -255,7 +259,7 @@ function DespesasContent() {
                         {activeCategory && (
                             <button
                                 onClick={() => setActiveCategory(null)}
-                                className="text-sm text-red-600 hover:text-red-700 font-medium"
+                                className="text-sm text-[#7CFF6B] hover:text-[#6FEB5A] font-medium"
                             >
                                 Ver todas
                             </button>
@@ -273,7 +277,7 @@ function DespesasContent() {
                             return (
                                 <div
                                     key={item.id}
-                                    className="flex items-center justify-between p-4 rounded-xl bg-gray-50/50 hover:bg-gray-100/50 transition-colors group"
+                                    className="flex items-center justify-between p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors group"
                                 >
                                     <div className="flex items-center gap-4">
                                         <div
@@ -282,24 +286,24 @@ function DespesasContent() {
                                             {IconComponent && <IconComponent size={20} className="text-white" />}
                                         </div>
                                         <div>
-                                            <p className="font-medium text-gray-800">{item.description}</p>
+                                            <p className="font-medium text-white">{item.description}</p>
                                             <div className="flex items-center gap-2 mt-0.5">
-                                                <span className="text-xs text-gray-500">{item.date}</span>
-                                                <span className="text-xs text-gray-400">•</span>
-                                                <span className="text-xs text-gray-500">{cat?.label}</span>
+                                                <span className="text-xs text-gray-400">{item.date}</span>
+                                                <span className="text-xs text-gray-500">•</span>
+                                                <span className="text-xs text-gray-400">{cat?.label}</span>
                                             </div>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-4">
-                                        <span className="font-bold text-red-600 text-lg">
+                                        <span className="font-bold text-red-400 text-lg">
                                             - R$ {item.value.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                                         </span>
                                         <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <button className="p-2 hover:bg-gray-200 rounded-lg transition-colors">
-                                                <Edit size={16} className="text-gray-500" />
+                                            <button className="p-2 hover:bg-white/10 rounded-lg transition-colors">
+                                                <Edit size={16} className="text-gray-400" />
                                             </button>
-                                            <button className="p-2 hover:bg-red-100 rounded-lg transition-colors">
-                                                <Trash2 size={16} className="text-red-500" />
+                                            <button className="p-2 hover:bg-red-500/20 rounded-lg transition-colors">
+                                                <Trash2 size={16} className="text-red-400" />
                                             </button>
                                         </div>
                                     </div>
@@ -311,12 +315,12 @@ function DespesasContent() {
                     {/* Empty State */}
                     {filteredExpenses.length === 0 && (
                         <div className="text-center py-12">
-                            <p className="text-gray-400">Nenhuma despesa encontrada para este período.</p>
+                            <p className="text-gray-500">Nenhuma despesa encontrada para este período.</p>
                         </div>
                     )}
                     {filteredExpenses.length > 0 && activeCategory && getItemsByCategory(activeCategory).length === 0 && (
                         <div className="text-center py-12">
-                            <p className="text-gray-400">Nenhuma despesa nesta categoria</p>
+                            <p className="text-gray-500">Nenhuma despesa nesta categoria</p>
                         </div>
                     )}
                 </div>

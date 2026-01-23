@@ -1,29 +1,74 @@
 @import "tailwindcss";
 
-/* Soft UI Financial Dashboard - Global Styles */
+/* Neon Green Financial Dashboard - Global Styles with Theme Support */
 
 :root {
-  /* Core Colors */
-  --background: #FDFBF7;
-  --foreground: #1F2937;
-  --accent: #A855F7;
-  --accent-light: #C084FC;
-  --card-bg: #FFFFFF;
-  --text-secondary: #6B7280;
-  --success: #10B981;
+  /* Graph Colors - From Reference Image */
+  --graph-primary: #2D5F3F;
+  --graph-accent: #C7FF3D;
+  --graph-secondary: #7CFF6B;
+  --graph-orange: #FF8C00;
+  --graph-red: #EF4444;
+}
+
+/* Dark Theme (Default) */
+:root,
+[data-theme="dark"] {
+  /* Core Colors - Darker Theme inspired by reference */
+  --background: #0F0F0F;
+  --background-light: #1A1A1A;
+  --foreground: #FFFFFF;
+  --accent: #C7FF3D;
+  --accent-hover: #E4FF1A;
+  --accent-dark: #5EDB49;
+  --secondary: #FFD700;
+  --secondary-light: #FFC700;
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --card-bg-solid: #242424;
+  --card-border: rgba(255, 255, 255, 0.08);
+  --text-primary: #FFFFFF;
+  --text-secondary: #A0A0A0;
+  --text-tertiary: #6B6B6B;
+  --success: #7CFF6B;
   --danger: #EF4444;
-  
-  /* Soft UI Shadows */
-  --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.05);
-  --shadow-soft-hover: 0 8px 30px rgba(0, 0, 0, 0.08);
-  --shadow-inset: inset 2px 2px 5px rgba(0, 0, 0, 0.05), inset -2px -2px 5px rgba(255, 255, 255, 0.8);
+  --warning: #FFD700;
+  --orange: #FF8C00;
+
+  /* Glassmorphism Shadows - Enhanced for darker theme */
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --shadow-glass-hover: 0 12px 40px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(199, 255, 61, 0.1);
+  --blur-glass: blur(20px);
+}
+
+/* Light Theme */
+[data-theme="light"] {
+  --background: #FFFFFF;
+  --background-light: #F5F5F5;
+  --foreground: #1A1A1A;
+  --accent: #2D5F3F;
+  --accent-hover: #3A7550;
+  --accent-dark: #1F4A2F;
+  --secondary: #FF8C00;
+  --secondary-light: #FFA726;
+  --card-bg: rgba(255, 255, 255, 0.9);
+  --card-border: rgba(45, 95, 63, 0.2);
+  --text-primary: #1A1A1A;
+  --text-secondary: #666666;
+  --text-tertiary: #999999;
+  --success: #2D5F3F;
+  --danger: #EF4444;
+  --warning: #FF8C00;
+  --orange: #FF8C00;
+
+  --shadow-glass: 0 4px 16px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  --shadow-glass-hover: 0 8px 24px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-accent: var(--accent);
-  --color-accent-light: var(--accent-light);
+  --color-accent-light: var(--accent-hover);
   --color-card: var(--card-bg);
   --color-muted: var(--text-secondary);
   --color-success: var(--success);
@@ -35,35 +80,60 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Soft UI Card Styles */
-.soft-card {
+/* Dark theme gradient background */
+[data-theme="dark"] body {
+  background: linear-gradient(135deg, #0F0F0F 0%, #1A1A1A 50%, #0F0F0F 100%);
+  background-attachment: fixed;
+}
+
+/* Light theme clean background */
+[data-theme="light"] body {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F5F5F5 50%, #ECECEC 100%);
+  background-attachment: fixed;
+}
+
+/* Glassmorphism Card Styles */
+.glass-card {
   background: var(--card-bg);
+  backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass);
+  border: 1px solid var(--card-border);
   border-radius: 20px;
-  box-shadow: var(--shadow-soft);
+  box-shadow: var(--shadow-glass);
   transition: all 0.3s ease;
 }
 
-.soft-card:hover {
-  box-shadow: var(--shadow-soft-hover);
-  transform: translateY(-2px);
+.glass-card:hover {
+  box-shadow: var(--shadow-glass-hover);
+  border-color: rgba(255, 255, 255, 0.25);
 }
 
-/* Soft UI Button Styles */
-.soft-button {
-  background: linear-gradient(145deg, #ffffff, #f5f5f5);
+/* Glass Button Styles */
+.glass-button {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 12px;
-  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.08), -4px -4px 10px rgba(255, 255, 255, 0.9);
   transition: all 0.2s ease;
 }
 
-.soft-button:hover {
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1), -2px -2px 5px rgba(255, 255, 255, 0.9);
+.glass-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
-.soft-button:active {
-  box-shadow: var(--shadow-inset);
+/* Primary Button */
+.btn-primary {
+  background: linear-gradient(135deg, #7CFF6B 0%, #6FEB5A 100%);
+  box-shadow: 0 4px 20px rgba(124, 255, 107, 0.4);
+}
+
+.btn-primary:hover {
+  filter: brightness(1.1);
 }
 
 /* Custom Scrollbar */
@@ -73,15 +143,187 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: rgba(255, 255, 255, 0.03);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c4c4c4;
+  background: rgba(124, 255, 107, 0.3);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a855f7;
+  background: rgba(124, 255, 107, 0.5);
+}
+
+/* Glass Input Styles */
+.glass-input {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.glass-input:focus {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(56, 189, 248, 0.5);
+  outline: none;
+}
+
+.glass-input::placeholder {
+  color: rgba(148, 163, 184, 0.7);
+}
+
+/* Print Styles - Fit on single A4 page */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm;
+  }
+
+  html {
+    font-size: 9px !important;
+  }
+
+  body {
+    background: white !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    transform-origin: top left;
+    width: 100%;
+    max-height: 100vh;
+    overflow: hidden;
+  }
+
+  /* Hide sidebar and non-printable elements */
+  aside,
+  nav,
+  .no-print,
+  button,
+  [data-no-print],
+  header>div>div:last-child {
+    display: none !important;
+  }
+
+  /* Reset main content margin and scale to fit */
+  main {
+    margin-left: 0 !important;
+    padding: 5px !important;
+    width: 100% !important;
+    transform: scale(0.85);
+    transform-origin: top left;
+  }
+
+  /* Compact spacing */
+  .mb-8 {
+    margin-bottom: 8px !important;
+  }
+
+  .mb-6 {
+    margin-bottom: 6px !important;
+  }
+
+  .p-6 {
+    padding: 8px !important;
+  }
+
+  .p-4 {
+    padding: 6px !important;
+  }
+
+  .gap-4 {
+    gap: 6px !important;
+  }
+
+  .gap-3 {
+    gap: 4px !important;
+  }
+
+  /* Smaller text sizes */
+  h1 {
+    font-size: 18px !important;
+  }
+
+  h2 {
+    font-size: 14px !important;
+  }
+
+  h3 {
+    font-size: 12px !important;
+  }
+
+  p,
+  span,
+  td,
+  th {
+    font-size: 10px !important;
+  }
+
+  /* Adjust colors for print */
+  * {
+    color: #1f2937 !important;
+  }
+
+  .text-emerald-400,
+  .text-emerald-500,
+  .text-emerald-600 {
+    color: #059669 !important;
+  }
+
+  .text-red-400,
+  .text-red-500,
+  .text-red-600 {
+    color: #dc2626 !important;
+  }
+
+  /* Remove background colors */
+  .glass-card,
+  [class*="bg-"] {
+    background: white !important;
+    border: 1px solid #e5e7eb !important;
+    box-shadow: none !important;
+  }
+
+  /* Compact grid */
+  .grid {
+    gap: 4px !important;
+  }
+
+  /* Adjust headers */
+  h1,
+  h2,
+  h3 {
+    color: #111827 !important;
+  }
+
+  /* Hide category icons to save space */
+  .rounded-xl.flex.items-center.justify-center {
+    width: 24px !important;
+    height: 24px !important;
+  }
+
+  /* Compact list items */
+  .space-y-3>*+* {
+    margin-top: 4px !important;
+  }
+
+  /* Hide category summary cards in print */
+  .grid.grid-cols-2.md\:grid-cols-3,
+  .grid.grid-cols-2.md\:grid-cols-4,
+  .grid.grid-cols-1.md\:grid-cols-3,
+  main>section:first-of-type .grid {
+    display: none !important;
+  }
+}
+
+/* Class for printing mode */
+body.printing aside,
+body.printing nav,
+body.printing .no-print {
+  display: none !important;
+}
+
+body.printing main {
+  margin-left: 0 !important;
 }
