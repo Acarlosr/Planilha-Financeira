@@ -15,18 +15,10 @@ interface InvestmentModalProps {
     }) => void;
 }
 
-const tiposInvestimento = [
-    { id: "tesouro", label: "Tesouro Direto", icone: "🏛️" },
-    { id: "cdb", label: "CDB / RDB", icone: "🏦" },
-    { id: "acoes", label: "Ações", icone: "📈" },
-    { id: "fiis", label: "FIIs", icone: "🏢" },
-];
-
 export default function InvestmentModal({ isOpen, onClose, onSave }: InvestmentModalProps) {
     const [description, setDescription] = useState("");
     const [value, setValue] = useState("");
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-    const [investmentType, setInvestmentType] = useState("tesouro");
     const [type, setType] = useState<"aporte" | "resgate">("aporte");
     const [loading, setLoading] = useState(false);
 
@@ -41,14 +33,13 @@ export default function InvestmentModal({ isOpen, onClose, onSave }: InvestmentM
                 value: parseFloat(value.replace(',', '.')),
                 date: formattedDate,
                 type,
-                investmentType,
+                investmentType: "geral", // Fallback para compatibilidade //
             });
 
             // Reset form
             setDescription("");
             setValue("");
             setDate(new Date().toISOString().split('T')[0]);
-            setInvestmentType("tesouro");
             setType("aporte");
             onClose();
         } catch (error) {
@@ -131,29 +122,7 @@ export default function InvestmentModal({ isOpen, onClose, onSave }: InvestmentM
                         </button>
                     </div>
 
-                    {/* Investment Type */}
-                    <div>
-                        <label className="block text-sm font-medium text-muted mb-2">
-                            Tipo de Investimento
-                        </label>
-                        <div className="grid grid-cols-4 gap-2">
-                            {tiposInvestimento.map((inv) => (
-                                <button
-                                    key={inv.id}
-                                    type="button"
-                                    onClick={() => setInvestmentType(inv.id)}
-                                    className={`p-3 rounded-xl border text-center transition-all ${investmentType === inv.id
-                                        ? "border-blue-500 bg-blue-500/20 text-white"
-                                        : "border-white/10 text-gray-400 hover:border-white/30"
-                                        }`}
-                                    style={{ background: investmentType === inv.id ? undefined : "rgba(255, 255, 255, 0.03)" }}
-                                >
-                                    <span className="text-xl block mb-1">{inv.icone}</span>
-                                    <span className="text-[10px]">{inv.label.split(' ')[0]}</span>
-                                </button>
-                            ))}
-                        </div>
-                    </div>
+                    {/* Removed Investment Type Selector as specific routes handle specific assets now */}
 
                     {/* Description */}
                     <div>

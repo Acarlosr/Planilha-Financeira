@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import Sidebar from "@/components/Sidebar";
 import InvestmentModal from "@/components/InvestmentModal";
 import {
@@ -133,29 +134,29 @@ export default function AplicacaoPage() {
                     {tiposInvestimento.map((inv) => {
                         const isActive = activeFilter === inv.id;
                         return (
-                            <div
-                                key={inv.id}
-                                onClick={() => setActiveFilter(isActive ? null : inv.id)}
-                                className={`glass-card p-5 cursor-pointer transition-all duration-300 ${isActive ? "ring-2 ring-blue-400 ring-offset-2 scale-105" : "hover:scale-102"
-                                    }`}
-                            >
-                                <div className="flex items-start justify-between mb-3">
-                                    <div
-                                        className={`w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br ${inv.cor} text-2xl`}
-                                        style={{ boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)" }}
-                                    >
-                                        {inv.icone}
+                            <Link href={`/aplicacao/${inv.id}`} key={inv.id}>
+                                <div
+                                    className={`glass-card p-5 cursor-pointer transition-all duration-300 hover:ring-2 hover:ring-[#7CFF6B] hover:shadow-[0_0_15px_rgba(124,255,107,0.3)] hover:scale-105 ${isActive ? "ring-2 ring-blue-400 ring-offset-2 scale-105" : ""
+                                        }`}
+                                >
+                                    <div className="flex items-start justify-between mb-3">
+                                        <div
+                                            className={`w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br ${inv.cor} text-2xl`}
+                                            style={{ boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)" }}
+                                        >
+                                            {inv.icone}
+                                        </div>
+                                        <div className="flex items-center gap-1 text-emerald-400">
+                                            <ArrowUpRight size={16} />
+                                            <span className="text-sm font-bold">{inv.rentabilidade}%</span>
+                                        </div>
                                     </div>
-                                    <div className="flex items-center gap-1 text-emerald-400">
-                                        <ArrowUpRight size={16} />
-                                        <span className="text-sm font-bold">{inv.rentabilidade}%</span>
-                                    </div>
+                                    <h3 className="text-muted text-sm font-medium mb-1">{inv.nome}</h3>
+                                    <p className="text-2xl font-bold text-foreground">
+                                        R$ {inv.saldo.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                                    </p>
                                 </div>
-                                <h3 className="text-muted text-sm font-medium mb-1">{inv.nome}</h3>
-                                <p className="text-2xl font-bold text-foreground">
-                                    R$ {inv.saldo.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                                </p>
-                            </div>
+                            </Link>
                         );
                     })}
                 </div>

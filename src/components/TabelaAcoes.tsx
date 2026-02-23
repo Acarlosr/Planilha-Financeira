@@ -1,0 +1,60 @@
+"use client";
+
+import { Acao } from "@/types/aplicacoes";
+
+interface TabelaAcoesProps {
+    acoes: Acao[];
+}
+
+export default function TabelaAcoes({ acoes }: TabelaAcoesProps) {
+    return (
+        <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+                <thead>
+                    <tr className="border-b border-white/10 text-muted text-sm">
+                        <th className="pb-3 px-4 font-medium">Ticker</th>
+                        <th className="pb-3 px-4 font-medium">Empresa</th>
+                        <th className="pb-3 px-4 font-medium text-right">Qtd.</th>
+                        <th className="pb-3 px-4 font-medium text-right hidden sm:table-cell">Preço Médio</th>
+                        <th className="pb-3 px-4 font-medium text-right">Valor Atual</th>
+                        <th className="pb-3 px-4 font-medium text-right">Variação</th>
+                    </tr>
+                </thead>
+                <tbody className="text-sm">
+                    {acoes.map((acao) => {
+                        const valorTotalMedio = acao.quantidade * acao.precoMedio;
+                        const variacaoRS = acao.valorAtual - valorTotalMedio;
+                        const variacaoPerc = (variacaoRS / valorTotalMedio) * 100;
+                        const isPositivo = variacaoRS >= 0;
+
+                        return (
+                            <tr key={acao.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                                <td className="py-4 px-4 font-bold text-foreground">
+                                    <span className="px-2 py-1 bg-white/5 rounded mx-1 pb-1.5">{acao.ticker}</span>
+                                </td>
+                                <td className="py-4 px-4 text-foreground">{acao.empresa}</td>
+                                <td className="py-4 px-4 text-right text-muted">{acao.quantidade}</td>
+                                <td className="py-4 px-4 text-right text-muted hidden sm:table-cell">
+                                    {acao.precoMedio.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                </td>
+                                <td className="py-4 px-4 text-right text-foreground font-medium">
+                                    {acao.valorAtual.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                </td>
+                                <td className="py-4 px-4 text-right font-medium">
+                                    <div className={`flex flex-col ${isPositivo ? 'text-emerald-400' : 'text-red-400'}`}>
+                                        <span>{isPositivo ? '+' : ''}{variacaoPerc.toFixed(2)}%</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        );
+                    })}
+                    {acoes.length === 0 && (
+                        <tr>
+                            <td colSpan={6} className="py-8 text-center text-muted">Nenhuma ação cadastrada.</td>
+                        </tr>
+                    )}
+                </tbody>
+            </table>
+        </div>
+    );
+}
