@@ -98,17 +98,17 @@ export default function SummaryCards() {
                 >
                     <div className="flex items-start justify-between">
                         <div className="flex-1">
-                            <p className="text-gray-400 text-sm font-medium mb-1">
+                            <p className="text-muted text-sm font-medium mb-1">
                                 {card.title}
                             </p>
-                            <h3 className="text-xl font-bold text-white mb-2">
+                            <h3 className="text-xl font-bold text-foreground mb-2">
                                 {card.value}
                             </h3>
                             <div className="flex items-center gap-1">
                                 <span className={`text-sm font-semibold ${getChangeColor(card.changeType)}`}>
                                     {card.change}
                                 </span>
-                                <span className="text-gray-500 text-xs">vs mês</span>
+                                <span className="text-muted text-xs">vs mês</span>
                             </div>
                         </div>
                         <div

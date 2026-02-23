@@ -116,17 +116,17 @@ export default function LoginPage() {
                 {/* Close Button */}
                 <Link
                     href="/landing"
-                    className="absolute top-4 right-4 p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                    className="absolute top-4 right-4 p-2 text-muted hover:text-white hover:bg-white/10 rounded-lg transition-colors"
                 >
                     <X size={20} />
                 </Link>
 
                 {/* Header */}
                 <div className="text-center mb-8">
-                    <h1 className="text-2xl font-bold text-white mb-3">
+                    <h1 className="text-2xl font-bold text-foreground mb-3">
                         Entrar ou cadastrar
                     </h1>
-                    <p className="text-gray-400 text-sm leading-relaxed">
+                    <p className="text-muted text-sm leading-relaxed">
                         Você vai poder aproveitar todas as funcionalidades do FinançasPro:
                         controle de receitas, despesas, investimentos e muito mais.
                     </p>
@@ -204,7 +204,7 @@ export default function LoginPage() {
                         {/* Divider */}
                         <div className="flex items-center gap-4 my-6">
                             <div className="flex-1 h-px bg-white/10"></div>
-                            <span className="text-gray-500 text-sm">OU</span>
+                            <span className="text-muted text-sm">OU</span>
                             <div className="flex-1 h-px bg-white/10"></div>
                         </div>
 
@@ -217,14 +217,14 @@ export default function LoginPage() {
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     placeholder="Endereço de e-mail"
-                                    className="w-full px-4 py-3.5 rounded-xl text-white placeholder:text-gray-500 outline-none transition-all border border-white/10 focus:border-[#7CFF6B]/50"
+                                    className="w-full px-4 py-3.5 rounded-xl text-white placeholder:text-muted outline-none transition-all border border-white/10 focus:border-[#7CFF6B]/50"
                                     style={{ background: "rgba(255, 255, 255, 0.03)" }}
                                 />
                             </div>
                             <button
                                 type="submit"
                                 disabled={loading || !email}
-                                className="w-full py-3.5 rounded-xl text-white font-semibold transition-all hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full py-3.5 rounded-xl text-foreground font-semibold transition-all hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed"
                                 style={{
                                     background: "linear-gradient(135deg, #7CFF6B 0%, #6FEB5A 100%)",
                                     boxShadow: "0 4px 15px rgba(30, 64, 175, 0.4)"
@@ -245,9 +245,9 @@ export default function LoginPage() {
                             <div className="inline-flex items-center justify-center w-14 h-14 bg-[#7CFF6B]/20 text-[#7CFF6B] rounded-full mb-4">
                                 <Mail className="w-7 h-7" />
                             </div>
-                            <h3 className="text-lg font-semibold text-white mb-1">Verifique seu e-mail</h3>
-                            <p className="text-gray-400 text-sm">
-                                Enviamos um código para <span className="text-white font-medium">{email}</span>
+                            <h3 className="text-lg font-semibold text-foreground mb-1">Verifique seu e-mail</h3>
+                            <p className="text-muted text-sm">
+                                Enviamos um código para <span className="text-foreground font-medium">{email}</span>
                             </p>
                         </div>
 
@@ -267,7 +267,7 @@ export default function LoginPage() {
                         <button
                             type="submit"
                             disabled={loading || otp.length < 6}
-                            className="w-full py-3.5 rounded-xl text-white font-semibold transition-all hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed mb-3"
+                            className="w-full py-3.5 rounded-xl text-foreground font-semibold transition-all hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed mb-3"
                             style={{
                                 background: "linear-gradient(135deg, #7CFF6B 0%, #6FEB5A 100%)",
                                 boxShadow: "0 4px 15px rgba(30, 64, 175, 0.4)"
@@ -286,7 +286,7 @@ export default function LoginPage() {
                                 setEmailSent(false);
                                 setOtp("");
                             }}
-                            className="w-full py-2 text-gray-400 hover:text-white text-sm font-medium transition-colors"
+                            className="w-full py-2 text-muted hover:text-foreground text-sm font-medium transition-colors"
                         >
                             Voltar e corrigir e-mail
                         </button>

@@ -39,7 +39,7 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
                     </div>
                     <div>
                         <p className="font-medium text-gray-900">Compra Parcelada?</p>
-                        <p className="text-xs text-gray-500">Repetir despesa nos próximos meses</p>
+                        <p className="text-xs text-muted">Repetir despesa nos próximos meses</p>
                     </div>
                 </div>
                 <button
@@ -64,7 +64,7 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
                 <div className="grid grid-cols-2 gap-4 pt-2 animate-in slide-in-from-top-2 duration-200">
                     {/* Número de Parcelas */}
                     <div>
-                        <label className="block text-xs font-medium text-gray-500 mb-1">
+                        <label className="block text-xs font-medium text-muted mb-1">
                             Qtd. Parcelas
                         </label>
                         <select
@@ -82,7 +82,7 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
 
                     {/* Data 1ª Parcela */}
                     <div>
-                        <label className="block text-xs font-medium text-gray-500 mb-1">
+                        <label className="block text-xs font-medium text-muted mb-1">
                             Data 1ª Parcela
                         </label>
                         <input
@@ -96,7 +96,7 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
 
                     {/* Seleção de Cartão */}
                     <div className="col-span-2">
-                        <label className="block text-xs font-medium text-gray-500 mb-1">
+                        <label className="block text-xs font-medium text-muted mb-1">
                             Vincular Cartão (Opcional)
                         </label>
                         <select

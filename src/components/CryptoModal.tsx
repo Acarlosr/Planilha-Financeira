@@ -125,13 +125,13 @@ export default function CryptoModal({ isOpen, onClose, onSave }: CryptoModalProp
                         >
                             <Bitcoin size={20} className="text-white" />
                         </div>
-                        <h2 className="text-xl font-bold text-white">Nova Transação Cripto</h2>
+                        <h2 className="text-xl font-bold text-foreground">Nova Transação Cripto</h2>
                     </div>
                     <button
                         onClick={onClose}
                         className="p-2 hover:bg-white/10 rounded-lg transition-colors"
                     >
-                        <X size={20} className="text-gray-400" />
+                        <X size={20} className="text-muted" />
                     </button>
                 </div>
 
@@ -143,7 +143,7 @@ export default function CryptoModal({ isOpen, onClose, onSave }: CryptoModalProp
                             onClick={() => setType("compra")}
                             className={`flex-1 py-2.5 rounded-lg font-medium transition-all flex items-center justify-center gap-2 ${type === "compra"
                                 ? "text-black"
-                                : "text-gray-400 hover:text-white"
+                                : "text-gray-400 hover:text-foreground"
                                 }`}
                             style={type === "compra" ? {
                                 background: "linear-gradient(135deg, #10B981 0%, #34D399 100%)"
@@ -156,8 +156,8 @@ export default function CryptoModal({ isOpen, onClose, onSave }: CryptoModalProp
                             type="button"
                             onClick={() => setType("venda")}
                             className={`flex-1 py-2.5 rounded-lg font-medium transition-all flex items-center justify-center gap-2 ${type === "venda"
-                                ? "text-white"
-                                : "text-gray-400 hover:text-white"
+                                ? "text-foreground"
+                                : "text-gray-400 hover:text-foreground"
                                 }`}
                             style={type === "venda" ? {
                                 background: "linear-gradient(135deg, #EF4444 0%, #F87171 100%)"
@@ -170,7 +170,7 @@ export default function CryptoModal({ isOpen, onClose, onSave }: CryptoModalProp
 
                     {/* Coin Select */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                        <label className="block text-sm font-medium text-muted mb-2">
                             Criptomoeda
                         </label>
                         <select
@@ -208,8 +208,8 @@ export default function CryptoModal({ isOpen, onClose, onSave }: CryptoModalProp
                                 className="w-8 h-8 rounded-full"
                             />
                             <div className="flex-1">
-                                <p className="font-medium text-white">{selectedCoin.name}</p>
-                                <p className="text-xs text-gray-400">
+                                <p className="font-medium text-foreground">{selectedCoin.name}</p>
+                                <p className="text-xs text-muted">
                                     Preço atual: R$ {selectedCoin.current_price.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                                 </p>
                             </div>
@@ -218,7 +218,7 @@ export default function CryptoModal({ isOpen, onClose, onSave }: CryptoModalProp
 
                     {/* Quantity */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                        <label className="block text-sm font-medium text-muted mb-2">
                             Quantidade
                         </label>
                         <input
@@ -228,14 +228,14 @@ export default function CryptoModal({ isOpen, onClose, onSave }: CryptoModalProp
                             onChange={(e) => setQuantity(e.target.value)}
                             placeholder="0.001"
                             required
-                            className="w-full px-4 py-3 rounded-xl text-white placeholder:text-gray-500 outline-none transition-all border border-white/10 focus:border-amber-500/50"
+                            className="w-full px-4 py-3 rounded-xl text-white placeholder:text-muted outline-none transition-all border border-white/10 focus:border-amber-500/50"
                             style={{ background: "rgba(255, 255, 255, 0.05)" }}
                         />
                     </div>
 
                     {/* Purchase Price */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                        <label className="block text-sm font-medium text-muted mb-2">
                             Preço por Unidade (R$)
                         </label>
                         <input
@@ -245,7 +245,7 @@ export default function CryptoModal({ isOpen, onClose, onSave }: CryptoModalProp
                             onChange={(e) => setPurchasePrice(e.target.value)}
                             placeholder="0.00"
                             required
-                            className="w-full px-4 py-3 rounded-xl text-white placeholder:text-gray-500 outline-none transition-all border border-white/10 focus:border-amber-500/50"
+                            className="w-full px-4 py-3 rounded-xl text-white placeholder:text-muted outline-none transition-all border border-white/10 focus:border-amber-500/50"
                             style={{ background: "rgba(255, 255, 255, 0.05)" }}
                         />
                     </div>
@@ -254,7 +254,7 @@ export default function CryptoModal({ isOpen, onClose, onSave }: CryptoModalProp
                     {quantity && purchasePrice && (
                         <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
                             <div className="flex justify-between">
-                                <span className="text-gray-400 text-sm">Valor Total</span>
+                                <span className="text-muted text-sm">Valor Total</span>
                                 <span className="font-bold text-amber-400">
                                     R$ {(parseFloat(quantity) * parseFloat(purchasePrice)).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                                 </span>
@@ -264,7 +264,7 @@ export default function CryptoModal({ isOpen, onClose, onSave }: CryptoModalProp
 
                     {/* Date */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                        <label className="block text-sm font-medium text-muted mb-2">
                             Data da Transação
                         </label>
                         <input
@@ -281,7 +281,7 @@ export default function CryptoModal({ isOpen, onClose, onSave }: CryptoModalProp
                     <button
                         type="submit"
                         disabled={loading || !coinId || !quantity || !purchasePrice}
-                        className="w-full py-3.5 rounded-xl text-white font-semibold transition-all hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full py-3.5 rounded-xl text-foreground font-semibold transition-all hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed"
                         style={{
                             background: type === "compra"
                                 ? "linear-gradient(135deg, #10B981 0%, #34D399 100%)"

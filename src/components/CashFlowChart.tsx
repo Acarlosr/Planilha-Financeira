@@ -46,7 +46,7 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
                     boxShadow: "0 10px 40px rgba(0, 0, 0, 0.3)",
                 }}
             >
-                <p className="font-semibold text-white mb-2">{label}</p>
+                <p className="font-semibold text-foreground mb-2">{label}</p>
                 {payload.map((entry, index) => (
                     <p key={index} className="text-sm" style={{ color: entry.color }}>
                         <span className="font-medium">
@@ -66,17 +66,17 @@ export default function CashFlowChart() {
         <div className="glass-card p-6">
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h2 className="text-xl font-bold text-white">Fluxo de Caixa</h2>
-                    <p className="text-gray-400 text-sm">Evolução mensal de entradas e saídas</p>
+                    <h2 className="text-xl font-bold text-foreground">Fluxo de Caixa</h2>
+                    <p className="text-muted text-sm">Evolução mensal de entradas e saídas</p>
                 </div>
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
                         <div className="w-3 h-3 rounded-full bg-emerald-500" />
-                        <span className="text-sm text-gray-400">Entradas</span>
+                        <span className="text-sm text-muted">Entradas</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <div className="w-3 h-3 rounded-full bg-red-400" />
-                        <span className="text-sm text-gray-400">Saídas</span>
+                        <span className="text-sm text-muted">Saídas</span>
                     </div>
                 </div>
             </div>

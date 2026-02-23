@@ -40,7 +40,7 @@ export default function DemoBanner() {
                         <LogIn size={18} className="text-white" />
                     </div>
                     <div>
-                        <p className="font-medium text-white">Modo Demonstração</p>
+                        <p className="font-medium text-foreground">Modo Demonstração</p>
                         <p className="text-sm text-cyan-100">
                             Você está visualizando dados de exemplo. Faça login para gerenciar suas finanças.
                         </p>
@@ -64,7 +64,7 @@ export default function DemoBanner() {
                         onClick={() => setShowBanner(false)}
                         className="p-2 hover:bg-white/10 rounded-lg transition-colors"
                     >
-                        <X size={20} className="text-white" />
+                        <X size={20} className="text-foreground" />
                     </button>
                 </div>
             </div>

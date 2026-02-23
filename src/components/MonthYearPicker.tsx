@@ -60,14 +60,14 @@ export default function MonthYearPicker({ date, onChange }: MonthYearPickerProps
                             onClick={() => handleYearChange(-1)}
                             className="p-1 hover:bg-gray-100 rounded-full transition-colors"
                         >
-                            <ChevronLeft size={20} className="text-gray-500" />
+                            <ChevronLeft size={20} className="text-muted" />
                         </button>
                         <span className="font-bold text-gray-800 text-lg">{viewYear}</span>
                         <button
                             onClick={() => handleYearChange(1)}
                             className="p-1 hover:bg-gray-100 rounded-full transition-colors"
                         >
-                            <ChevronRight size={20} className="text-gray-500" />
+                            <ChevronRight size={20} className="text-muted" />
                         </button>
                     </div>
 

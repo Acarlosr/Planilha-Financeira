@@ -18,8 +18,8 @@ export default function Home() {
         {/* Header */}
         <header className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-white">Dashboard</h1>
-            <p className="text-gray-400 mt-1">
+            <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
+            <p className="text-muted mt-1">
               Bem-vindo de volta! Aqui está o resumo das suas finanças.
             </p>
           </div>
@@ -33,11 +33,11 @@ export default function Home() {
                 backdropFilter: "blur(10px)",
               }}
             >
-              <Search size={18} className="text-gray-400" />
+              <Search size={18} className="text-muted" />
               <input
                 type="text"
                 placeholder="Buscar transações..."
-                className="bg-transparent outline-none text-sm text-white w-48 placeholder:text-gray-500"
+                className="bg-transparent outline-none text-sm text-white w-48 placeholder:text-muted"
               />
             </div>
 
@@ -48,7 +48,7 @@ export default function Home() {
                 background: "rgba(255, 255, 255, 0.05)",
               }}
             >
-              <Bell size={20} className="text-gray-400" />
+              <Bell size={20} className="text-muted" />
               <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-[#7CFF6B] rounded-full border-2 border-[#0a1628]" />
             </button>
 
@@ -79,7 +79,7 @@ export default function Home() {
         </section>
 
         {/* Footer */}
-        <footer className="text-center py-6 text-gray-500 text-sm">
+        <footer className="text-center py-6 text-muted text-sm">
           © 2026 FinançasPro. Desenvolvido com ❤️ para suas finanças.
         </footer>
       </main>

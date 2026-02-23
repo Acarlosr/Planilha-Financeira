@@ -87,7 +87,7 @@ export default function CardModal({ isOpen, onClose, onSave }: CardModalProps) {
                         </div>
                         <h2 className="text-xl font-bold text-gray-800">Adicionar Cartão</h2>
                     </div>
-                    <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-500">
+                    <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors text-muted">
                         <X size={20} />
                     </button>
                 </div>

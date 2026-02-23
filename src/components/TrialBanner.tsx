@@ -24,7 +24,7 @@ export default function TrialBanner() {
         >
             <button
                 onClick={() => setDismissed(true)}
-                className="absolute top-3 right-3 p-1 text-gray-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors"
+                className="absolute top-3 right-3 p-1 text-muted hover:text-white rounded-lg hover:bg-white/10 transition-colors"
             >
                 <X size={16} />
             </button>
@@ -42,13 +42,13 @@ export default function TrialBanner() {
                 </div>
 
                 <div className="flex-1">
-                    <h3 className="text-white font-semibold mb-1">
+                    <h3 className="text-foreground font-semibold mb-1">
                         {urgency
                             ? `⚡ Seu trial expira em ${trialDaysLeft} ${trialDaysLeft === 1 ? 'dia' : 'dias'}!`
                             : `🎉 Você está no período de trial`
                         }
                     </h3>
-                    <p className="text-gray-400 text-sm mb-3">
+                    <p className="text-muted text-sm mb-3">
                         {urgency
                             ? 'Assine agora para continuar com acesso ilimitado a todas as funcionalidades.'
                             : `Aproveite os próximos ${trialDaysLeft} dias com acesso completo ao plano Free. Faça upgrade para desbloquear recursos premium.`
@@ -69,7 +69,7 @@ export default function TrialBanner() {
                         {!urgency && (
                             <Link
                                 href="/pricing"
-                                className="text-sm text-gray-400 hover:text-white transition-colors"
+                                className="text-sm text-muted hover:text-foreground transition-colors"
                             >
                                 Saiba mais
                             </Link>

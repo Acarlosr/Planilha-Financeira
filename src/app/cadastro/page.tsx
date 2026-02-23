@@ -148,7 +148,7 @@ export default function CadastroPage() {
                 {/* Back Button */}
                 <Link
                     href="/landing"
-                    className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-xl text-gray-300 hover:text-white transition-all hover:bg-white/10 border border-white/10 hover:border-white/20"
+                    className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-xl text-muted hover:text-white transition-all hover:bg-white/10 border border-white/10 hover:border-white/20"
                     style={{
                         background: "rgba(255, 255, 255, 0.05)",
                     }}
@@ -171,7 +171,7 @@ export default function CadastroPage() {
                         boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.1)"
                     }}
                 >
-                    <h2 className="text-2xl font-bold text-white mb-6">Create Account</h2>
+                    <h2 className="text-2xl font-bold text-foreground mb-6">Create Account</h2>
 
                     {/* Error Message */}
                     {erro && (
@@ -183,14 +183,14 @@ export default function CadastroPage() {
                     <form onSubmit={handleCadastro} className="space-y-4">
                         {/* Nome */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
+                            <label className="block text-sm font-medium text-muted mb-2">Full Name</label>
                             <div className="relative">
                                 <input
                                     type="text"
                                     required
                                     value={nome}
                                     onChange={(e) => setNome(e.target.value)}
-                                    className="w-full px-4 py-3 rounded-xl text-white placeholder:text-gray-400 outline-none transition-all duration-300 border border-white/10 focus:border-[#7CFF6B]/50"
+                                    className="w-full px-4 py-3 rounded-xl text-white placeholder:text-muted outline-none transition-all duration-300 border border-white/10 focus:border-[#7CFF6B]/50"
                                     style={{
                                         background: "rgba(255, 255, 255, 0.05)",
                                     }}
@@ -201,14 +201,14 @@ export default function CadastroPage() {
 
                         {/* Email */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                            <label className="block text-sm font-medium text-muted mb-2">Email</label>
                             <div className="relative">
                                 <input
                                     type="email"
                                     required
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full px-4 py-3 rounded-xl text-white placeholder:text-gray-400 outline-none transition-all duration-300 border border-white/10 focus:border-[#7CFF6B]/50"
+                                    className="w-full px-4 py-3 rounded-xl text-white placeholder:text-muted outline-none transition-all duration-300 border border-white/10 focus:border-[#7CFF6B]/50"
                                     style={{
                                         background: "rgba(255, 255, 255, 0.05)",
                                     }}
@@ -219,14 +219,14 @@ export default function CadastroPage() {
 
                         {/* Password */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                            <label className="block text-sm font-medium text-muted mb-2">Password</label>
                             <div className="relative">
                                 <input
                                     type={showPassword ? "text" : "password"}
                                     required
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full px-4 py-3 pr-12 rounded-xl text-white placeholder:text-gray-400 outline-none transition-all duration-300 border border-white/10 focus:border-[#7CFF6B]/50"
+                                    className="w-full px-4 py-3 pr-12 rounded-xl text-white placeholder:text-muted outline-none transition-all duration-300 border border-white/10 focus:border-[#7CFF6B]/50"
                                     style={{
                                         background: "rgba(255, 255, 255, 0.05)",
                                     }}
@@ -235,7 +235,7 @@ export default function CadastroPage() {
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-foreground transition-colors"
                                 >
                                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                                 </button>
@@ -244,14 +244,14 @@ export default function CadastroPage() {
 
                         {/* Confirm Password */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-2">Confirm Password</label>
+                            <label className="block text-sm font-medium text-muted mb-2">Confirm Password</label>
                             <div className="relative">
                                 <input
                                     type={showPassword ? "text" : "password"}
                                     required
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
-                                    className="w-full px-4 py-3 rounded-xl text-white placeholder:text-gray-400 outline-none transition-all duration-300 border border-white/10 focus:border-[#7CFF6B]/50"
+                                    className="w-full px-4 py-3 rounded-xl text-white placeholder:text-muted outline-none transition-all duration-300 border border-white/10 focus:border-[#7CFF6B]/50"
                                     style={{
                                         background: "rgba(255, 255, 255, 0.05)",
                                     }}
@@ -264,7 +264,7 @@ export default function CadastroPage() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full py-3.5 rounded-xl text-white font-semibold transition-all duration-300 hover:brightness-110 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed mt-2"
+                            className="w-full py-3.5 rounded-xl text-foreground font-semibold transition-all duration-300 hover:brightness-110 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed mt-2"
                             style={{
                                 background: "linear-gradient(135deg, #7CFF6B 0%, #6FEB5A 100%)",
                                 boxShadow: "0 4px 20px rgba(30, 64, 175, 0.4)"
@@ -281,7 +281,7 @@ export default function CadastroPage() {
                     {/* Divider */}
                     <div className="flex items-center my-6">
                         <div className="flex-1 h-px bg-white/10"></div>
-                        <span className="px-4 text-sm text-gray-400">or continue with</span>
+                        <span className="px-4 text-sm text-muted">or continue with</span>
                         <div className="flex-1 h-px bg-white/10"></div>
                     </div>
 
@@ -332,7 +332,7 @@ export default function CadastroPage() {
 
                     {/* Login Link */}
                     <div className="mt-6 text-center">
-                        <p className="text-gray-400 text-sm">
+                        <p className="text-muted text-sm">
                             Already have an account?{" "}
                             <Link href="/login" className="text-[#7CFF6B] font-semibold hover:text-[#6FEB5A] transition-colors">
                                 Sign in

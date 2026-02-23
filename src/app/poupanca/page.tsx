@@ -67,14 +67,14 @@ export default function PoupancaPage() {
                 <header className="mb-8">
                     <div className="flex items-center justify-between">
                         <div>
-                            <h1 className="text-3xl font-bold text-white">Poupança</h1>
-                            <p className="text-gray-400 mt-1">
+                            <h1 className="text-3xl font-bold text-foreground">Poupança</h1>
+                            <p className="text-muted mt-1">
                                 Acompanhe suas economias e metas financeiras
                             </p>
                         </div>
                         <button
                             onClick={() => setIsModalOpen(true)}
-                            className="flex items-center gap-2 px-5 py-3 text-white font-medium rounded-xl transition-all hover:shadow-lg"
+                            className="flex items-center gap-2 px-5 py-3 text-foreground font-medium rounded-xl transition-all hover:shadow-lg"
                             style={{
                                 background: "linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)",
                                 boxShadow: "0 4px 15px rgba(245, 158, 11, 0.4)",
@@ -95,9 +95,9 @@ export default function PoupancaPage() {
                                 >
                                     <PiggyBank size={20} className="text-white" />
                                 </div>
-                                <p className="text-gray-400 text-sm font-medium">Total Poupado</p>
+                                <p className="text-muted text-sm font-medium">Total Poupado</p>
                             </div>
-                            <h2 className="text-3xl font-bold text-white">
+                            <h2 className="text-3xl font-bold text-foreground">
                                 R$ {totalPoupanca.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                             </h2>
                         </div>
@@ -110,7 +110,7 @@ export default function PoupancaPage() {
                                 >
                                     <Target size={20} className="text-white" />
                                 </div>
-                                <p className="text-gray-400 text-sm font-medium">Progresso das Metas</p>
+                                <p className="text-muted text-sm font-medium">Progresso das Metas</p>
                             </div>
                             <h2 className="text-3xl font-bold text-emerald-400">
                                 {progressoGeral}%
@@ -125,7 +125,7 @@ export default function PoupancaPage() {
                                 >
                                     <TrendingUp size={20} className="text-white" />
                                 </div>
-                                <p className="text-gray-400 text-sm font-medium">Crescimento (30d)</p>
+                                <p className="text-muted text-sm font-medium">Crescimento (30d)</p>
                             </div>
                             <h2 className="text-3xl font-bold text-[#FFD700]">
                                 + R$ 650,00
@@ -156,28 +156,28 @@ export default function PoupancaPage() {
                                         {meta.icone}
                                     </div>
                                     <div className="text-right">
-                                        <p className="text-xs text-gray-400">Progresso</p>
-                                        <p className="text-lg font-bold text-white">{progresso}%</p>
+                                        <p className="text-xs text-muted">Progresso</p>
+                                        <p className="text-lg font-bold text-foreground">{progresso}%</p>
                                     </div>
                                 </div>
 
-                                <h3 className="text-white font-bold mb-2">{meta.nome}</h3>
+                                <h3 className="text-foreground font-bold mb-2">{meta.nome}</h3>
 
                                 <div className="space-y-1 mb-3">
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-gray-400">Atual</span>
-                                        <span className="font-semibold text-white">
+                                        <span className="text-muted">Atual</span>
+                                        <span className="font-semibold text-foreground">
                                             R$ {meta.valorAtual.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                                         </span>
                                     </div>
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-gray-400">Meta</span>
-                                        <span className="font-semibold text-white">
+                                        <span className="text-muted">Meta</span>
+                                        <span className="font-semibold text-foreground">
                                             R$ {meta.valorMeta.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                                         </span>
                                     </div>
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-gray-400">Faltam</span>
+                                        <span className="text-muted">Faltam</span>
                                         <span className="font-semibold text-amber-400">
                                             R$ {faltante.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                                         </span>
@@ -203,8 +203,8 @@ export default function PoupancaPage() {
                 <div className="glass-card p-6 mb-8">
                     <div className="flex items-center justify-between mb-6">
                         <div>
-                            <h2 className="text-xl font-bold text-white">Evolução da Poupança</h2>
-                            <p className="text-gray-400 text-sm mt-1">Últimos 7 meses</p>
+                            <h2 className="text-xl font-bold text-foreground">Evolução da Poupança</h2>
+                            <p className="text-muted text-sm mt-1">Últimos 7 meses</p>
                         </div>
                         <div className="flex items-center gap-2 text-amber-500">
                             <Calendar size={18} />
@@ -246,7 +246,7 @@ export default function PoupancaPage() {
                 {/* Transactions */}
                 <div className="glass-card p-6">
                     <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-xl font-bold text-white">
+                        <h2 className="text-xl font-bold text-foreground">
                             {activeMeta
                                 ? `Transações - ${metas.find((m) => m.id === activeMeta)?.nome}`
                                 : "Todas as Transações"}
@@ -281,10 +281,10 @@ export default function PoupancaPage() {
                                             )}
                                         </div>
                                         <div>
-                                            <p className="font-medium text-white">{transacao.descricao}</p>
+                                            <p className="font-medium text-foreground">{transacao.descricao}</p>
                                             <div className="flex items-center gap-2 mt-0.5">
-                                                <span className="text-xs text-gray-400">{transacao.data}</span>
-                                                <span className="text-xs text-gray-500">•</span>
+                                                <span className="text-xs text-muted">{transacao.data}</span>
+                                                <span className="text-xs text-muted">•</span>
                                                 <span className={`text-xs px-2 py-0.5 rounded-full ${isDeposito ? "bg-emerald-500/20 text-emerald-400" : "bg-red-500/20 text-red-400"
                                                     }`}>
                                                     {isDeposito ? "Depósito" : "Retirada"}
@@ -302,7 +302,7 @@ export default function PoupancaPage() {
 
                     {activeMeta && getTransacoesFiltradas().length === 0 && (
                         <div className="text-center py-12">
-                            <p className="text-gray-500">Nenhuma transação nesta meta</p>
+                            <p className="text-muted">Nenhuma transação nesta meta</p>
                         </div>
                     )}
                 </div>

@@ -59,11 +59,11 @@ export default function CriptoPage() {
                 {/* Header */}
                 <header className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-3xl font-bold text-white flex items-center gap-3">
+                        <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
                             <Coins className="text-amber-400" size={32} />
                             Criptomoedas
                         </h1>
-                        <p className="text-gray-400 mt-1">
+                        <p className="text-muted mt-1">
                             Acompanhe o mercado e gerencie sua carteira
                         </p>
                     </div>
@@ -72,7 +72,7 @@ export default function CriptoPage() {
                         {/* New Crypto Button */}
                         <button
                             onClick={() => setIsModalOpen(true)}
-                            className="flex items-center gap-2 px-5 py-3 text-white font-medium rounded-xl transition-all hover:shadow-lg"
+                            className="flex items-center gap-2 px-5 py-3 text-foreground font-medium rounded-xl transition-all hover:shadow-lg"
                             style={{
                                 background: "linear-gradient(135deg, #FFD700 0%, #FFC700 100%)",
                                 boxShadow: "0 4px 15px rgba(255, 215, 0, 0.4)",
@@ -112,7 +112,7 @@ export default function CriptoPage() {
                         onClick={() => setActiveTab("market")}
                         className={`pb-4 px-4 text-sm font-medium transition-all relative ${activeTab === "market"
                             ? "text-amber-400"
-                            : "text-gray-400 hover:text-white"
+                            : "text-gray-400 hover:text-foreground"
                             }`}
                     >
                         <div className="flex items-center gap-2">
@@ -127,7 +127,7 @@ export default function CriptoPage() {
                         onClick={() => setActiveTab("portfolio")}
                         className={`pb-4 px-4 text-sm font-medium transition-all relative ${activeTab === "portfolio"
                             ? "text-amber-400"
-                            : "text-gray-400 hover:text-white"
+                            : "text-gray-400 hover:text-foreground"
                             }`}
                     >
                         <div className="flex items-center gap-2">
@@ -145,14 +145,14 @@ export default function CriptoPage() {
                     {activeTab === "market" ? (
                         <>
                             {loading ? (
-                                <div className="text-center py-12 text-gray-500">
+                                <div className="text-center py-12 text-muted">
                                     Carregando cotações...
                                 </div>
                             ) : (
                                 <div className="overflow-x-auto">
                                     <table className="w-full">
                                         <thead>
-                                            <tr className="text-left text-sm text-gray-400 border-b border-white/10">
+                                            <tr className="text-left text-sm text-muted border-b border-white/10">
                                                 <th className="pb-4 font-medium pl-4">Moeda</th>
                                                 <th className="pb-4 font-medium">Preço Atual</th>
                                                 <th className="pb-4 font-medium">Variação 24h</th>
@@ -166,12 +166,12 @@ export default function CriptoPage() {
                                                         <div className="flex items-center gap-3">
                                                             <img src={coin.image} alt={coin.name} className="w-8 h-8 rounded-full" />
                                                             <div>
-                                                                <p className="font-semibold text-white">{coin.name}</p>
-                                                                <p className="text-xs text-gray-400 uppercase">{coin.symbol}</p>
+                                                                <p className="font-semibold text-foreground">{coin.name}</p>
+                                                                <p className="text-xs text-muted uppercase">{coin.symbol}</p>
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td className="py-4 font-medium text-white">
+                                                    <td className="py-4 font-medium text-foreground">
                                                         {formatCurrency(coin.current_price)}
                                                     </td>
                                                     <td className="py-4">
@@ -183,7 +183,7 @@ export default function CriptoPage() {
                                                             {coin.price_change_percentage_24h?.toFixed(2)}%
                                                         </span>
                                                     </td>
-                                                    <td className="py-4 text-gray-400">
+                                                    <td className="py-4 text-muted">
                                                         {formatCurrency(coin.market_cap)}
                                                     </td>
                                                 </tr>

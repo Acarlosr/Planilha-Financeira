@@ -92,7 +92,7 @@ function CheckoutContent() {
                 {/* Header */}
                 <Link
                     href="/pricing"
-                    className="inline-flex items-center gap-2 mb-8 text-gray-400 hover:text-white transition-colors"
+                    className="inline-flex items-center gap-2 mb-8 text-muted hover:text-foreground transition-colors"
                 >
                     <ArrowLeft size={20} />
                     Voltar aos Planos
@@ -118,14 +118,14 @@ function CheckoutContent() {
                                 )}
                             </div>
                             <div>
-                                <h1 className="text-2xl font-bold text-white">Plano {plan.name}</h1>
-                                <p className="text-gray-400">{plan.description}</p>
+                                <h1 className="text-2xl font-bold text-foreground">Plano {plan.name}</h1>
+                                <p className="text-muted">{plan.description}</p>
                             </div>
                         </div>
 
                         {/* Billing Cycle Toggle */}
                         <div className="mb-6">
-                            <p className="text-sm text-gray-400 mb-3">Ciclo de cobrança</p>
+                            <p className="text-sm text-muted mb-3">Ciclo de cobrança</p>
                             <div
                                 className="inline-flex rounded-xl p-1 border border-white/10"
                                 style={{ background: "rgba(255, 255, 255, 0.05)" }}
@@ -134,7 +134,7 @@ function CheckoutContent() {
                                     onClick={() => setBillingCycle("monthly")}
                                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${billingCycle === "monthly"
                                         ? "text-black"
-                                        : "text-gray-400 hover:text-white"
+                                        : "text-gray-400 hover:text-foreground"
                                         }`}
                                     style={
                                         billingCycle === "monthly"
@@ -150,7 +150,7 @@ function CheckoutContent() {
                                     onClick={() => setBillingCycle("yearly")}
                                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${billingCycle === "yearly"
                                         ? "text-black"
-                                        : "text-gray-400 hover:text-white"
+                                        : "text-gray-400 hover:text-foreground"
                                         }`}
                                     style={
                                         billingCycle === "yearly"
@@ -169,10 +169,10 @@ function CheckoutContent() {
                         {/* Price */}
                         <div className="mb-6 p-4 rounded-xl bg-white/5 border border-white/10">
                             <div className="flex justify-between items-center">
-                                <span className="text-gray-400">Subtotal</span>
-                                <span className="text-xl font-bold text-white">
+                                <span className="text-muted">Subtotal</span>
+                                <span className="text-xl font-bold text-foreground">
                                     {formatPrice(currentPrice || 0)}
-                                    <span className="text-sm font-normal text-gray-400">
+                                    <span className="text-sm font-normal text-muted">
                                         /{billingCycle === "monthly" ? "mês" : "ano"}
                                     </span>
                                 </span>
@@ -181,10 +181,10 @@ function CheckoutContent() {
 
                         {/* Features */}
                         <div>
-                            <p className="text-sm text-gray-400 mb-3">O que está incluso:</p>
+                            <p className="text-sm text-muted mb-3">O que está incluso:</p>
                             <ul className="space-y-2">
                                 {plan.features.map((feature, idx) => (
-                                    <li key={idx} className="flex items-center gap-2 text-sm text-gray-300">
+                                    <li key={idx} className="flex items-center gap-2 text-sm text-muted">
                                         <CheckCircle size={16} className="text-[#7CFF6B]" />
                                         {feature.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
                                     </li>
@@ -200,7 +200,7 @@ function CheckoutContent() {
                     >
                         <div className="flex items-center gap-2 mb-6">
                             <CreditCard size={20} className="text-[#7CFF6B]" />
-                            <h2 className="text-xl font-bold text-white">Pagamento</h2>
+                            <h2 className="text-xl font-bold text-foreground">Pagamento</h2>
                         </div>
 
                         {/* Security Badge */}
@@ -216,10 +216,10 @@ function CheckoutContent() {
                             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-amber-500/20 flex items-center justify-center">
                                 <CreditCard size={32} className="text-amber-400" />
                             </div>
-                            <h3 className="text-lg font-semibold text-white mb-2">
+                            <h3 className="text-lg font-semibold text-foreground mb-2">
                                 Integração de Pagamento
                             </h3>
-                            <p className="text-gray-400 text-sm mb-6">
+                            <p className="text-muted text-sm mb-6">
                                 A integração com gateway de pagamento (Stripe/PagSeguro) está em desenvolvimento.
                             </p>
                         </div>
@@ -241,7 +241,7 @@ function CheckoutContent() {
                             )}
                         </button>
 
-                        <p className="text-center text-gray-500 text-xs mt-4">
+                        <p className="text-center text-muted text-xs mt-4">
                             Ao assinar, você concorda com nossos Termos de Serviço e Política de Privacidade.
                         </p>
                     </div>

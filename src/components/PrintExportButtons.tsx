@@ -84,7 +84,7 @@ export default function PrintExportButtons({ title, period }: PrintExportButtons
                             document.querySelectorAll('[class*="text-red"]').forEach(el => {
                                 el.style.color = '#dc2626';
                             });
-                            document.querySelectorAll('[class*="text-white"]').forEach(el => {
+                            document.querySelectorAll('[class*="text-foreground"]').forEach(el => {
                                 el.style.color = '#1f2937';
                             });
                             document.querySelectorAll('[class*="text-gray"]').forEach(el => {
@@ -114,7 +114,7 @@ export default function PrintExportButtons({ title, period }: PrintExportButtons
         <div className="flex items-center gap-2">
             <button
                 onClick={handlePrint}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-gray-300 hover:text-white hover:bg-white/10 border border-white/10 transition-all"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-muted hover:text-white hover:bg-white/10 border border-white/10 transition-all"
                 title="Imprimir"
             >
                 <Printer size={18} />
@@ -122,7 +122,7 @@ export default function PrintExportButtons({ title, period }: PrintExportButtons
             </button>
             <button
                 onClick={handleExportPDF}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-gray-300 hover:text-white hover:bg-white/10 border border-white/10 transition-all"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-muted hover:text-white hover:bg-white/10 border border-white/10 transition-all"
                 title="Salvar PDF"
             >
                 <Download size={18} />

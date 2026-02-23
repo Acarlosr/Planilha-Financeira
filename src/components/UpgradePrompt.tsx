@@ -38,7 +38,7 @@ export default function UpgradePrompt({
                     {onClose && (
                         <button
                             onClick={onClose}
-                            className="absolute top-4 right-4 p-2 text-gray-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors"
+                            className="absolute top-4 right-4 p-2 text-muted hover:text-white rounded-lg hover:bg-white/10 transition-colors"
                         >
                             <X size={20} />
                         </button>
@@ -54,11 +54,11 @@ export default function UpgradePrompt({
                             <Crown size={28} className="text-black" />
                         </div>
 
-                        <h3 className="text-2xl font-bold text-white mb-2">
+                        <h3 className="text-2xl font-bold text-foreground mb-2">
                             Upgrade para {planName}
                         </h3>
 
-                        <p className="text-gray-400 mb-6">
+                        <p className="text-muted mb-6">
                             {reason || `Esta funcionalidade está disponível apenas no plano ${planName}.`}
                         </p>
 
@@ -77,7 +77,7 @@ export default function UpgradePrompt({
                             {onClose && (
                                 <button
                                     onClick={onClose}
-                                    className="w-full py-3 text-gray-400 hover:text-white transition-colors"
+                                    className="w-full py-3 text-muted hover:text-foreground transition-colors"
                                 >
                                     Agora não
                                 </button>
@@ -108,10 +108,10 @@ export default function UpgradePrompt({
                             <Crown size={20} className="text-black" />
                         </div>
                         <div>
-                            <p className="text-white font-medium">
+                            <p className="text-foreground font-medium">
                                 Upgrade para {planName}
                             </p>
-                            <p className="text-sm text-gray-400">
+                            <p className="text-sm text-muted">
                                 {reason || `Desbloqueie funcionalidades avançadas`}
                             </p>
                         </div>
@@ -147,11 +147,11 @@ export default function UpgradePrompt({
                 <Crown size={24} className="text-black" />
             </div>
 
-            <h3 className="text-lg font-bold text-white mb-2">
+            <h3 className="text-lg font-bold text-foreground mb-2">
                 Recurso Premium
             </h3>
 
-            <p className="text-gray-400 text-sm mb-4">
+            <p className="text-muted text-sm mb-4">
                 {reason || `Esta funcionalidade está disponível apenas no plano ${planName}.`}
             </p>
 

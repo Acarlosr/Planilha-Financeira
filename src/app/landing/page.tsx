@@ -109,7 +109,7 @@ export default function LandingPage() {
                         {/* Theme Toggle */}
                         <button
                             onClick={toggleTheme}
-                            className="p-2 text-gray-300 hover:text-white transition-colors rounded-lg hover:bg-white/10"
+                            className="p-2 text-muted hover:text-white transition-colors rounded-lg hover:bg-white/10"
                             title={theme === "dark" ? "Modo Light" : "Modo Dark"}
                         >
                             {theme === "dark" ? (
@@ -120,13 +120,13 @@ export default function LandingPage() {
                         </button>
                         <Link
                             href="/login"
-                            className="px-4 py-2 text-gray-300 hover:text-white transition-colors font-medium"
+                            className="px-4 py-2 text-muted hover:text-foreground transition-colors font-medium"
                         >
                             Entrar
                         </Link>
                         <Link
                             href="/cadastro"
-                            className="px-5 py-2.5 rounded-xl text-white font-semibold transition-all hover:brightness-110"
+                            className="px-5 py-2.5 rounded-xl text-foreground font-semibold transition-all hover:brightness-110"
                             style={{
                                 background: "linear-gradient(135deg, #FFD700 0%, #FFC700 100%)",
                                 boxShadow: "0 4px 15px rgba(30, 64, 175, 0.4)"
@@ -146,7 +146,7 @@ export default function LandingPage() {
                         <span className="text-sm text-[#6FEB5A] font-medium">Gestão financeira simplificada</span>
                     </div>
 
-                    <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
+                    <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 leading-tight">
                         Organize suas{" "}
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
                             finanças pessoais
@@ -154,7 +154,7 @@ export default function LandingPage() {
                         {" "}em um só lugar
                     </h1>
 
-                    <p className="text-xl text-gray-400 max-w-3xl mx-auto mb-10 leading-relaxed">
+                    <p className="text-xl text-muted max-w-3xl mx-auto mb-10 leading-relaxed">
                         O FinançasPro é sua plataforma completa para controlar receitas, despesas,
                         investimentos e metas financeiras. Tome decisões mais inteligentes sobre seu dinheiro.
                     </p>
@@ -162,7 +162,7 @@ export default function LandingPage() {
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                         <Link
                             href="/cadastro"
-                            className="flex items-center gap-2 px-8 py-4 rounded-xl text-white font-semibold text-lg transition-all hover:brightness-110 hover:scale-105"
+                            className="flex items-center gap-2 px-8 py-4 rounded-xl text-foreground font-semibold text-lg transition-all hover:brightness-110 hover:scale-105"
                             style={{
                                 background: "linear-gradient(135deg, #FFD700 0%, #FFC700 100%)",
                                 boxShadow: "0 4px 20px rgba(30, 64, 175, 0.5)"
@@ -185,10 +185,10 @@ export default function LandingPage() {
             <section className="relative z-10 py-20 px-6 border-t border-white/5">
                 <div className="max-w-7xl mx-auto">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                        <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
                             O que você pode gerenciar
                         </h2>
-                        <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+                        <p className="text-muted text-lg max-w-2xl mx-auto">
                             Ferramentas completas para ter controle total das suas finanças
                         </p>
                     </div>
@@ -211,8 +211,8 @@ export default function LandingPage() {
                                 >
                                     {feature.icon}
                                 </div>
-                                <h3 className="text-xl font-semibold text-white mb-2">{feature.title}</h3>
-                                <p className="text-gray-400 leading-relaxed">{feature.description}</p>
+                                <h3 className="text-xl font-semibold text-foreground mb-2">{feature.title}</h3>
+                                <p className="text-muted leading-relaxed">{feature.description}</p>
                             </div>
                         ))}
                     </div>
@@ -231,16 +231,16 @@ export default function LandingPage() {
                     >
                         <div className="grid md:grid-cols-2 gap-10 items-center">
                             <div>
-                                <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                                <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
                                     Por que escolher o FinançasPro?
                                 </h2>
-                                <p className="text-gray-400 text-lg mb-8">
+                                <p className="text-muted text-lg mb-8">
                                     Uma plataforma pensada para simplificar sua vida financeira,
                                     com recursos poderosos e interface intuitiva.
                                 </p>
                                 <Link
                                     href="/cadastro"
-                                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-white font-semibold transition-all hover:brightness-110"
+                                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-foreground font-semibold transition-all hover:brightness-110"
                                     style={{
                                         background: "linear-gradient(135deg, #FFD700 0%, #FFC700 100%)",
                                         boxShadow: "0 4px 15px rgba(30, 64, 175, 0.4)"
@@ -256,7 +256,7 @@ export default function LandingPage() {
                                         <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center shrink-0">
                                             <Check className="w-4 h-4 text-emerald-400" />
                                         </div>
-                                        <span className="text-gray-300">{benefit}</span>
+                                        <span className="text-muted">{benefit}</span>
                                     </div>
                                 ))}
                             </div>
@@ -273,10 +273,10 @@ export default function LandingPage() {
                             <Zap className="w-4 h-4 text-emerald-400" />
                             <span className="text-sm text-emerald-300 font-medium">Experimente grátis por 15 dias</span>
                         </div>
-                        <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                        <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
                             Planos simples e acessíveis
                         </h2>
-                        <p className="text-gray-400 text-lg">
+                        <p className="text-muted text-lg">
                             Comece gratuitamente e depois escolha o plano que melhor se adapta a você
                         </p>
                     </div>
@@ -290,35 +290,35 @@ export default function LandingPage() {
                             <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 mb-4">
                                 🇧🇷
                             </div>
-                            <h3 className="text-xl font-semibold text-white mb-2">Plano Brasil</h3>
+                            <h3 className="text-xl font-semibold text-foreground mb-2">Plano Brasil</h3>
                             <div className="mb-4">
-                                <span className="text-4xl font-bold text-white">R$ 10,99</span>
-                                <span className="text-gray-400">/mês</span>
+                                <span className="text-4xl font-bold text-foreground">R$ 10,99</span>
+                                <span className="text-muted">/mês</span>
                             </div>
-                            <p className="text-gray-400 text-sm mb-6">
+                            <p className="text-muted text-sm mb-6">
                                 Acesso completo a todas as funcionalidades
                             </p>
                             <ul className="text-left space-y-3 mb-8">
-                                <li className="flex items-center gap-2 text-gray-300 text-sm">
+                                <li className="flex items-center gap-2 text-muted text-sm">
                                     <Check className="w-4 h-4 text-emerald-400" />
                                     15 dias grátis para testar
                                 </li>
-                                <li className="flex items-center gap-2 text-gray-300 text-sm">
+                                <li className="flex items-center gap-2 text-muted text-sm">
                                     <Check className="w-4 h-4 text-emerald-400" />
                                     Controle ilimitado de transações
                                 </li>
-                                <li className="flex items-center gap-2 text-gray-300 text-sm">
+                                <li className="flex items-center gap-2 text-muted text-sm">
                                     <Check className="w-4 h-4 text-emerald-400" />
                                     Relatórios e gráficos avançados
                                 </li>
-                                <li className="flex items-center gap-2 text-gray-300 text-sm">
+                                <li className="flex items-center gap-2 text-muted text-sm">
                                     <Check className="w-4 h-4 text-emerald-400" />
                                     Suporte prioritário
                                 </li>
                             </ul>
                             <Link
                                 href="/cadastro"
-                                className="block w-full py-3 rounded-xl text-white font-semibold transition-all hover:brightness-110"
+                                className="block w-full py-3 rounded-xl text-foreground font-semibold transition-all hover:brightness-110"
                                 style={{
                                     background: "linear-gradient(135deg, #FFD700 0%, #FFC700 100%)",
                                     boxShadow: "0 4px 15px rgba(30, 64, 175, 0.4)"
@@ -339,35 +339,35 @@ export default function LandingPage() {
                             <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[#FFD700]/20 text-[#FFD700] mb-4 text-2xl">
                                 🌎
                             </div>
-                            <h3 className="text-xl font-semibold text-white mb-2">Plano Global</h3>
+                            <h3 className="text-xl font-semibold text-foreground mb-2">Plano Global</h3>
                             <div className="mb-4">
-                                <span className="text-4xl font-bold text-white">$ 2</span>
-                                <span className="text-gray-400">/mês</span>
+                                <span className="text-4xl font-bold text-foreground">$ 2</span>
+                                <span className="text-muted">/mês</span>
                             </div>
-                            <p className="text-gray-400 text-sm mb-6">
+                            <p className="text-muted text-sm mb-6">
                                 Ideal para quem está fora do Brasil
                             </p>
                             <ul className="text-left space-y-3 mb-8">
-                                <li className="flex items-center gap-2 text-gray-300 text-sm">
+                                <li className="flex items-center gap-2 text-muted text-sm">
                                     <Check className="w-4 h-4 text-[#7CFF6B]" />
                                     15 dias grátis para testar
                                 </li>
-                                <li className="flex items-center gap-2 text-gray-300 text-sm">
+                                <li className="flex items-center gap-2 text-muted text-sm">
                                     <Check className="w-4 h-4 text-[#7CFF6B]" />
                                     Controle ilimitado de transações
                                 </li>
-                                <li className="flex items-center gap-2 text-gray-300 text-sm">
+                                <li className="flex items-center gap-2 text-muted text-sm">
                                     <Check className="w-4 h-4 text-[#7CFF6B]" />
                                     Relatórios e gráficos avançados
                                 </li>
-                                <li className="flex items-center gap-2 text-gray-300 text-sm">
+                                <li className="flex items-center gap-2 text-muted text-sm">
                                     <Check className="w-4 h-4 text-[#7CFF6B]" />
                                     Suporte prioritário
                                 </li>
                             </ul>
                             <Link
                                 href="/cadastro"
-                                className="block w-full py-3 rounded-xl text-white font-semibold transition-all hover:brightness-110"
+                                className="block w-full py-3 rounded-xl text-foreground font-semibold transition-all hover:brightness-110"
                                 style={{
                                     background: "linear-gradient(135deg, #7CFF6B 0%, #6FEB5A 100%)",
                                     boxShadow: "0 4px 15px rgba(14, 165, 233, 0.4)"
@@ -378,7 +378,7 @@ export default function LandingPage() {
                         </div>
                     </div>
 
-                    <p className="text-center text-gray-500 text-sm mt-8">
+                    <p className="text-center text-muted text-sm mt-8">
                         Cancele a qualquer momento. Sem compromisso.
                     </p>
                 </div>
@@ -398,7 +398,7 @@ export default function LandingPage() {
                         </div>
                         <span className="text-lg font-semibold text-[#7CFF6B]">FinançasPro</span>
                     </div>
-                    <p className="text-gray-500 text-sm">
+                    <p className="text-muted text-sm">
                         © 2026 FinançasPro. Todos os direitos reservados.
                     </p>
                 </div>

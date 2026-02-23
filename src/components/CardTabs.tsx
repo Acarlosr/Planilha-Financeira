@@ -73,7 +73,7 @@ export default function CardTabs({ cartoes, activeCardId, onSelectCard, onAddCar
                                 {cartao.nome}
                             </span>
                             {cartao.ultimos_digitos && (
-                                <span className="text-[10px] text-gray-400">
+                                <span className="text-[10px] text-muted">
                                     •••• {cartao.ultimos_digitos}
                                 </span>
                             )}

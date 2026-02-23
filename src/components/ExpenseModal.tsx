@@ -163,7 +163,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
             <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl p-6 animate-in zoom-in-95 duration-200 overflow-y-auto max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-bold text-gray-800">Nova Despesa</h2>
-                    <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-500">
+                    <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors text-muted">
                         <X size={20} />
                     </button>
                 </div>
@@ -174,7 +174,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                         <div className="col-span-1 md:col-span-2">
                             <label className="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
                             <div className="relative">
-                                <AlignLeft className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                <AlignLeft className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
                                 <input
                                     type="text"
                                     required
@@ -189,7 +189,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Valor</label>
                             <div className="relative">
-                                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
                                 <input
                                     type="text"
                                     required
@@ -204,7 +204,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Data</label>
                             <div className="relative">
-                                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
                                 <input
                                     type="date"
                                     required
@@ -219,7 +219,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                         <div className="col-span-1 md:col-span-2">
                             <label className="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
                             <div className="relative">
-                                <Tag className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                <Tag className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
                                 <select
                                     required
                                     value={categoryId}

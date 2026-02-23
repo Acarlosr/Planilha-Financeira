@@ -145,9 +145,9 @@ export default function Sidebar() {
                 }}
             >
                 {collapsed ? (
-                    <ChevronRight size={18} className="text-gray-400" />
+                    <ChevronRight size={18} className="text-muted" />
                 ) : (
-                    <ChevronLeft size={18} className="text-gray-400" />
+                    <ChevronLeft size={18} className="text-muted" />
                 )}
             </button>
         </aside>

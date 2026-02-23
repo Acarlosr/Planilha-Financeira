@@ -65,13 +65,13 @@ export default function UserMenu() {
             <div className="flex items-center gap-3">
                 <Link
                     href="/login"
-                    className="px-4 py-2 text-gray-400 font-medium hover:text-white hover:bg-white/5 rounded-xl transition-colors"
+                    className="px-4 py-2 text-muted font-medium hover:text-white hover:bg-white/5 rounded-xl transition-colors"
                 >
                     Entrar
                 </Link>
                 <Link
                     href="/cadastro"
-                    className="px-4 py-2 text-white font-medium rounded-xl transition-all hover:brightness-110"
+                    className="px-4 py-2 text-foreground font-medium rounded-xl transition-all hover:brightness-110"
                     style={{
                         background: "linear-gradient(135deg, #7CFF6B 0%, #6FEB5A 100%)",
                         boxShadow: "0 4px 15px rgba(30, 64, 175, 0.4)",
@@ -102,8 +102,8 @@ export default function UserMenu() {
                     <User size={18} className="text-white" />
                 </div>
                 <div className="hidden md:block">
-                    <p className="text-sm font-medium text-white">{userName}</p>
-                    <p className="text-xs text-gray-400">{userEmail}</p>
+                    <p className="text-sm font-medium text-foreground">{userName}</p>
+                    <p className="text-xs text-muted">{userEmail}</p>
                 </div>
                 <ChevronDown
                     size={16}
@@ -122,8 +122,8 @@ export default function UserMenu() {
                     }}
                 >
                     <div className="p-3 border-b border-white/10">
-                        <p className="text-sm font-medium text-white">{userName}</p>
-                        <p className="text-xs text-gray-400 mt-0.5">{userEmail}</p>
+                        <p className="text-sm font-medium text-foreground">{userName}</p>
+                        <p className="text-xs text-muted mt-0.5">{userEmail}</p>
                     </div>
 
                     <button
@@ -131,7 +131,7 @@ export default function UserMenu() {
                         className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-white/5 transition-colors"
                     >
                         <LogOut size={18} className="text-red-400" />
-                        <span className="text-sm font-medium text-gray-300">Sair</span>
+                        <span className="text-sm font-medium text-muted">Sair</span>
                     </button>
                 </div>
             )}

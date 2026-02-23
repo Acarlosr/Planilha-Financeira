@@ -93,13 +93,13 @@ export default function InvestmentModal({ isOpen, onClose, onSave }: InvestmentM
                         >
                             <Plus className="text-white" size={20} />
                         </div>
-                        <h2 className="text-xl font-bold text-white">
+                        <h2 className="text-xl font-bold text-foreground">
                             {type === "aporte" ? "Novo Aporte" : "Novo Resgate"}
                         </h2>
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                        className="p-2 text-muted hover:text-white hover:bg-white/10 rounded-lg transition-colors"
                     >
                         <X size={20} />
                     </button>
@@ -114,7 +114,7 @@ export default function InvestmentModal({ isOpen, onClose, onSave }: InvestmentM
                             onClick={() => setType("aporte")}
                             className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${type === "aporte"
                                 ? "bg-blue-500 text-white"
-                                : "text-gray-400 hover:text-white"
+                                : "text-gray-400 hover:text-foreground"
                                 }`}
                         >
                             Aporte
@@ -124,7 +124,7 @@ export default function InvestmentModal({ isOpen, onClose, onSave }: InvestmentM
                             onClick={() => setType("resgate")}
                             className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${type === "resgate"
                                 ? "bg-red-500 text-white"
-                                : "text-gray-400 hover:text-white"
+                                : "text-gray-400 hover:text-foreground"
                                 }`}
                         >
                             Resgate
@@ -133,7 +133,7 @@ export default function InvestmentModal({ isOpen, onClose, onSave }: InvestmentM
 
                     {/* Investment Type */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-400 mb-2">
+                        <label className="block text-sm font-medium text-muted mb-2">
                             Tipo de Investimento
                         </label>
                         <div className="grid grid-cols-4 gap-2">
@@ -157,7 +157,7 @@ export default function InvestmentModal({ isOpen, onClose, onSave }: InvestmentM
 
                     {/* Description */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-400 mb-2">
+                        <label className="block text-sm font-medium text-muted mb-2">
                             Descrição
                         </label>
                         <input
@@ -166,14 +166,14 @@ export default function InvestmentModal({ isOpen, onClose, onSave }: InvestmentM
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             placeholder="Ex: Aporte Tesouro Selic"
-                            className="w-full px-4 py-3 rounded-xl text-white placeholder:text-gray-500 outline-none transition-all border border-white/10 focus:border-blue-500/50"
+                            className="w-full px-4 py-3 rounded-xl text-white placeholder:text-muted outline-none transition-all border border-white/10 focus:border-blue-500/50"
                             style={{ background: "rgba(255, 255, 255, 0.05)" }}
                         />
                     </div>
 
                     {/* Value */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-400 mb-2">
+                        <label className="block text-sm font-medium text-muted mb-2">
                             Valor (R$)
                         </label>
                         <input
@@ -182,14 +182,14 @@ export default function InvestmentModal({ isOpen, onClose, onSave }: InvestmentM
                             value={value}
                             onChange={(e) => formatValue(e.target.value)}
                             placeholder="0,00"
-                            className="w-full px-4 py-3 rounded-xl text-white placeholder:text-gray-500 outline-none transition-all border border-white/10 focus:border-blue-500/50"
+                            className="w-full px-4 py-3 rounded-xl text-white placeholder:text-muted outline-none transition-all border border-white/10 focus:border-blue-500/50"
                             style={{ background: "rgba(255, 255, 255, 0.05)" }}
                         />
                     </div>
 
                     {/* Date */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-400 mb-2">
+                        <label className="block text-sm font-medium text-muted mb-2">
                             Data
                         </label>
                         <input
@@ -206,7 +206,7 @@ export default function InvestmentModal({ isOpen, onClose, onSave }: InvestmentM
                     <button
                         type="submit"
                         disabled={loading || !description || !value}
-                        className="w-full py-3.5 rounded-xl text-white font-semibold transition-all hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed mt-6"
+                        className="w-full py-3.5 rounded-xl text-foreground font-semibold transition-all hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed mt-6"
                         style={{
                             background: type === "aporte"
                                 ? "linear-gradient(135deg, #FFD700 0%, #FFC700 100%)"

@@ -75,7 +75,7 @@ export default function CardFormModal({ isOpen, onClose, onSave }: CardFormModal
             <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl p-6 animate-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-bold text-gray-800">Adicionar Cartão</h2>
-                    <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-500">
+                    <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors text-muted">
                         <X size={20} />
                     </button>
                 </div>
@@ -84,7 +84,7 @@ export default function CardFormModal({ isOpen, onClose, onSave }: CardFormModal
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Nome do Cartão</label>
                         <div className="relative">
-                            <Type className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                            <Type className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
                             <input
                                 required
                                 value={formData.nome}
@@ -126,7 +126,7 @@ export default function CardFormModal({ isOpen, onClose, onSave }: CardFormModal
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Últimos 4 Dígitos</label>
                             <div className="relative">
-                                <Hash className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                <Hash className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
                                 <input
                                     maxLength={4}
                                     value={formData.ultimos_digitos}
@@ -139,7 +139,7 @@ export default function CardFormModal({ isOpen, onClose, onSave }: CardFormModal
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Limite (R$)</label>
                             <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">R$</span>
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted text-xs">R$</span>
                                 <input
                                     type="number"
                                     value={formData.limite}

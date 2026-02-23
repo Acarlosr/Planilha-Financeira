@@ -61,14 +61,14 @@ export default function AplicacaoPage() {
                 <header className="mb-8">
                     <div className="flex items-center justify-between">
                         <div>
-                            <h1 className="text-3xl font-bold text-white">Aplicações</h1>
-                            <p className="text-gray-400 mt-1">
+                            <h1 className="text-3xl font-bold text-foreground">Aplicações</h1>
+                            <p className="text-muted mt-1">
                                 Acompanhe seus investimentos e rentabilidade
                             </p>
                         </div>
                         <button
                             onClick={() => setIsModalOpen(true)}
-                            className="flex items-center gap-2 px-5 py-3 text-white font-medium rounded-xl transition-all hover:shadow-lg"
+                            className="flex items-center gap-2 px-5 py-3 text-foreground font-medium rounded-xl transition-all hover:shadow-lg"
                             style={{
                                 background: "linear-gradient(135deg, #FFD700 0%, #FFC700 100%)",
                                 boxShadow: "0 4px 15px rgba(59, 130, 246, 0.4)",
@@ -89,9 +89,9 @@ export default function AplicacaoPage() {
                                 >
                                     <DollarSign size={20} className="text-white" />
                                 </div>
-                                <p className="text-gray-400 text-sm font-medium">Total Investido</p>
+                                <p className="text-muted text-sm font-medium">Total Investido</p>
                             </div>
-                            <h2 className="text-3xl font-bold text-white">
+                            <h2 className="text-3xl font-bold text-foreground">
                                 R$ {totalInvestido.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                             </h2>
                         </div>
@@ -104,7 +104,7 @@ export default function AplicacaoPage() {
                                 >
                                     <Percent size={20} className="text-white" />
                                 </div>
-                                <p className="text-gray-400 text-sm font-medium">Rentabilidade Média</p>
+                                <p className="text-muted text-sm font-medium">Rentabilidade Média</p>
                             </div>
                             <h2 className="text-3xl font-bold text-emerald-400">
                                 {rentabilidadeMedia}% a.a.
@@ -119,7 +119,7 @@ export default function AplicacaoPage() {
                                 >
                                     <TrendingUp size={20} className="text-white" />
                                 </div>
-                                <p className="text-gray-400 text-sm font-medium">Rendimento (7 dias)</p>
+                                <p className="text-muted text-sm font-medium">Rendimento (7 dias)</p>
                             </div>
                             <h2 className="text-3xl font-bold text-[#FFD700]">
                                 + R$ 1.420,00
@@ -151,8 +151,8 @@ export default function AplicacaoPage() {
                                         <span className="text-sm font-bold">{inv.rentabilidade}%</span>
                                     </div>
                                 </div>
-                                <h3 className="text-gray-400 text-sm font-medium mb-1">{inv.nome}</h3>
-                                <p className="text-2xl font-bold text-white">
+                                <h3 className="text-muted text-sm font-medium mb-1">{inv.nome}</h3>
+                                <p className="text-2xl font-bold text-foreground">
                                     R$ {inv.saldo.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                                 </p>
                             </div>
@@ -164,8 +164,8 @@ export default function AplicacaoPage() {
                 <div className="glass-card p-6 mb-8">
                     <div className="flex items-center justify-between mb-6">
                         <div>
-                            <h2 className="text-xl font-bold text-white">Evolução do Patrimônio</h2>
-                            <p className="text-gray-400 text-sm mt-1">Últimos 7 meses</p>
+                            <h2 className="text-xl font-bold text-foreground">Evolução do Patrimônio</h2>
+                            <p className="text-muted text-sm mt-1">Últimos 7 meses</p>
                         </div>
                         <div className="flex items-center gap-2 text-[#FFD700]">
                             <Calendar size={18} />
@@ -207,7 +207,7 @@ export default function AplicacaoPage() {
                 {/* Transactions */}
                 <div className="glass-card p-6">
                     <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-xl font-bold text-white">
+                        <h2 className="text-xl font-bold text-foreground">
                             {activeFilter
                                 ? `Transações - ${tiposInvestimento.find((i) => i.id === activeFilter)?.nome}`
                                 : "Todas as Transações"}
@@ -242,10 +242,10 @@ export default function AplicacaoPage() {
                                             )}
                                         </div>
                                         <div>
-                                            <p className="font-medium text-white">{transacao.descricao}</p>
+                                            <p className="font-medium text-foreground">{transacao.descricao}</p>
                                             <div className="flex items-center gap-2 mt-0.5">
-                                                <span className="text-xs text-gray-400">{transacao.data}</span>
-                                                <span className="text-xs text-gray-500">•</span>
+                                                <span className="text-xs text-muted">{transacao.data}</span>
+                                                <span className="text-xs text-muted">•</span>
                                                 <span className={`text-xs px-2 py-0.5 rounded-full ${isAporte ? "bg-emerald-500/20 text-emerald-400" : "bg-red-500/20 text-red-400"
                                                     }`}>
                                                     {isAporte ? "Aporte" : "Resgate"}
@@ -263,7 +263,7 @@ export default function AplicacaoPage() {
 
                     {activeFilter && getTransacoesFiltradas().length === 0 && (
                         <div className="text-center py-12">
-                            <p className="text-gray-500">Nenhuma transação neste investimento</p>
+                            <p className="text-muted">Nenhuma transação neste investimento</p>
                         </div>
                     )}
                 </div>

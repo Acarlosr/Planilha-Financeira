@@ -95,7 +95,7 @@ export default function CryptoPortfolio() {
                             </option>
                         ))}
                     </select>
-                    <div className="text-sm text-gray-500">
+                    <div className="text-sm text-muted">
                         {filteredTransactions.length} transações
                     </div>
                 </div>
@@ -124,9 +124,9 @@ export default function CryptoPortfolio() {
                     <h3 className="font-semibold text-gray-800 mb-4">Adicionar Nova Criptomoeda</h3>
                     <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div>
-                            <label className="block text-xs font-medium text-gray-500 mb-1">Nome da Cripto</label>
+                            <label className="block text-xs font-medium text-muted mb-1">Nome da Cripto</label>
                             <div className="relative">
-                                <Coins className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                                <Coins className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={16} />
                                 <input
                                     name="coin"
                                     value={formData.coin}
@@ -138,7 +138,7 @@ export default function CryptoPortfolio() {
                             </div>
                         </div>
                         <div>
-                            <label className="block text-xs font-medium text-gray-500 mb-1">Data da Compra</label>
+                            <label className="block text-xs font-medium text-muted mb-1">Data da Compra</label>
                             <input
                                 type="date"
                                 name="date"
@@ -149,7 +149,7 @@ export default function CryptoPortfolio() {
                             />
                         </div>
                         <div>
-                            <label className="block text-xs font-medium text-gray-500 mb-1">Quantidade</label>
+                            <label className="block text-xs font-medium text-muted mb-1">Quantidade</label>
                             <input
                                 type="number"
                                 step="any"
@@ -162,9 +162,9 @@ export default function CryptoPortfolio() {
                             />
                         </div>
                         <div>
-                            <label className="block text-xs font-medium text-gray-500 mb-1">Valor Pago (USD)</label>
+                            <label className="block text-xs font-medium text-muted mb-1">Valor Pago (USD)</label>
                             <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">$</span>
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted text-xs">$</span>
                                 <input
                                     type="number"
                                     step="0.01"
@@ -178,9 +178,9 @@ export default function CryptoPortfolio() {
                             </div>
                         </div>
                         <div>
-                            <label className="block text-xs font-medium text-gray-500 mb-1">Cotação do Dólar</label>
+                            <label className="block text-xs font-medium text-muted mb-1">Cotação do Dólar</label>
                             <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">R$</span>
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted text-xs">R$</span>
                                 <input
                                     type="number"
                                     step="0.001"
@@ -194,7 +194,7 @@ export default function CryptoPortfolio() {
                             </div>
                         </div>
                         <div className="pt-5 flex gap-2">
-                            <button type="button" onClick={() => setIsFormOpen(false)} className="px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-lg">Cancelar</button>
+                            <button type="button" onClick={() => setIsFormOpen(false)} className="px-4 py-2 text-muted hover:bg-gray-100 rounded-lg">Cancelar</button>
                             <button type="submit" className="flex-1 px-4 py-2 bg-yellow-500 text-white font-medium rounded-lg hover:bg-yellow-600">Salvar</button>
                         </div>
                     </form>
@@ -204,9 +204,9 @@ export default function CryptoPortfolio() {
             {/* Print Header */}
             <div className="hidden print:block mb-8">
                 <h1 className="text-2xl font-bold text-gray-800">Relatório de Investimentos em Criptomoedas</h1>
-                <p className="text-gray-500">Mês de referência: {format(new Date(2024, selectedMonth - 1, 1), 'MMMM', { locale: ptBR })}</p>
+                <p className="text-muted">Mês de referência: {format(new Date(2024, selectedMonth - 1, 1), 'MMMM', { locale: ptBR })}</p>
                 <div className="mt-4 p-4 border border-gray-200 rounded-lg">
-                    <p className="text-sm text-gray-500">Total Investido (BRL)</p>
+                    <p className="text-sm text-muted">Total Investido (BRL)</p>
                     <p className="text-xl font-bold text-gray-800">
                         {totalInvestedBrl.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                     </p>
@@ -215,14 +215,14 @@ export default function CryptoPortfolio() {
 
             {/* List */}
             {filteredTransactions.length === 0 ? (
-                <div className="text-center py-12 text-gray-400 bg-gray-50/50 rounded-xl border-dashed border-2 border-gray-100">
+                <div className="text-center py-12 text-muted bg-gray-50/50 rounded-xl border-dashed border-2 border-gray-100">
                     Nenhuma transação registrada neste mês.
                 </div>
             ) : (
                 <div className="overflow-x-auto rounded-xl border border-gray-100">
                     <table className="w-full text-sm">
                         <thead className="bg-gray-50 border-b border-gray-100">
-                            <tr className="text-left text-gray-500">
+                            <tr className="text-left text-muted">
                                 <th className="p-4 font-medium">Data</th>
                                 <th className="p-4 font-medium">Criptomoeda</th>
                                 <th className="p-4 font-medium">Qtd.</th>
@@ -241,7 +241,7 @@ export default function CryptoPortfolio() {
                                     <td className="p-4 text-blue-600 font-medium">
                                         {t.priceUsd.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
                                     </td>
-                                    <td className="p-4 text-gray-500">
+                                    <td className="p-4 text-muted">
                                         R$ {t.dollarRate.toFixed(3)}
                                     </td>
                                     <td className="p-4 font-bold text-green-700 bg-green-50/30">

@@ -173,8 +173,8 @@ function DespesasContent() {
                 <header className="mb-8">
                     <div className="flex items-center justify-between">
                         <div>
-                            <h1 className="text-3xl font-bold text-white">Despesas</h1>
-                            <p className="text-gray-400 mt-1">
+                            <h1 className="text-3xl font-bold text-foreground">Despesas</h1>
+                            <p className="text-muted mt-1">
                                 Controle seus gastos e despesas mensais
                             </p>
                         </div>
@@ -182,7 +182,7 @@ function DespesasContent() {
                             <PrintExportButtons title="Despesas" period={`${currentMonth}/${currentYear}`} />
                             <button
                                 onClick={() => setIsModalOpen(true)}
-                                className="flex items-center gap-2 px-5 py-3 text-white font-medium rounded-xl transition-all hover:shadow-lg no-print"
+                                className="flex items-center gap-2 px-5 py-3 text-foreground font-medium rounded-xl transition-all hover:shadow-lg no-print"
                                 style={{
                                     background: "linear-gradient(135deg, #EF4444 0%, #F87171 100%)",
                                     boxShadow: "0 4px 15px rgba(239, 68, 68, 0.4)",
@@ -198,7 +198,7 @@ function DespesasContent() {
                     <div className="mt-6 glass-card p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-gray-400 text-sm font-medium">Total de Despesas</p>
+                                <p className="text-muted text-sm font-medium">Total de Despesas</p>
                                 <h2 className="text-3xl font-bold text-red-400 mt-1">
                                     R$ {totalDespesas.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                                 </h2>
@@ -237,8 +237,8 @@ function DespesasContent() {
                                         <IconComponent size={24} className="text-white" />
                                     </div>
                                     <div>
-                                        <p className="text-gray-400 text-xs font-medium leading-tight">{cat.label}</p>
-                                        <h3 className="text-lg font-bold text-white mt-1">
+                                        <p className="text-muted text-xs font-medium leading-tight">{cat.label}</p>
+                                        <h3 className="text-lg font-bold text-foreground mt-1">
                                             R$ {total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                                         </h3>
                                     </div>
@@ -251,7 +251,7 @@ function DespesasContent() {
                 {/* Items List */}
                 <div className="glass-card p-6">
                     <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-xl font-bold text-white">
+                        <h2 className="text-xl font-bold text-foreground">
                             {activeCategory
                                 ? getCategoryById(activeCategory)?.label
                                 : "Todas as Despesas"}
@@ -286,11 +286,11 @@ function DespesasContent() {
                                             {IconComponent && <IconComponent size={20} className="text-white" />}
                                         </div>
                                         <div>
-                                            <p className="font-medium text-white">{item.description}</p>
+                                            <p className="font-medium text-foreground">{item.description}</p>
                                             <div className="flex items-center gap-2 mt-0.5">
-                                                <span className="text-xs text-gray-400">{item.date}</span>
-                                                <span className="text-xs text-gray-500">•</span>
-                                                <span className="text-xs text-gray-400">{cat?.label}</span>
+                                                <span className="text-xs text-muted">{item.date}</span>
+                                                <span className="text-xs text-muted">•</span>
+                                                <span className="text-xs text-muted">{cat?.label}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -300,7 +300,7 @@ function DespesasContent() {
                                         </span>
                                         <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <button className="p-2 hover:bg-white/10 rounded-lg transition-colors">
-                                                <Edit size={16} className="text-gray-400" />
+                                                <Edit size={16} className="text-muted" />
                                             </button>
                                             <button className="p-2 hover:bg-red-500/20 rounded-lg transition-colors">
                                                 <Trash2 size={16} className="text-red-400" />
@@ -315,12 +315,12 @@ function DespesasContent() {
                     {/* Empty State */}
                     {filteredExpenses.length === 0 && (
                         <div className="text-center py-12">
-                            <p className="text-gray-500">Nenhuma despesa encontrada para este período.</p>
+                            <p className="text-muted">Nenhuma despesa encontrada para este período.</p>
                         </div>
                     )}
                     {filteredExpenses.length > 0 && activeCategory && getItemsByCategory(activeCategory).length === 0 && (
                         <div className="text-center py-12">
-                            <p className="text-gray-500">Nenhuma despesa nesta categoria</p>
+                            <p className="text-muted">Nenhuma despesa nesta categoria</p>
                         </div>
                     )}
                 </div>

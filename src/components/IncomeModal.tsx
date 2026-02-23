@@ -92,11 +92,11 @@ export default function IncomeModal({ isOpen, onClose, onSave }: IncomeModalProp
                         >
                             <Plus className="text-white" size={20} />
                         </div>
-                        <h2 className="text-xl font-bold text-white">Nova Receita</h2>
+                        <h2 className="text-xl font-bold text-foreground">Nova Receita</h2>
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                        className="p-2 text-muted hover:text-white hover:bg-white/10 rounded-lg transition-colors"
                     >
                         <X size={20} />
                     </button>
@@ -106,7 +106,7 @@ export default function IncomeModal({ isOpen, onClose, onSave }: IncomeModalProp
                 <form onSubmit={handleSubmit} className="space-y-4">
                     {/* Description */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-400 mb-2">
+                        <label className="block text-sm font-medium text-muted mb-2">
                             Descrição
                         </label>
                         <input
@@ -115,14 +115,14 @@ export default function IncomeModal({ isOpen, onClose, onSave }: IncomeModalProp
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             placeholder="Ex: Salário Janeiro"
-                            className="w-full px-4 py-3 rounded-xl text-white placeholder:text-gray-500 outline-none transition-all border border-white/10 focus:border-emerald-500/50"
+                            className="w-full px-4 py-3 rounded-xl text-white placeholder:text-muted outline-none transition-all border border-white/10 focus:border-emerald-500/50"
                             style={{ background: "rgba(255, 255, 255, 0.05)" }}
                         />
                     </div>
 
                     {/* Value */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-400 mb-2">
+                        <label className="block text-sm font-medium text-muted mb-2">
                             Valor (R$)
                         </label>
                         <input
@@ -131,14 +131,14 @@ export default function IncomeModal({ isOpen, onClose, onSave }: IncomeModalProp
                             value={value}
                             onChange={(e) => formatValue(e.target.value)}
                             placeholder="0,00"
-                            className="w-full px-4 py-3 rounded-xl text-white placeholder:text-gray-500 outline-none transition-all border border-white/10 focus:border-emerald-500/50"
+                            className="w-full px-4 py-3 rounded-xl text-white placeholder:text-muted outline-none transition-all border border-white/10 focus:border-emerald-500/50"
                             style={{ background: "rgba(255, 255, 255, 0.05)" }}
                         />
                     </div>
 
                     {/* Date */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-400 mb-2">
+                        <label className="block text-sm font-medium text-muted mb-2">
                             Data
                         </label>
                         <div className="relative">
@@ -155,7 +155,7 @@ export default function IncomeModal({ isOpen, onClose, onSave }: IncomeModalProp
 
                     {/* Category */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-400 mb-2">
+                        <label className="block text-sm font-medium text-muted mb-2">
                             Categoria
                         </label>
                         <div className="grid grid-cols-3 gap-2">
@@ -181,7 +181,7 @@ export default function IncomeModal({ isOpen, onClose, onSave }: IncomeModalProp
                     <button
                         type="submit"
                         disabled={loading || !description || !value}
-                        className="w-full py-3.5 rounded-xl text-white font-semibold transition-all hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed mt-6"
+                        className="w-full py-3.5 rounded-xl text-foreground font-semibold transition-all hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed mt-6"
                         style={{
                             background: "linear-gradient(135deg, #10B981 0%, #34D399 100%)",
                             boxShadow: "0 4px 15px rgba(16, 185, 129, 0.4)"

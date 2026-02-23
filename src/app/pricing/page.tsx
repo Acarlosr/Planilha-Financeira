@@ -69,17 +69,17 @@ export default function PricingPage() {
             <div className="max-w-6xl mx-auto">
                 <Link
                     href="/"
-                    className="inline-flex items-center gap-2 mb-8 text-gray-400 hover:text-white transition-colors"
+                    className="inline-flex items-center gap-2 mb-8 text-muted hover:text-foreground transition-colors"
                 >
                     <ArrowLeft size={20} />
                     Voltar ao Dashboard
                 </Link>
 
                 <div className="text-center mb-12">
-                    <h1 className="text-4xl font-bold text-white mb-4">
+                    <h1 className="text-4xl font-bold text-foreground mb-4">
                         Escolha o plano ideal para você
                     </h1>
-                    <p className="text-gray-400 text-lg">
+                    <p className="text-muted text-lg">
                         Comece grátis e faça upgrade quando precisar de mais recursos
                     </p>
                 </div>
@@ -94,7 +94,7 @@ export default function PricingPage() {
                             onClick={() => setBillingCycle('monthly')}
                             className={`px-6 py-2 rounded-lg font-medium transition-all ${billingCycle === 'monthly'
                                     ? 'text-black'
-                                    : 'text-gray-400 hover:text-white'
+                                    : 'text-gray-400 hover:text-foreground'
                                 }`}
                             style={billingCycle === 'monthly' ? {
                                 background: "linear-gradient(135deg, #7CFF6B 0%, #6FEB5A 100%)"
@@ -106,7 +106,7 @@ export default function PricingPage() {
                             onClick={() => setBillingCycle('yearly')}
                             className={`px-6 py-2 rounded-lg font-medium transition-all ${billingCycle === 'yearly'
                                     ? 'text-black'
-                                    : 'text-gray-400 hover:text-white'
+                                    : 'text-gray-400 hover:text-foreground'
                                 }`}
                             style={billingCycle === 'yearly' ? {
                                 background: "linear-gradient(135deg, #7CFF6B 0%, #6FEB5A 100%)"
@@ -168,23 +168,23 @@ export default function PricingPage() {
                                 </div>
 
                                 {/* Name */}
-                                <h3 className="text-2xl font-bold text-white mb-2">
+                                <h3 className="text-2xl font-bold text-foreground mb-2">
                                     {plan.name}
                                 </h3>
 
                                 {/* Description */}
-                                <p className="text-gray-400 text-sm mb-6">
+                                <p className="text-muted text-sm mb-6">
                                     {plan.description}
                                 </p>
 
                                 {/* Price */}
                                 <div className="mb-6">
                                     <div className="flex items-baseline gap-2">
-                                        <span className="text-4xl font-bold text-white">
+                                        <span className="text-4xl font-bold text-foreground">
                                             {formatPrice(plan)}
                                         </span>
                                         {plan.price_monthly > 0 && (
-                                            <span className="text-gray-400">
+                                            <span className="text-muted">
                                                 /{billingCycle === 'monthly' ? 'mês' : 'ano'}
                                             </span>
                                         )}
@@ -193,13 +193,13 @@ export default function PricingPage() {
 
                                 {/* Limits */}
                                 <div className="mb-6 space-y-2">
-                                    <div className="text-sm text-gray-400">
-                                        <strong className="text-white">
+                                    <div className="text-sm text-muted">
+                                        <strong className="text-foreground">
                                             {plan.max_transactions || 'Ilimitadas'}
                                         </strong> transações/mês
                                     </div>
-                                    <div className="text-sm text-gray-400">
-                                        <strong className="text-white">
+                                    <div className="text-sm text-muted">
+                                        <strong className="text-foreground">
                                             {plan.max_dashboard_cards || 'Ilimitados'}
                                         </strong> cards no dashboard
                                     </div>
@@ -210,7 +210,7 @@ export default function PricingPage() {
                                     {getFeaturesList(plan.features).map((feature, idx) => (
                                         <li key={idx} className="flex items-start gap-3">
                                             <Check size={20} className="text-[#7CFF6B] flex-shrink-0 mt-0.5" />
-                                            <span className="text-sm text-gray-300">{feature}</span>
+                                            <span className="text-sm text-muted">{feature}</span>
                                         </li>
                                     ))}
                                 </ul>
@@ -219,14 +219,14 @@ export default function PricingPage() {
                                 {isCurrentPlan ? (
                                     <button
                                         disabled
-                                        className="w-full py-3 rounded-xl font-semibold bg-white/10 text-gray-400 cursor-not-allowed"
+                                        className="w-full py-3 rounded-xl font-semibold bg-white/10 text-muted cursor-not-allowed"
                                     >
                                         Plano Atual
                                     </button>
                                 ) : (
                                     <Link
                                         href={plan.slug === 'free' ? '/cadastro' : `/checkout?plan=${plan.slug}`}
-                                        className={`block w-full py-3 rounded-xl font-semibold text-center transition-all hover:brightness-110 ${isPro ? 'text-black' : 'text-white'
+                                        className={`block w-full py-3 rounded-xl font-semibold text-center transition-all hover:brightness-110 ${isPro ? 'text-black' : 'text-foreground'
                                             }`}
                                         style={isPro ? {
                                             background: "linear-gradient(135deg, #7CFF6B 0%, #6FEB5A 100%)"
@@ -244,7 +244,7 @@ export default function PricingPage() {
                 </div>
 
                 {/* FAQ or Additional Info */}
-                <div className="text-center text-gray-400 text-sm">
+                <div className="text-center text-muted text-sm">
                     <p>Todos os planos incluem 7 dias de trial gratuito</p>
                     <p className="mt-2">Cancele a qualquer momento, sem taxas</p>
                 </div>
