@@ -30,6 +30,7 @@ export interface FII {
     precoMedio: number; // R$ por cota
     valorAtual: number; // R$ total
     dyAnual: number; // Dividend Yield % 12 meses
+    cnpj?: string; // Ex: "11.222.333/0001-44"
 }
 
 export interface Dividendo {

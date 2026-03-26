@@ -11,6 +11,7 @@ interface CryptoTransaction {
     date: string;
     quantity: number;
     priceUsd: number;
+    priceBrl: number;
     dollarRate: number;
     totalBrl: number;
 }
@@ -26,6 +27,7 @@ export default function CryptoPortfolio() {
         date: new Date().toISOString().split('T')[0],
         quantity: "",
         priceUsd: "",
+        priceBrl: "",
         dollarRate: "",
     });
 
@@ -39,17 +41,18 @@ export default function CryptoPortfolio() {
 
         const quantity = parseFloat(formData.quantity);
         const priceUsd = parseFloat(formData.priceUsd);
+        const priceBrl = parseFloat(formData.priceBrl);
         const dollarRate = parseFloat(formData.dollarRate);
 
-        const totalUsd = parseFloat(formData.priceUsd);
-        const totalBrl = totalUsd * dollarRate;
+        const totalBrl = priceBrl || (priceUsd * dollarRate);
 
         const newTransaction: CryptoTransaction = {
             id: Math.random().toString(36).substr(2, 9),
             coin: formData.coin,
             date: formData.date,
             quantity: quantity,
-            priceUsd: totalUsd,
+            priceUsd: priceUsd,
+            priceBrl: priceBrl || totalBrl,
             dollarRate: dollarRate,
             totalBrl: totalBrl,
         };
@@ -61,6 +64,7 @@ export default function CryptoPortfolio() {
             date: new Date().toISOString().split('T')[0],
             quantity: "",
             priceUsd: "",
+            priceBrl: "",
             dollarRate: "",
         });
     };
@@ -75,6 +79,7 @@ export default function CryptoPortfolio() {
     });
 
     const totalInvestedBrl = filteredTransactions.reduce((acc, curr) => acc + curr.totalBrl, 0);
+    const totalInvestedUsd = filteredTransactions.reduce((acc, curr) => acc + curr.priceUsd, 0);
 
     const handlePrint = () => {
         window.print();
@@ -193,6 +198,22 @@ export default function CryptoPortfolio() {
                                 />
                             </div>
                         </div>
+                        <div>
+                            <label className="block text-xs font-medium text-muted mb-1">Valor Pago (BRL) <span className="text-green-600 font-normal">p/ IR</span></label>
+                            <div className="relative">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted text-xs">R$</span>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    name="priceBrl"
+                                    value={formData.priceBrl}
+                                    onChange={handleInputChange}
+                                    placeholder="0,00"
+                                    className="w-full pl-8 pr-3 py-2 rounded-lg border border-green-300 bg-green-50/30 focus:ring-2 focus:ring-green-200 outline-none"
+                                />
+                            </div>
+                            <span className="text-[10px] text-green-600 mt-0.5 block">Valor para declaração de IR</span>
+                        </div>
                         <div className="pt-5 flex gap-2">
                             <button type="button" onClick={() => setIsFormOpen(false)} className="px-4 py-2 text-muted hover:bg-gray-100 rounded-lg">Cancelar</button>
                             <button type="submit" className="flex-1 px-4 py-2 bg-yellow-500 text-white font-medium rounded-lg hover:bg-yellow-600">Salvar</button>
@@ -226,9 +247,9 @@ export default function CryptoPortfolio() {
                                 <th className="p-4 font-medium">Data</th>
                                 <th className="p-4 font-medium">Criptomoeda</th>
                                 <th className="p-4 font-medium">Qtd.</th>
-                                <th className="p-4 font-medium">Valor Pago (USD)</th>
+                                <th className="p-4 font-medium">Valor (USD)</th>
                                 <th className="p-4 font-medium">Cotação ($)</th>
-                                <th className="p-4 font-medium text-gray-800">Valor Real (BRL)</th>
+                                <th className="p-4 font-medium text-green-700">Valor (BRL) <span className="text-[10px] font-normal">IR</span></th>
                                 <th className="p-4 font-medium text-center no-print">Ações</th>
                             </tr>
                         </thead>
@@ -245,7 +266,7 @@ export default function CryptoPortfolio() {
                                         R$ {t.dollarRate.toFixed(3)}
                                     </td>
                                     <td className="p-4 font-bold text-green-700 bg-green-50/30">
-                                        {t.totalBrl.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                        {t.priceBrl.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                                     </td>
                                     <td className="p-4 text-center no-print">
                                         <button
@@ -260,7 +281,11 @@ export default function CryptoPortfolio() {
                         </tbody>
                         <tfoot className="bg-gray-50 font-medium">
                             <tr>
-                                <td colSpan={5} className="p-4 text-right text-gray-600">Total do Mês:</td>
+                                <td colSpan={3} className="p-4 text-right text-gray-600">Total do Mês:</td>
+                                <td className="p-4 text-blue-600 font-bold">
+                                    {totalInvestedUsd.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
+                                </td>
+                                <td></td>
                                 <td className="p-4 text-green-700 font-bold">
                                     {totalInvestedBrl.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                                 </td>

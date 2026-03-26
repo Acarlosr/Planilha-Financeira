@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, X, Building, Hash, CalendarDays, DollarSign } from "lucide-react";
+import { Plus, X, Building, Hash, CalendarDays, DollarSign, FileText } from "lucide-react";
 
 interface NovaPosicaoFIIModalProps {
     isOpen: boolean;
@@ -16,6 +16,7 @@ export default function NovaPosicaoFIIModal({ isOpen, onClose, onSave }: NovaPos
     const [quantidade, setQuantidade] = useState("");
     const [precoMedio, setPrecoMedio] = useState("");
     const [dataCompra, setDataCompra] = useState("");
+    const [cnpj, setCnpj] = useState("");
 
     if (!isOpen) return null;
 
@@ -25,6 +26,7 @@ export default function NovaPosicaoFIIModal({ isOpen, onClose, onSave }: NovaPos
             id: `fii-${Date.now()}`,
             ticker: ticker.toUpperCase(),
             nome,
+            cnpj: cnpj || undefined,
             setor,
             quantidade: parseInt(quantidade),
             precoMedio: parseFloat(precoMedio),
@@ -35,7 +37,7 @@ export default function NovaPosicaoFIIModal({ isOpen, onClose, onSave }: NovaPos
         onClose();
         // Default reset
         setTicker(""); setNome(""); setSetor("Logística");
-        setQuantidade(""); setPrecoMedio(""); setDataCompra("");
+        setQuantidade(""); setPrecoMedio(""); setDataCompra(""); setCnpj("");
     };
 
     return (
@@ -100,6 +102,29 @@ export default function NovaPosicaoFIIModal({ isOpen, onClose, onSave }: NovaPos
                             placeholder="Ex: CSHG Logística"
                             className="w-full px-4 py-3 rounded-xl bg-black/20 text-foreground placeholder:text-muted/50 border border-white/5 focus:border-purple-500/50 outline-none transition-all"
                         />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-muted mb-1.5">CNPJ do Fundo</label>
+                        <div className="relative">
+                            <FileText className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" size={18} />
+                            <input
+                                type="text"
+                                value={cnpj}
+                                onChange={(e) => {
+                                    // Máscara de CNPJ: XX.XXX.XXX/XXXX-XX
+                                    let v = e.target.value.replace(/\D/g, "").slice(0, 14);
+                                    if (v.length > 12) v = v.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{1,2})/, "$1.$2.$3/$4-$5");
+                                    else if (v.length > 8) v = v.replace(/(\d{2})(\d{3})(\d{3})(\d{1,4})/, "$1.$2.$3/$4");
+                                    else if (v.length > 5) v = v.replace(/(\d{2})(\d{3})(\d{1,3})/, "$1.$2.$3");
+                                    else if (v.length > 2) v = v.replace(/(\d{2})(\d{1,3})/, "$1.$2");
+                                    setCnpj(v);
+                                }}
+                                placeholder="00.000.000/0000-00"
+                                maxLength={18}
+                                className="w-full pl-11 pr-4 py-3 rounded-xl bg-black/20 text-foreground placeholder:text-muted/50 border border-white/5 focus:border-purple-500/50 outline-none transition-all"
+                            />
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
