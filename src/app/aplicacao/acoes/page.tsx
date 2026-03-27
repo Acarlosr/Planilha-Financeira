@@ -13,8 +13,8 @@ import { Plus, HandCoins, Briefcase, TrendingUp, Calendar as CalIcon } from "luc
 import { mockAcoes, mockDividendos } from "@/data/aplicacoes-mock";
 
 export default function AcoesPage() {
-    const [acoes] = useState(mockAcoes);
-    const [dividendos] = useState(mockDividendos.filter(d => ['dividendo', 'jcp'].includes(d.tipo)));
+    const [acoes, setAcoes] = useState(mockAcoes);
+    const [dividendos, setDividendos] = useState(mockDividendos.filter(d => ['dividendo', 'jcp'].includes(d.tipo)));
 
     const [isPosicaoModalOpen, setPosicaoModalOpen] = useState(false);
     const [isDividendoModalOpen, setDividendoModalOpen] = useState(false);
@@ -28,6 +28,14 @@ export default function AcoesPage() {
         .reduce((acc, d) => acc + d.valorTotal, 0);
 
     const dividendosAcumulados = dividendos.reduce((acc, d) => acc + d.valorTotal, 0);
+
+    const handleDeleteAcao = (id: string) => {
+        setAcoes(prev => prev.filter(a => a.id !== id));
+    };
+
+    const handleDeleteDividendo = (id: string) => {
+        setDividendos(prev => prev.filter(d => d.id !== id));
+    };
 
     return (
         <div className="min-h-screen border-t border-transparent">
@@ -96,7 +104,7 @@ export default function AcoesPage() {
                             Minhas Posições
                         </h2>
                         <div className="glass-card rounded-2xl p-1 overflow-hidden">
-                            <TabelaAcoes acoes={acoes} />
+                            <TabelaAcoes acoes={acoes} onDelete={handleDeleteAcao} />
                         </div>
                     </section>
 
@@ -115,7 +123,7 @@ export default function AcoesPage() {
 
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                             <div className="lg:col-span-2 glass-card rounded-2xl p-1 overflow-hidden">
-                                <TabelaDividendos dividendos={dividendos} />
+                                <TabelaDividendos dividendos={dividendos} onDelete={handleDeleteDividendo} />
                             </div>
                             <div className="lg:col-span-1">
                                 <ResumoDividendos

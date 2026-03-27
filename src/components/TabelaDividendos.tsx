@@ -1,12 +1,14 @@
 "use client";
 
 import { Dividendo } from "@/types/aplicacoes";
+import { Trash2 } from "lucide-react";
 
 interface TabelaDividendosProps {
     dividendos: Dividendo[];
+    onDelete?: (id: string) => void;
 }
 
-export default function TabelaDividendos({ dividendos }: TabelaDividendosProps) {
+export default function TabelaDividendos({ dividendos, onDelete }: TabelaDividendosProps) {
     const getTipoBadge = (tipo: string) => {
         switch (tipo) {
             case 'dividendo': return <span className="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs font-medium rounded-full">Dividendo</span>;
@@ -33,11 +35,12 @@ export default function TabelaDividendos({ dividendos }: TabelaDividendosProps) 
                         <th className="pb-3 px-4 font-medium text-right hidden sm:table-cell">R$/cota</th>
                         <th className="pb-3 px-4 font-medium text-right hidden md:table-cell">Cotas</th>
                         <th className="pb-3 px-4 font-medium text-right">Total Recebido</th>
+                        {onDelete && <th className="pb-3 px-4 font-medium text-center w-16"></th>}
                     </tr>
                 </thead>
                 <tbody className="text-sm">
                     {dividendos.map((div) => (
-                        <tr key={div.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                        <tr key={div.id} className="border-b border-white/5 hover:bg-white/5 transition-colors group">
                             <td className="py-4 px-4 text-muted">{formatDate(div.dataPagamento)}</td>
                             <td className="py-4 px-4 font-bold text-foreground">{div.ticker}</td>
                             <td className="py-4 px-4 hidden sm:table-cell">{getTipoBadge(div.tipo)}</td>
@@ -48,11 +51,26 @@ export default function TabelaDividendos({ dividendos }: TabelaDividendosProps) 
                             <td className="py-4 px-4 text-right font-medium text-emerald-400">
                                 + {div.valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                             </td>
+                            {onDelete && (
+                                <td className="py-4 px-4 text-center">
+                                    <button
+                                        onClick={() => {
+                                            if (confirm(`Excluir provento de "${div.ticker}"?`)) {
+                                                onDelete(div.id);
+                                            }
+                                        }}
+                                        className="p-2 hover:bg-red-500/20 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                                        title="Excluir"
+                                    >
+                                        <Trash2 size={16} className="text-red-400" />
+                                    </button>
+                                </td>
+                            )}
                         </tr>
                     ))}
                     {dividendos.length === 0 && (
                         <tr>
-                            <td colSpan={6} className="py-8 text-center text-muted">Nenhum provento neste período.</td>
+                            <td colSpan={onDelete ? 7 : 6} className="py-8 text-center text-muted">Nenhum provento neste período.</td>
                         </tr>
                     )}
                 </tbody>

@@ -11,6 +11,7 @@ import {
     ArrowUpRight,
     ArrowDownRight,
     PiggyBank,
+    Trash2,
 } from "lucide-react";
 import {
     AreaChart,
@@ -52,6 +53,10 @@ export default function PoupancaPage() {
             meta: saving.meta,
         };
         setTransacoesData(prev => [newTransaction, ...prev]);
+    };
+
+    const handleDeleteTransaction = (id: number) => {
+        setTransacoesData(prev => prev.filter(t => t.id !== id));
     };
 
     const calcularProgresso = (atual: number, meta: number) => {
@@ -267,7 +272,7 @@ export default function PoupancaPage() {
                             return (
                                 <div
                                     key={transacao.id}
-                                    className="flex items-center justify-between p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
+                                    className="flex items-center justify-between p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors group"
                                 >
                                     <div className="flex items-center gap-4">
                                         <div
@@ -292,9 +297,22 @@ export default function PoupancaPage() {
                                             </div>
                                         </div>
                                     </div>
-                                    <span className={`font-bold text-lg ${isDeposito ? "text-emerald-400" : "text-red-400"}`}>
-                                        {isDeposito ? "+" : "-"} R$ {transacao.valor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                                    </span>
+                                    <div className="flex items-center gap-3">
+                                        <span className={`font-bold text-lg ${isDeposito ? "text-emerald-400" : "text-red-400"}`}>
+                                            {isDeposito ? "+" : "-"} R$ {transacao.valor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                                        </span>
+                                        <button
+                                            onClick={() => {
+                                                if (confirm(`Excluir "${transacao.descricao}"?`)) {
+                                                    handleDeleteTransaction(transacao.id);
+                                                }
+                                            }}
+                                            className="p-2 hover:bg-red-500/20 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                                            title="Excluir"
+                                        >
+                                            <Trash2 size={16} className="text-red-400" />
+                                        </button>
+                                    </div>
                                 </div>
                             );
                         })}

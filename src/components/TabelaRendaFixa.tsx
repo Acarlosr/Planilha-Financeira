@@ -1,12 +1,14 @@
 "use client";
 
 import { RendaFixaPrivada } from "@/types/aplicacoes";
+import { Trash2 } from "lucide-react";
 
 interface TabelaRendaFixaProps {
     titulos: RendaFixaPrivada[];
+    onDelete?: (id: string) => void;
 }
 
-export default function TabelaRendaFixa({ titulos }: TabelaRendaFixaProps) {
+export default function TabelaRendaFixa({ titulos, onDelete }: TabelaRendaFixaProps) {
     const getTipoBadge = (tipo: string) => {
         switch (tipo) {
             case 'CDB': return <span className="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs font-medium rounded-full border border-blue-500/30">CDB</span>;
@@ -43,6 +45,7 @@ export default function TabelaRendaFixa({ titulos }: TabelaRendaFixaProps) {
                         <th className="pb-3 px-4 font-medium">Vencimento</th>
                         <th className="pb-3 px-4 font-medium text-right">Valor</th>
                         <th className="pb-3 px-4 font-medium text-right">Rendimento</th>
+                        {onDelete && <th className="pb-3 px-4 font-medium text-center w-16"></th>}
                     </tr>
                 </thead>
                 <tbody className="text-sm">
@@ -50,7 +53,7 @@ export default function TabelaRendaFixa({ titulos }: TabelaRendaFixaProps) {
                         const vencendo = isVencendoLogo(t.vencimento);
 
                         return (
-                            <tr key={t.id} className={`border-b border-white/5 transition-colors ${vencendo ? 'bg-orange-500/10 hover:bg-orange-500/20' : 'hover:bg-white/5'}`}>
+                            <tr key={t.id} className={`border-b border-white/5 transition-colors group ${vencendo ? 'bg-orange-500/10 hover:bg-orange-500/20' : 'hover:bg-white/5'}`}>
                                 <td className="py-4 px-4">{getTipoBadge(t.tipo)}</td>
                                 <td className="py-4 px-4 font-bold text-foreground">{t.instituicao}</td>
                                 <td className="py-4 px-4 text-muted hidden sm:table-cell">{t.indexador}</td>
@@ -72,12 +75,27 @@ export default function TabelaRendaFixa({ titulos }: TabelaRendaFixaProps) {
                                 <td className="py-4 px-4 text-right font-bold text-emerald-400">
                                     + {t.rendimentoAcumulado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                                 </td>
+                                {onDelete && (
+                                    <td className="py-4 px-4 text-center">
+                                        <button
+                                            onClick={() => {
+                                                if (confirm(`Excluir "${t.tipo} - ${t.instituicao}"?`)) {
+                                                    onDelete(t.id);
+                                                }
+                                            }}
+                                            className="p-2 hover:bg-red-500/20 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                                            title="Excluir"
+                                        >
+                                            <Trash2 size={16} className="text-red-400" />
+                                        </button>
+                                    </td>
+                                )}
                             </tr>
                         );
                     })}
                     {titulos.length === 0 && (
                         <tr>
-                            <td colSpan={8} className="py-8 text-center text-muted">Nenhum título cadastrado.</td>
+                            <td colSpan={onDelete ? 9 : 8} className="py-8 text-center text-muted">Nenhum título cadastrado.</td>
                         </tr>
                     )}
                 </tbody>

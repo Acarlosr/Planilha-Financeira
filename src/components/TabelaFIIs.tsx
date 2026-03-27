@@ -1,12 +1,14 @@
 "use client";
 
 import { FII } from "@/types/aplicacoes";
+import { Trash2 } from "lucide-react";
 
 interface TabelaFIIsProps {
     fiis: FII[];
+    onDelete?: (id: string) => void;
 }
 
-export default function TabelaFIIs({ fiis }: TabelaFIIsProps) {
+export default function TabelaFIIs({ fiis, onDelete }: TabelaFIIsProps) {
     const getCorSector = (setor: string) => {
         switch (setor.toLowerCase()) {
             case 'logística': return 'bg-blue-500/20 text-blue-400';
@@ -28,11 +30,12 @@ export default function TabelaFIIs({ fiis }: TabelaFIIsProps) {
                         <th className="pb-3 px-4 font-medium text-right hidden sm:table-cell">Preço Médio</th>
                         <th className="pb-3 px-4 font-medium text-right">Valor Atual</th>
                         <th className="pb-3 px-4 font-medium text-right">DY (12m)</th>
+                        {onDelete && <th className="pb-3 px-4 font-medium text-center w-16"></th>}
                     </tr>
                 </thead>
                 <tbody className="text-sm">
                     {fiis.map((fii) => (
-                        <tr key={fii.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                        <tr key={fii.id} className="border-b border-white/5 hover:bg-white/5 transition-colors group">
                             <td className="py-4 px-4 font-bold text-foreground">
                                 <div className="flex flex-col">
                                     <span className="px-2 py-1 bg-white/5 rounded w-fit pb-1.5">{fii.ticker}</span>
@@ -56,11 +59,26 @@ export default function TabelaFIIs({ fiis }: TabelaFIIsProps) {
                                     {fii.dyAnual.toFixed(2)}%
                                 </span>
                             </td>
+                            {onDelete && (
+                                <td className="py-4 px-4 text-center">
+                                    <button
+                                        onClick={() => {
+                                            if (confirm(`Excluir "${fii.ticker} - ${fii.nome}"?`)) {
+                                                onDelete(fii.id);
+                                            }
+                                        }}
+                                        className="p-2 hover:bg-red-500/20 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                                        title="Excluir"
+                                    >
+                                        <Trash2 size={16} className="text-red-400" />
+                                    </button>
+                                </td>
+                            )}
                         </tr>
                     ))}
                     {fiis.length === 0 && (
                         <tr>
-                            <td colSpan={6} className="py-8 text-center text-muted">Nenhum FII cadastrado.</td>
+                            <td colSpan={onDelete ? 7 : 6} className="py-8 text-center text-muted">Nenhum FII cadastrado.</td>
                         </tr>
                     )}
                 </tbody>

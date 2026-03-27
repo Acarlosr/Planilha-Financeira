@@ -13,8 +13,8 @@ import { Plus, HandCoins, Building, TrendingUp, Percent } from "lucide-react";
 import { mockFIIs, mockDividendos } from "@/data/aplicacoes-mock";
 
 export default function FIIsPage() {
-    const [fiis] = useState(mockFIIs);
-    const [dividendos] = useState(mockDividendos.filter(d => ['rendimento_fii', 'amortizacao'].includes(d.tipo)));
+    const [fiis, setFiis] = useState(mockFIIs);
+    const [dividendos, setDividendos] = useState(mockDividendos.filter(d => ['rendimento_fii', 'amortizacao'].includes(d.tipo)));
 
     const [isPosicaoModalOpen, setPosicaoModalOpen] = useState(false);
     const [isDividendoModalOpen, setDividendoModalOpen] = useState(false);
@@ -30,6 +30,14 @@ export default function FIIsPage() {
         .reduce((acc, d) => acc + d.valorTotal, 0);
 
     const dividendosAcumulados = dividendos.reduce((acc, d) => acc + d.valorTotal, 0);
+
+    const handleDeleteFII = (id: string) => {
+        setFiis(prev => prev.filter(f => f.id !== id));
+    };
+
+    const handleDeleteDividendo = (id: string) => {
+        setDividendos(prev => prev.filter(d => d.id !== id));
+    };
 
     return (
         <div className="min-h-screen">
@@ -109,7 +117,7 @@ export default function FIIsPage() {
                             Meus Fundos
                         </h2>
                         <div className="glass-card rounded-2xl p-1 overflow-hidden">
-                            <TabelaFIIs fiis={fiis} />
+                            <TabelaFIIs fiis={fiis} onDelete={handleDeleteFII} />
                         </div>
                     </section>
 
@@ -128,7 +136,7 @@ export default function FIIsPage() {
 
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                             <div className="lg:col-span-2 glass-card rounded-2xl p-1 overflow-hidden">
-                                <TabelaDividendos dividendos={dividendos} />
+                                <TabelaDividendos dividendos={dividendos} onDelete={handleDeleteDividendo} />
                             </div>
                             <div className="lg:col-span-1">
                                 <ResumoDividendos

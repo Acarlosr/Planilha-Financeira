@@ -1,12 +1,14 @@
 "use client";
 
 import { TesouroDireto } from "@/types/aplicacoes";
+import { Trash2 } from "lucide-react";
 
 interface TabelaTesourosProps {
     titulos: TesouroDireto[];
+    onDelete?: (id: string) => void;
 }
 
-export default function TabelaTesouros({ titulos }: TabelaTesourosProps) {
+export default function TabelaTesouros({ titulos, onDelete }: TabelaTesourosProps) {
     const getTipoBadge = (tipo: string) => {
         switch (tipo) {
             case 'selic': return <span className="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs font-medium rounded-md border border-blue-500/30">Pós-fixado (Selic)</span>;
@@ -33,11 +35,12 @@ export default function TabelaTesouros({ titulos }: TabelaTesourosProps) {
                         <th className="pb-3 px-4 font-medium text-right">Valor Aplicado</th>
                         <th className="pb-3 px-4 font-medium hidden lg:table-cell">Taxa</th>
                         <th className="pb-3 px-4 font-medium text-right">Rendimento Acum.</th>
+                        {onDelete && <th className="pb-3 px-4 font-medium text-center w-16"></th>}
                     </tr>
                 </thead>
                 <tbody className="text-sm">
                     {titulos.map((t) => (
-                        <tr key={t.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                        <tr key={t.id} className="border-b border-white/5 hover:bg-white/5 transition-colors group">
                             <td className="py-4 px-4 font-medium text-foreground">{t.titulo}</td>
                             <td className="py-4 px-4">{getTipoBadge(t.tipo)}</td>
                             <td className="py-4 px-4 text-muted hidden md:table-cell">{formatDate(t.dataCompra)}</td>
@@ -49,11 +52,26 @@ export default function TabelaTesouros({ titulos }: TabelaTesourosProps) {
                             <td className="py-4 px-4 text-right font-bold text-emerald-400">
                                 + {t.rendimentoAcumulado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                             </td>
+                            {onDelete && (
+                                <td className="py-4 px-4 text-center">
+                                    <button
+                                        onClick={() => {
+                                            if (confirm(`Excluir "${t.titulo}"?`)) {
+                                                onDelete(t.id);
+                                            }
+                                        }}
+                                        className="p-2 hover:bg-red-500/20 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                                        title="Excluir"
+                                    >
+                                        <Trash2 size={16} className="text-red-400" />
+                                    </button>
+                                </td>
+                            )}
                         </tr>
                     ))}
                     {titulos.length === 0 && (
                         <tr>
-                            <td colSpan={7} className="py-8 text-center text-muted">Nenhum título cadastrado.</td>
+                            <td colSpan={onDelete ? 8 : 7} className="py-8 text-center text-muted">Nenhum título cadastrado.</td>
                         </tr>
                     )}
                 </tbody>

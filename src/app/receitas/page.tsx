@@ -58,6 +58,10 @@ export default function ReceitasPage() {
         setIncomeData(prev => [newItem, ...prev]);
     };
 
+    const handleDeleteIncome = (id: number) => {
+        setIncomeData(prev => prev.filter(item => item.id !== id));
+    };
+
     const getItemsByCategory = (categoryId: string) => {
         return incomeData.filter((item) => item.category === categoryId);
     };
@@ -222,8 +226,14 @@ export default function ReceitasPage() {
                                             <button className="p-2 hover:bg-white/10 rounded-lg transition-colors">
                                                 <Edit size={16} className="text-muted" />
                                             </button>
-                                            <button className="p-2 hover:bg-red-500/20 rounded-lg transition-colors">
-                                                <Trash2 size={16} className="text-red-400" />
+                                        <button
+                                                onClick={() => {
+                                                    if (confirm(`Excluir "${item.description}"?`)) {
+                                                        handleDeleteIncome(item.id);
+                                                    }
+                                                }}
+                                                className="p-2 hover:bg-red-500/20 rounded-lg transition-colors"
+                                            >                                                <Trash2 size={16} className="text-red-400" />
                                             </button>
                                         </div>
                                     </div>

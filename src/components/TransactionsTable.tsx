@@ -1,6 +1,7 @@
 "use client";
 
-import { ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { useState } from "react";
+import { ArrowUpRight, ArrowDownRight, Trash2 } from "lucide-react";
 
 interface Transaction {
     id: number;
@@ -11,7 +12,7 @@ interface Transaction {
     type: "entrada" | "saida";
 }
 
-const transactions: Transaction[] = [
+const initialTransactions: Transaction[] = [
     {
         id: 1,
         date: "02/01/2026",
@@ -89,6 +90,12 @@ const categoryColors: { [key: string]: string } = {
 };
 
 export default function TransactionsTable() {
+    const [transactions, setTransactions] = useState<Transaction[]>(initialTransactions);
+
+    const handleDelete = (id: number) => {
+        setTransactions(prev => prev.filter(t => t.id !== id));
+    };
+
     return (
         <div className="glass-card p-6">
             <div className="flex items-center justify-between mb-6">
@@ -118,6 +125,8 @@ export default function TransactionsTable() {
                             </th>
                             <th className="text-right py-3 px-4 text-xs font-semibold text-muted uppercase tracking-wider">
                                 Valor
+                            </th>
+                            <th className="text-center py-3 px-4 text-xs font-semibold text-muted uppercase tracking-wider w-16">
                             </th>
                         </tr>
                     </thead>
@@ -170,8 +179,28 @@ export default function TransactionsTable() {
                                         })}
                                     </span>
                                 </td>
+                                <td className="py-4 px-4 text-center">
+                                    <button
+                                        onClick={() => {
+                                            if (confirm(`Excluir "${transaction.description}"?`)) {
+                                                handleDelete(transaction.id);
+                                            }
+                                        }}
+                                        className="p-2 hover:bg-red-500/20 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                                        title="Excluir"
+                                    >
+                                        <Trash2 size={16} className="text-red-400" />
+                                    </button>
+                                </td>
                             </tr>
                         ))}
+                        {transactions.length === 0 && (
+                            <tr>
+                                <td colSpan={5} className="py-12 text-center text-muted">
+                                    Nenhuma transação encontrada.
+                                </td>
+                            </tr>
+                        )}
                     </tbody>
                 </table>
             </div>
@@ -179,7 +208,7 @@ export default function TransactionsTable() {
             {/* Pagination */}
             <div className="flex items-center justify-between mt-6 pt-4 border-t border-white/10">
                 <span className="text-sm text-muted">
-                    Mostrando 1-8 de 48 transações
+                    Mostrando {transactions.length} transações
                 </span>
                 <div className="flex items-center gap-2">
                     <button className="px-3 py-1.5 text-sm text-muted hover:bg-white/5 rounded-lg transition-colors">
@@ -187,12 +216,6 @@ export default function TransactionsTable() {
                     </button>
                     <button className="px-3 py-1.5 text-sm text-white bg-blue-600 rounded-lg">
                         1
-                    </button>
-                    <button className="px-3 py-1.5 text-sm text-muted hover:bg-white/5 rounded-lg transition-colors">
-                        2
-                    </button>
-                    <button className="px-3 py-1.5 text-sm text-muted hover:bg-white/5 rounded-lg transition-colors">
-                        3
                     </button>
                     <button className="px-3 py-1.5 text-sm text-muted hover:bg-white/5 rounded-lg transition-colors">
                         Próximo

@@ -10,7 +10,11 @@ import { Plus, Landmark, TrendingUp, CalendarDays } from "lucide-react";
 import { mockTesouroDireto } from "@/data/aplicacoes-mock";
 
 export default function TesouroDiretoPage() {
-    const [titulos] = useState(mockTesouroDireto);
+    const [titulos, setTitulos] = useState(mockTesouroDireto);
+
+    const handleDeleteTitulo = (id: string) => {
+        setTitulos(prev => prev.filter(t => t.id !== id));
+    };
 
     // Mocks local history specifically for this view
     const historico = [
@@ -77,7 +81,7 @@ export default function TesouroDiretoPage() {
                             Meus Títulos
                         </h2>
                         <div className="glass-card rounded-2xl p-1 overflow-hidden">
-                            <TabelaTesouros titulos={titulos} />
+                            <TabelaTesouros titulos={titulos} onDelete={handleDeleteTitulo} />
                         </div>
                     </div>
 

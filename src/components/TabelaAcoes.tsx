@@ -1,12 +1,14 @@
 "use client";
 
 import { Acao } from "@/types/aplicacoes";
+import { Trash2 } from "lucide-react";
 
 interface TabelaAcoesProps {
     acoes: Acao[];
+    onDelete?: (id: string) => void;
 }
 
-export default function TabelaAcoes({ acoes }: TabelaAcoesProps) {
+export default function TabelaAcoes({ acoes, onDelete }: TabelaAcoesProps) {
     return (
         <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
@@ -18,6 +20,7 @@ export default function TabelaAcoes({ acoes }: TabelaAcoesProps) {
                         <th className="pb-3 px-4 font-medium text-right hidden sm:table-cell">Preço Médio</th>
                         <th className="pb-3 px-4 font-medium text-right">Valor Atual</th>
                         <th className="pb-3 px-4 font-medium text-right">Variação</th>
+                        {onDelete && <th className="pb-3 px-4 font-medium text-center w-16"></th>}
                     </tr>
                 </thead>
                 <tbody className="text-sm">
@@ -28,7 +31,7 @@ export default function TabelaAcoes({ acoes }: TabelaAcoesProps) {
                         const isPositivo = variacaoRS >= 0;
 
                         return (
-                            <tr key={acao.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                            <tr key={acao.id} className="border-b border-white/5 hover:bg-white/5 transition-colors group">
                                 <td className="py-4 px-4 font-bold text-foreground">
                                     <span className="px-2 py-1 bg-white/5 rounded mx-1 pb-1.5">{acao.ticker}</span>
                                 </td>
@@ -45,12 +48,27 @@ export default function TabelaAcoes({ acoes }: TabelaAcoesProps) {
                                         <span>{isPositivo ? '+' : ''}{variacaoPerc.toFixed(2)}%</span>
                                     </div>
                                 </td>
+                                {onDelete && (
+                                    <td className="py-4 px-4 text-center">
+                                        <button
+                                            onClick={() => {
+                                                if (confirm(`Excluir "${acao.ticker} - ${acao.empresa}"?`)) {
+                                                    onDelete(acao.id);
+                                                }
+                                            }}
+                                            className="p-2 hover:bg-red-500/20 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                                            title="Excluir"
+                                        >
+                                            <Trash2 size={16} className="text-red-400" />
+                                        </button>
+                                    </td>
+                                )}
                             </tr>
                         );
                     })}
                     {acoes.length === 0 && (
                         <tr>
-                            <td colSpan={6} className="py-8 text-center text-muted">Nenhuma ação cadastrada.</td>
+                            <td colSpan={onDelete ? 7 : 6} className="py-8 text-center text-muted">Nenhuma ação cadastrada.</td>
                         </tr>
                     )}
                 </tbody>

@@ -142,6 +142,10 @@ function DespesasContent() {
         setExpenses(prev => [...formattedExpenses, ...prev]);
     };
 
+    const handleDeleteExpense = (id: number) => {
+        setExpenses(prev => prev.filter(item => item.id !== id));
+    };
+
     // Filter items by selected month/year
     const filteredExpenses = expenses.filter(item => {
         const [day, month, year] = item.date.split('/').map(Number);
@@ -302,7 +306,14 @@ function DespesasContent() {
                                             <button className="p-2 hover:bg-white/10 rounded-lg transition-colors">
                                                 <Edit size={16} className="text-muted" />
                                             </button>
-                                            <button className="p-2 hover:bg-red-500/20 rounded-lg transition-colors">
+                                            <button
+                                                onClick={() => {
+                                                    if (confirm(`Excluir "${item.description}"?`)) {
+                                                        handleDeleteExpense(item.id);
+                                                    }
+                                                }}
+                                                className="p-2 hover:bg-red-500/20 rounded-lg transition-colors"
+                                            >
                                                 <Trash2 size={16} className="text-red-400" />
                                             </button>
                                         </div>

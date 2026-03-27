@@ -10,8 +10,12 @@ import { Plus, Building2, TrendingUp, AlertTriangle } from "lucide-react";
 import { mockRendaFixaPrivada } from "@/data/aplicacoes-mock";
 
 export default function RendaFixaPage() {
-    const [titulos] = useState(mockRendaFixaPrivada);
+    const [titulos, setTitulos] = useState(mockRendaFixaPrivada);
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const handleDeleteTitulo = (id: string) => {
+        setTitulos(prev => prev.filter(t => t.id !== id));
+    };
 
     // Totais
     const totalAplicado = titulos.reduce((acc, t) => acc + t.valorAplicado, 0);
@@ -83,7 +87,7 @@ export default function RendaFixaPage() {
                         Meus Títulos (Instituições Privadas)
                     </h2>
                     <div className="glass-card rounded-2xl p-1 overflow-hidden">
-                        <TabelaRendaFixa titulos={titulos} />
+                        <TabelaRendaFixa titulos={titulos} onDelete={handleDeleteTitulo} />
                     </div>
                 </div>
             </main>

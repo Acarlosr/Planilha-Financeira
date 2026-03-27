@@ -55,14 +55,14 @@ export async function middleware(request: NextRequest) {
         }
     );
 
-    // Refresh session if expired
-    const { data: { session } } = await supabase.auth.getSession();
+    // Validate user (getUser() validates the JWT, unlike getSession())
+    const { data: { user } } = await supabase.auth.getUser();
 
     const path = request.nextUrl.pathname;
 
     // Protected admin routes
     if (path.startsWith('/admin')) {
-        if (!session) {
+        if (!user) {
             // Not logged in - redirect to login
             return NextResponse.redirect(new URL('/login', request.url));
         }
@@ -71,7 +71,7 @@ export async function middleware(request: NextRequest) {
         const { data: profile } = await supabase
             .from('user_profiles')
             .select('role')
-            .eq('id', session.user.id)
+            .eq('id', user.id)
             .single();
 
         if (profile?.role !== 'admin') {
@@ -83,14 +83,14 @@ export async function middleware(request: NextRequest) {
     // Protected premium routes (requires active subscription)
     const premiumRoutes = ['/export', '/api-access', '/advanced-reports'];
     if (premiumRoutes.some(route => path.startsWith(route))) {
-        if (!session) {
+        if (!user) {
             return NextResponse.redirect(new URL('/login', request.url));
         }
 
         const { data: profile } = await supabase
             .from('user_profiles')
             .select('subscription_status, subscription_plan:subscription_plans(slug)')
-            .eq('id', session.user.id)
+            .eq('id', user.id)
             .single();
 
         const isActive = profile?.subscription_status === 'active' || profile?.subscription_status === 'trial';
@@ -107,6 +107,7 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
     matcher: [
+        '/auth/callback',
         '/admin/:path*',
         '/export/:path*',
         '/api-access/:path*',
