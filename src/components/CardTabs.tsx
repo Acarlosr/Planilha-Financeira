@@ -1,7 +1,7 @@
 "use client";
 
-import { CreditCard, Plus } from "lucide-react";
-import { Database } from "@/types/database.types";
+import { CreditCard, Plus, LayoutGrid } from "lucide-react";
+import type { Database } from "@/types/database.types";
 
 type Cartao = Database["public"]["Tables"]["cartoes"]["Row"];
 
@@ -42,7 +42,7 @@ export default function CardTabs({ cartoes, activeCardId, onSelectCard, onAddCar
                     }
                 `}
             >
-                <Database size={16} />
+                <LayoutGrid size={16} />
                 <span className="font-medium">Todos</span>
             </button>
 
