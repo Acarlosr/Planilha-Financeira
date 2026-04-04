@@ -30,15 +30,15 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
     };
 
     return (
-        <div className="space-y-4 bg-gray-50/50 p-4 rounded-xl border border-gray-200/50">
+        <div className="space-y-4 p-4 rounded-xl border border-white/10" style={{ background: "rgba(255, 255, 255, 0.03)" }}>
             {/* Toggle Parcelado */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${data.parcelada ? 'bg-purple-100 text-purple-600' : 'bg-gray-200 text-gray-500'}`}>
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${data.parcelada ? 'bg-red-500/20 text-red-400' : 'bg-white/10 text-muted'}`}>
                         <Divide size={18} />
                     </div>
                     <div>
-                        <p className="font-medium text-gray-900">Compra Parcelada?</p>
+                        <p className="font-medium text-white">Compra Parcelada?</p>
                         <p className="text-xs text-muted">Repetir despesa nos próximos meses</p>
                     </div>
                 </div>
@@ -46,8 +46,8 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
                     type="button"
                     onClick={handleToggle}
                     className={`
-                        relative w-12 h-6 rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2
-                        ${data.parcelada ? 'bg-purple-600' : 'bg-gray-300'}
+                        relative w-12 h-6 rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:ring-offset-0
+                        ${data.parcelada ? 'bg-red-500' : 'bg-white/10'}
                     `}
                 >
                     <span
@@ -70,10 +70,11 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
                         <select
                             value={data.numeroParcelas}
                             onChange={(e) => onChange({ ...data, numeroParcelas: Number(e.target.value) })}
-                            className="w-full px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none"
+                            className="w-full px-3 py-2 rounded-lg text-white text-sm focus:border-red-500/50 focus:ring-0 outline-none border border-white/10"
+                            style={{ background: "rgba(255, 255, 255, 0.05)" }}
                         >
                             {[...Array(36)].map((_, i) => (
-                                <option key={i + 1} value={i + 1}>
+                                <option key={i + 1} value={i + 1} className="text-gray-800">
                                     {i + 1}x
                                 </option>
                             ))}
@@ -90,7 +91,8 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
                             required={data.parcelada}
                             value={data.dataPrimeiraParcela}
                             onChange={(e) => onChange({ ...data, dataPrimeiraParcela: e.target.value })}
-                            className="w-full px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none"
+                            className="w-full px-3 py-2 rounded-lg text-white text-sm focus:border-red-500/50 focus:ring-0 outline-none border border-white/10"
+                            style={{ background: "rgba(255, 255, 255, 0.05)" }}
                         />
                     </div>
 
@@ -102,11 +104,12 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
                         <select
                             value={data.cartaoId || ""}
                             onChange={(e) => onChange({ ...data, cartaoId: e.target.value || null })}
-                            className="w-full px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none"
+                            className="w-full px-3 py-2 rounded-lg text-white text-sm focus:border-red-500/50 focus:ring-0 outline-none border border-white/10"
+                            style={{ background: "rgba(255, 255, 255, 0.05)" }}
                         >
-                            <option value="">Nenhum cartão selecionado</option>
+                            <option value="" className="text-gray-800">Nenhum cartão selecionado</option>
                             {cartoes.map((item) => (
-                                <option key={item.id} value={item.id}>
+                                <option key={item.id} value={item.id} className="text-gray-800">
                                     {item.nome} • {item.banco} ({item.bandeira})
                                 </option>
                             ))}
@@ -114,8 +117,8 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
                     </div>
 
                     {/* Preview da projeção */}
-                    <div className="col-span-2 bg-purple-50 rounded-lg p-3 text-xs text-purple-700">
-                        <p className="font-medium mb-1">Projeção:</p>
+                    <div className="col-span-2 rounded-lg p-3 text-xs text-red-200 border border-red-500/20 bg-red-500/5">
+                        <p className="font-medium mb-1 text-red-400">Projeção:</p>
                         <div className="flex justify-between opacity-80">
                             <span>1ª: {data.dataPrimeiraParcela ? format(new Date(data.dataPrimeiraParcela), 'dd/MM/yyyy') : '--'}</span>
                             <span>➜</span>

@@ -159,11 +159,19 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl p-6 animate-in zoom-in-95 duration-200 overflow-y-auto max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+            <div
+                className="relative w-full max-w-2xl rounded-2xl border border-white/10 p-6 animate-in zoom-in-95 duration-200 overflow-y-auto max-h-[90vh]"
+                style={{
+                    background: "rgba(15, 23, 42, 0.95)",
+                    backdropFilter: "blur(20px)",
+                    boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)"
+                }}
+                onClick={(e) => e.stopPropagation()}
+            >
                 <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-bold text-gray-800">Nova Despesa</h2>
-                    <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors text-muted">
+                    <h2 className="text-xl font-bold text-foreground">Nova Despesa</h2>
+                    <button onClick={onClose} className="p-2 text-muted hover:text-white hover:bg-white/10 rounded-lg transition-colors">
                         <X size={20} />
                     </button>
                 </div>
@@ -172,7 +180,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                     {/* Campos Básicos */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="col-span-1 md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
+                            <label className="block text-sm font-medium text-muted mb-1">Descrição</label>
                             <div className="relative">
                                 <AlignLeft className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
                                 <input
@@ -181,62 +189,65 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
                                     placeholder="Ex: Supermercado"
-                                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none transition-all"
+                                    className="w-full pl-10 pr-4 py-2.5 rounded-xl text-white placeholder:text-muted outline-none transition-all border border-white/10 focus:border-red-500/50"
+                                    style={{ background: "rgba(255, 255, 255, 0.05)" }}
                                 />
                             </div>
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Valor</label>
+                            <label className="block text-sm font-medium text-muted mb-1">Valor</label>
                             <div className="relative">
                                 <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
                                 <input
                                     type="text"
                                     required
                                     value={amount}
-                                    onChange={(e) => setAmount(e.target.value)} // Ideal: mascara de moeda
+                                    onChange={(e) => setAmount(e.target.value)}
                                     placeholder="0,00"
-                                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none transition-all font-medium"
+                                    className="w-full pl-10 pr-4 py-2.5 rounded-xl text-white placeholder:text-muted outline-none transition-all border border-white/10 focus:border-red-500/50 font-medium"
+                                    style={{ background: "rgba(255, 255, 255, 0.05)" }}
                                 />
                             </div>
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Data</label>
+                            <label className="block text-sm font-medium text-muted mb-1">Data</label>
                             <div className="relative">
                                 <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
                                 <input
                                     type="date"
                                     required
-                                    disabled={installmentsData.parcelada} // Desabilita se for parcelado (usa data da 1a parcela)
+                                    disabled={installmentsData.parcelada}
                                     value={installmentsData.parcelada ? installmentsData.dataPrimeiraParcela : date}
                                     onChange={(e) => setDate(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none transition-all disabled:opacity-60"
+                                    className="w-full pl-10 pr-4 py-2.5 rounded-xl text-white outline-none transition-all border border-white/10 focus:border-red-500/50 disabled:opacity-50"
+                                    style={{ background: "rgba(255, 255, 255, 0.05)" }}
                                 />
                             </div>
                         </div>
 
                         <div className="col-span-1 md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
+                            <label className="block text-sm font-medium text-muted mb-1">Categoria</label>
                             <div className="relative">
                                 <Tag className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
                                 <select
                                     required
                                     value={categoryId}
                                     onChange={(e) => setCategoryId(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none transition-all appearance-none"
+                                    className="w-full pl-10 pr-4 py-2.5 rounded-xl text-white outline-none transition-all border border-white/10 focus:border-red-500/50 appearance-none"
+                                    style={{ background: "rgba(255, 255, 255, 0.05)" }}
                                 >
-                                    <option value="" disabled>Selecione uma categoria</option>
+                                    <option value="" disabled className="text-gray-800">Selecione uma categoria</option>
                                     {categorias.map(cat => (
-                                        <option key={cat.id} value={cat.id}>{cat.nome}</option>
+                                        <option key={cat.id} value={cat.id} className="text-gray-800">{cat.nome}</option>
                                     ))}
                                 </select>
                             </div>
                         </div>
                     </div>
 
-                    {/* Componente de Parcelamento */}
-                    <div className="border-t border-gray-100 pt-4">
+                    <div className="border-t border-white/10 pt-4">
                         <InstallmentsForm
                             data={installmentsData}
                             onChange={setInstallmentsData}
@@ -244,11 +255,11 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                         />
                     </div>
 
-                    <div className="flex gap-3 pt-2">
+                    <div className="flex gap-3 pt-4">
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 px-4 py-3 text-gray-700 font-medium bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
+                            className="flex-1 px-4 py-3 text-white font-medium bg-white/5 hover:bg-white/10 rounded-xl transition-colors border border-white/10"
                         >
                             Cancelar
                         </button>
