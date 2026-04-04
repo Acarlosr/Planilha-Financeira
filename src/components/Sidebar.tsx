@@ -48,9 +48,18 @@ export default function Sidebar() {
 
     return (
         <>
+            {/* Beta Banner */}
+            <div className="fixed top-0 left-0 w-full z-[100] bg-orange-500/10 text-orange-400 border-b border-orange-500/20 text-center flex items-center justify-center gap-2 h-8 text-xs font-medium backdrop-blur-md shadow-lg">
+                <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
+                </span>
+                Dapp Versão Beta - algumas opções podem não funcionar direito
+            </div>
+
             {/* Mobile Top Bar */}
             <div 
-                className="md:hidden fixed top-0 left-0 w-full z-40 p-4 flex items-center justify-between border-b border-white/10"
+                className="md:hidden fixed top-8 left-0 w-full z-40 p-4 flex items-center justify-between border-b border-white/10"
                 style={{
                     background: "rgba(15, 23, 42, 0.8)",
                     backdropFilter: "blur(12px)",
@@ -85,7 +94,7 @@ export default function Sidebar() {
             )}
 
             <aside
-                className={`fixed left-0 top-0 h-screen transition-all duration-300 ease-in-out z-50 border-r 
+                className={`fixed left-0 top-8 h-[calc(100vh-2rem)] transition-all duration-300 ease-in-out z-50 border-r 
                     ${collapsed ? "w-64 md:w-20" : "w-64"} 
                     ${mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
                 style={{
