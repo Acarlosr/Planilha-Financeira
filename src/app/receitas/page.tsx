@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createBrowserSupabaseClient } from "@/lib/supabase";
 import Sidebar from "@/components/Sidebar";
 import PrintExportButtons from "@/components/PrintExportButtons";
 import IncomeModal from "@/components/IncomeModal";
@@ -23,42 +24,104 @@ const categoriasReceita = [
 ];
 
 interface IncomeItem {
-    id: number;
+    id: number | string;
     description: string;
     value: number;
     date: string;
     category: string;
 }
 
-const initialIncomeData: IncomeItem[] = [
-    { id: 1, description: "Saldo conta corrente", value: 5200.0, date: "01/01/2026", category: "anterior" },
-    { id: 2, description: "Saldo poupança transferido", value: 3800.0, date: "01/01/2026", category: "anterior" },
-    { id: 3, description: "Salário Janeiro", value: 8500.0, date: "05/01/2026", category: "salario" },
-    { id: 4, description: "Salário Dezembro", value: 8500.0, date: "05/12/2025", category: "salario" },
-    { id: 5, description: "13º Salário - 1ª Parcela", value: 4250.0, date: "30/11/2025", category: "decimo" },
-    { id: 6, description: "13º Salário - 2ª Parcela", value: 4250.0, date: "20/12/2025", category: "decimo" },
-    { id: 7, description: "Projeto Website Cliente A", value: 3200.0, date: "15/12/2025", category: "freela" },
-    { id: 8, description: "Consultoria técnica", value: 1500.0, date: "22/12/2025", category: "freela" },
-    { id: 9, description: "Venda Mercado Livre - Notebook", value: 2800.0, date: "10/12/2025", category: "vendas" },
-    { id: 10, description: "Venda OLX - Móveis", value: 650.0, date: "18/12/2025", category: "vendas" },
-    { id: 11, description: "Reembolso viagem corporativa", value: 850.0, date: "28/12/2025", category: "reembolso" },
-    { id: 12, description: "Estorno cartão de crédito", value: 180.0, date: "02/01/2026", category: "reembolso" },
-];
+const initialIncomeData: IncomeItem[] = [];
 
 export default function ReceitasPage() {
+    const supabase = createBrowserSupabaseClient();
+    const [user, setUser] = useState<any>(null);
     const [activeCategory, setActiveCategory] = useState<string | null>(null);
     const [incomeData, setIncomeData] = useState<IncomeItem[]>(initialIncomeData);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isLoadingData, setIsLoadingData] = useState(true);
 
-    const handleSaveIncome = (newIncome: { description: string; value: number; date: string; category: string }) => {
-        const newItem: IncomeItem = {
-            id: Date.now(),
-            ...newIncome,
+    useEffect(() => {
+        const loadData = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) return;
+            setUser(session.user);
+            
+            const { data, error } = await supabase
+                .from('receitas')
+                .select('*')
+                .eq('user_id', session.user.id)
+                .order('data', { ascending: false });
+                
+            if (error) {
+                console.error("Erro ao carregar receitas (Tabela pode não existir):", error);
+                setIsLoadingData(false);
+                return;
+            }
+            
+            const mappedData = data.map((dbItem: any) => {
+                // Formata "YYYY-MM-DD" para "DD/MM/YYYY" localmente
+                const [year, month, day] = dbItem.data.split('-');
+                return {
+                    id: dbItem.id,
+                    description: dbItem.descricao,
+                    value: Number(dbItem.valor),
+                    date: `${day}/${month}/${year}`,
+                    category: dbItem.categoria_id
+                };
+            });
+            
+            setIncomeData(mappedData);
+            setIsLoadingData(false);
         };
+        
+        loadData();
+    }, []);
+
+    const handleSaveIncome = async (newIncome: { description: string; value: number; date: string; category: string }) => {
+        if (!user) {
+            alert("Sua sessão expirou. Faça login novamente.");
+            return;
+        }
+
+        // Converte DD/MM/YYYY para YYYY-MM-DD
+        const [day, month, year] = newIncome.date.split('/');
+        const pgDate = `${year}-${month}-${day}`;
+
+        const dbItem = {
+            user_id: user.id,
+            descricao: newIncome.description,
+            valor: newIncome.value,
+            data: pgDate,
+            categoria_id: newIncome.category,
+        };
+
+        const { data, error } = await supabase.from('receitas').insert(dbItem).select().single();
+        
+        if (error) {
+            console.error(error);
+            alert("Erro ao salvar! Tem certeza que rodou o arquivo SQL no site do Supabase?");
+            return;
+        }
+
+        const newItem: IncomeItem = {
+            id: data.id,
+            description: data.descricao,
+            value: Number(data.valor),
+            date: newIncome.date, // mantém formato visual pt-BR
+            category: data.categoria_id,
+        };
+        
         setIncomeData(prev => [newItem, ...prev]);
     };
 
-    const handleDeleteIncome = (id: number) => {
+    const handleDeleteIncome = async (id: number | string) => {
+        const { error } = await supabase.from('receitas').delete().eq('id', id);
+        if (error) {
+            console.error("Erro ao deletar:", error);
+            alert("Erro ao excluir do banco de dados.");
+            return;
+        }
         setIncomeData(prev => prev.filter(item => item.id !== id));
     };
 
@@ -184,70 +247,76 @@ export default function ReceitasPage() {
                         )}
                     </div>
 
-                    <div className="space-y-3">
-                        {(activeCategory
-                            ? getItemsByCategory(activeCategory)
-                            : incomeData
-                        ).map((item) => {
-                            const cat = getCategoryById(item.category);
-                            return (
-                                <div
-                                    key={item.id}
-                                    className="flex items-center justify-between p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors group"
-                                >
-                                    <div className="flex items-center gap-4">
+                        {isLoadingData ? (
+                            <div className="text-center py-12 text-muted">Acessando banco de dados...</div>
+                        ) : activeCategory && getItemsByCategory(activeCategory).length === 0 ? (
+                            <div className="text-center py-12">
+                                <p className="text-muted">Nenhuma receita nesta categoria</p>
+                            </div>
+                        ) : incomeData.length === 0 ? (
+                            <div className="text-center py-12">
+                                <p className="text-muted">Nenhuma receita registrada. Clique em "Nova Receita" para registrar.</p>
+                            </div>
+                        ) : (
+                            <div className="space-y-3">
+                                {(activeCategory
+                                    ? getItemsByCategory(activeCategory)
+                                    : incomeData
+                                ).map((item) => {
+                                    const cat = getCategoryById(item.category);
+                                    return (
                                         <div
-                                            className={`w-11 h-11 rounded-lg flex items-center justify-center bg-gradient-to-br ${cat?.cor}`}
+                                            key={item.id}
+                                            className="flex items-center justify-between p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors group"
                                         >
-                                            {cat && (
-                                                <span className="text-lg">
-                                                    {cat.icone === "back" ? (
-                                                        <RotateCcw size={18} className="text-white" />
-                                                    ) : (
-                                                        cat.icone
+                                            <div className="flex items-center gap-4">
+                                                <div
+                                                    className={`w-11 h-11 rounded-lg flex items-center justify-center bg-gradient-to-br ${cat?.cor}`}
+                                                >
+                                                    {cat && (
+                                                        <span className="text-lg">
+                                                            {cat.icone === "back" ? (
+                                                                <RotateCcw size={18} className="text-white" />
+                                                            ) : (
+                                                                cat.icone
+                                                            )}
+                                                        </span>
                                                     )}
+                                                </div>
+                                                <div>
+                                                    <p className="font-medium text-foreground">{item.description}</p>
+                                                    <div className="flex items-center gap-2 mt-0.5">
+                                                        <span className="text-xs text-muted">{item.date}</span>
+                                                        <span className="text-xs text-muted">•</span>
+                                                        <span className="text-xs text-muted">{cat?.label}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-4">
+                                                <span className="font-bold text-emerald-400 text-lg">
+                                                    + R$ {item.value.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                                                 </span>
-                                            )}
-                                        </div>
-                                        <div>
-                                            <p className="font-medium text-foreground">{item.description}</p>
-                                            <div className="flex items-center gap-2 mt-0.5">
-                                                <span className="text-xs text-muted">{item.date}</span>
-                                                <span className="text-xs text-muted">•</span>
-                                                <span className="text-xs text-muted">{cat?.label}</span>
+                                                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <button className="p-2 hover:bg-white/10 rounded-lg transition-colors">
+                                                        <Edit size={16} className="text-muted" />
+                                                    </button>
+                                                <button
+                                                        onClick={() => {
+                                                            if (confirm(`Excluir "${item.description}"?`)) {
+                                                                handleDeleteIncome(item.id);
+                                                            }
+                                                        }}
+                                                        className="p-2 hover:bg-red-500/20 rounded-lg transition-colors"
+                                                    >                                                <Trash2 size={16} className="text-red-400" />
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div className="flex items-center gap-4">
-                                        <span className="font-bold text-emerald-400 text-lg">
-                                            + R$ {item.value.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                                        </span>
-                                        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <button className="p-2 hover:bg-white/10 rounded-lg transition-colors">
-                                                <Edit size={16} className="text-muted" />
-                                            </button>
-                                        <button
-                                                onClick={() => {
-                                                    if (confirm(`Excluir "${item.description}"?`)) {
-                                                        handleDeleteIncome(item.id);
-                                                    }
-                                                }}
-                                                className="p-2 hover:bg-red-500/20 rounded-lg transition-colors"
-                                            >                                                <Trash2 size={16} className="text-red-400" />
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
+                                    );
+                                })}
+                            </div>
+                        )}
 
-                    {/* Empty State */}
-                    {activeCategory && getItemsByCategory(activeCategory).length === 0 && (
-                        <div className="text-center py-12">
-                            <p className="text-muted">Nenhuma receita nesta categoria</p>
-                        </div>
-                    )}
                 </div>
             </main>
 

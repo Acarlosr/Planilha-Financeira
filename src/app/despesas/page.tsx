@@ -41,31 +41,7 @@ interface ExpenseItem {
     category: string;
 }
 
-const expenseData: ExpenseItem[] = [
-    { id: 1, description: "Aluguel Janeiro", value: 2500.0, date: "05/01/2026", category: "moradia" },
-    { id: 2, description: "Condomínio", value: 450.0, date: "05/01/2026", category: "moradia" },
-    { id: 3, description: "Energia elétrica", value: 280.0, date: "08/01/2026", category: "moradia" },
-    { id: 4, description: "Internet + TV", value: 150.0, date: "10/01/2026", category: "moradia" },
-    { id: 5, description: "Supermercado - Compra mensal", value: 1200.0, date: "03/01/2026", category: "alimentacao" },
-    { id: 6, description: "Restaurante - Almoço", value: 85.0, date: "07/01/2026", category: "alimentacao" },
-    { id: 7, description: "Padaria", value: 45.0, date: "09/01/2026", category: "alimentacao" },
-    { id: 8, description: "iFood - Jantar", value: 62.0, date: "10/01/2026", category: "alimentacao" },
-    { id: 9, description: "Gasolina", value: 320.0, date: "04/01/2026", category: "transporte" },
-    { id: 10, description: "Uber", value: 78.0, date: "06/01/2026", category: "transporte" },
-    { id: 11, description: "Estacionamento", value: 25.0, date: "08/01/2026", category: "transporte" },
-    { id: 12, description: "Plano de saúde", value: 580.0, date: "05/01/2026", category: "saude" },
-    { id: 13, description: "Farmácia - Medicamentos", value: 125.0, date: "07/01/2026", category: "saude" },
-    { id: 14, description: "Consulta médica", value: 250.0, date: "09/01/2026", category: "saude" },
-    { id: 15, description: "Curso online - Udemy", value: 89.90, date: "02/01/2026", category: "educacao" },
-    { id: 16, description: "Livros técnicos", value: 145.0, date: "06/01/2026", category: "educacao" },
-    { id: 17, description: "Netflix", value: 55.90, date: "05/01/2026", category: "lazer" },
-    { id: 18, description: "Spotify", value: 21.90, date: "05/01/2026", category: "lazer" },
-    { id: 19, description: "Cinema", value: 68.0, date: "08/01/2026", category: "lazer" },
-    { id: 20, description: "Tênis esportivo", value: 380.0, date: "04/01/2026", category: "vestuario" },
-    { id: 21, description: "Camisetas", value: 120.0, date: "07/01/2026", category: "vestuario" },
-    { id: 22, description: "Amazon - Eletrônicos", value: 450.0, date: "03/01/2026", category: "compras" },
-    { id: 23, description: "Mercado Livre - Acessórios", value: 95.0, date: "09/01/2026", category: "compras" },
-];
+const expenseData: ExpenseItem[] = [];
 
 // Mock Data for UI Testing
 const mockCartoes = [

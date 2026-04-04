@@ -34,18 +34,7 @@ export const poupancaData = {
             icone: "🚗",
         },
     ],
-    transacoes: [
-        { id: 1, tipo: "deposito", descricao: "Depósito mensal - Reserva", valor: 650.0, data: "05/01/2026", meta: "emergencia" },
-        { id: 2, tipo: "deposito", descricao: "Extra freelance - Viagem", valor: 800.0, data: "08/01/2026", meta: "viagem" },
-        { id: 3, tipo: "deposito", descricao: "Economia do mês", valor: 500.0, data: "10/01/2026" },
-        { id: 4, tipo: "retirada", descricao: "Emergência médica", valor: 450.0, data: "12/01/2026", meta: "emergencia" },
-        { id: 5, tipo: "deposito", descricao: "13º salário - Carro", valor: 1000.0, data: "20/12/2025", meta: "carro" },
-        { id: 6, tipo: "deposito", descricao: "Depósito mensal - Reserva", valor: 650.0, data: "05/12/2025", meta: "emergencia" },
-        { id: 7, tipo: "deposito", descricao: "Bônus trabalho - Viagem", valor: 1200.0, data: "15/12/2025", meta: "viagem" },
-        { id: 8, tipo: "deposito", descricao: "Economia do mês", valor: 550.0, data: "28/12/2025" },
-        { id: 9, tipo: "retirada", descricao: "Conserto carro", valor: 380.0, data: "10/12/2025" },
-        { id: 10, tipo: "deposito", descricao: "Venda de item - Viagem", valor: 450.0, data: "18/11/2025", meta: "viagem" },
-    ]
+    transacoes: []
 };
 
 export const aplicacaoData = {
@@ -92,14 +81,5 @@ export const aplicacaoData = {
             icone: "💰",
         },
     ],
-    transacoes: [
-        { id: 1, tipo: "aporte", descricao: "Aporte mensal - Tesouro Selic", valor: 1000.0, data: "05/01/2026", investimento: "tesouro" },
-        { id: 2, tipo: "aporte", descricao: "Compra ITSA4 - 100 ações", valor: 850.0, data: "08/01/2026", investimento: "acoes" },
-        { id: 3, tipo: "aporte", descricao: "Aporte FII HGLG11", valor: 500.0, data: "10/01/2026", investimento: "fiis" },
-        { id: 4, tipo: "resgate", descricao: "Resgate parcial CDB", valor: 2000.0, data: "12/01/2026", investimento: "cdb" },
-        { id: 5, tipo: "aporte", descricao: "Compra PETR4 - 50 ações", valor: 1200.0, data: "15/12/2025", investimento: "acoes" },
-        { id: 6, tipo: "aporte", descricao: "Aporte Tesouro IPCA+", valor: 1500.0, data: "20/12/2025", investimento: "tesouro" },
-        { id: 7, tipo: "aporte", descricao: "Aporte FII MXRF11", valor: 600.0, data: "22/12/2025", investimento: "fiis" },
-        { id: 8, tipo: "resgate", descricao: "Venda VALE3 - 80 ações", valor: 3500.0, data: "28/12/2025", investimento: "acoes" },
-    ]
+    transacoes: []
 };
