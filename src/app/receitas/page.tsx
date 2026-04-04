@@ -152,7 +152,7 @@ export default function ReceitasPage() {
         <div className="min-h-screen">
             <Sidebar />
 
-            <main className="ml-64 p-8 transition-all duration-300">
+            <main className="md:ml-64 p-4 pt-24 md:p-8 transition-all duration-300">
                 {/* Header */}
                 <header className="mb-8">
                     <div className="flex items-center justify-between">

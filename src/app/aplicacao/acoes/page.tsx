@@ -41,7 +41,7 @@ export default function AcoesPage() {
         <div className="min-h-screen border-t border-transparent">
             <Sidebar />
 
-            <main className="ml-64 p-8 transition-all duration-300">
+            <main className="md:ml-64 p-4 pt-24 md:p-8 transition-all duration-300">
                 <BotaoVoltar label="Voltar para Aplicações" fallbackUrl="/aplicacao" />
 
                 <header className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">

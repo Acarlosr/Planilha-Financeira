@@ -16,6 +16,8 @@ import {
     Bitcoin,
     Sun,
     Moon,
+    Menu,
+    X,
 } from "lucide-react";
 
 interface NavItem {
@@ -26,6 +28,7 @@ interface NavItem {
 
 export default function Sidebar() {
     const [collapsed, setCollapsed] = useState(false);
+    const [mobileOpen, setMobileOpen] = useState(false);
     const pathname = usePathname();
     const { theme, toggleTheme } = useTheme();
 
@@ -44,16 +47,54 @@ export default function Sidebar() {
     };
 
     return (
-        <aside
-            className={`fixed left-0 top-0 h-screen transition-all duration-300 ease-in-out z-50 border-r ${collapsed ? "w-20" : "w-64"
-                }`}
-            style={{
-                background: "var(--background-light)",
-                borderColor: "var(--card-border)",
-                backdropFilter: "blur(20px)",
-                boxShadow: "4px 0 20px rgba(0, 0, 0, 0.1)",
-            }}
-        >
+        <>
+            {/* Mobile Top Bar */}
+            <div 
+                className="md:hidden fixed top-0 left-0 w-full z-40 p-4 flex items-center justify-between border-b border-white/10"
+                style={{
+                    background: "rgba(15, 23, 42, 0.8)",
+                    backdropFilter: "blur(12px)",
+                }}
+            >
+                <Link href="/landing" className="flex items-center gap-3">
+                    <div
+                        className="w-10 h-10 rounded-xl flex items-center justify-center"
+                        style={{
+                            background: "linear-gradient(135deg, #7CFF6B 0%, #6FEB5A 100%)",
+                            boxShadow: "0 4px 15px rgba(124, 255, 107, 0.4)",
+                        }}
+                    >
+                        <TrendingUp className="text-[#0a0f16]" size={20} />
+                    </div>
+                    <span className="font-semibold text-[#7CFF6B] text-lg">FinançasPro</span>
+                </Link>
+                <button 
+                    onClick={() => setMobileOpen(!mobileOpen)}
+                    className="p-2 rounded-lg bg-white/5 text-white hover:bg-white/10 transition-colors"
+                >
+                    {mobileOpen ? <X size={24} /> : <Menu size={24} />}
+                </button>
+            </div>
+
+            {/* Backdrop for mobile */}
+            {mobileOpen && (
+                <div 
+                    className="md:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
+                    onClick={() => setMobileOpen(false)}
+                />
+            )}
+
+            <aside
+                className={`fixed left-0 top-0 h-screen transition-all duration-300 ease-in-out z-50 border-r 
+                    ${collapsed ? "w-64 md:w-20" : "w-64"} 
+                    ${mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
+                style={{
+                    background: "var(--background-light)",
+                    borderColor: "var(--card-border)",
+                    backdropFilter: "blur(20px)",
+                    boxShadow: "4px 0 20px rgba(0, 0, 0, 0.1)",
+                }}
+            >
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-white/10">
                 {!collapsed && (
@@ -90,6 +131,7 @@ export default function Sidebar() {
                     <Link
                         key={index}
                         href={item.href}
+                        onClick={() => setMobileOpen(false)}
                         className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 ${isActive(item.href) ? "" : "hover:bg-white/5"
                             }`}
                         style={
@@ -136,10 +178,10 @@ export default function Sidebar() {
                 </button>
             </div>
 
-            {/* Collapse Button */}
+            {/* Collapse Button (Desktop Only) */}
             <button
                 onClick={() => setCollapsed(!collapsed)}
-                className="absolute bottom-6 left-1/2 -translate-x-1/2 w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 border border-white/10 hover:border-white/20"
+                className="hidden md:flex absolute bottom-6 left-1/2 -translate-x-1/2 w-10 h-10 rounded-xl items-center justify-center transition-all duration-200 border border-white/10 hover:border-white/20"
                 style={{
                     background: "rgba(255, 255, 255, 0.05)",
                 }}
@@ -151,5 +193,6 @@ export default function Sidebar() {
                 )}
             </button>
         </aside>
+        </>
     );
 }
