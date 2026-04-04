@@ -60,6 +60,14 @@ export async function middleware(request: NextRequest) {
 
     const path = request.nextUrl.pathname;
 
+    // Protected app routes
+    const protectedRoutes = ['/receitas', '/despesas', '/aplicacao', '/poupanca', '/criptomoedas', '/settings', '/checkout'];
+    if (protectedRoutes.some(route => path.startsWith(route))) {
+        if (!user) {
+            return NextResponse.redirect(new URL('/cadastro', request.url));
+        }
+    }
+
     // Protected admin routes
     if (path.startsWith('/admin')) {
         if (!user) {
@@ -112,5 +120,12 @@ export const config = {
         '/export/:path*',
         '/api-access/:path*',
         '/advanced-reports/:path*',
+        '/receitas/:path*',
+        '/despesas/:path*',
+        '/aplicacao/:path*',
+        '/poupanca/:path*',
+        '/criptomoedas/:path*',
+        '/settings/:path*',
+        '/checkout/:path*',
     ],
 };
