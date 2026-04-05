@@ -4,7 +4,8 @@ export interface Transacao {
     valor: number;
     data: string;
     tipo: string;
-    investimento: string;
+    investimento?: string;
+    meta?: string;
 }
 
 export const poupancaData = {
