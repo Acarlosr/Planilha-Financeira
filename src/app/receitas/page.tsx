@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { createBrowserSupabaseClient } from "@/lib/supabase";
 import Sidebar from "@/components/Sidebar";
 import PrintExportButtons from "@/components/PrintExportButtons";
@@ -11,6 +11,8 @@ import {
     Edit,
     Trash2,
     RotateCcw,
+    ChevronLeft,
+    ChevronRight,
 } from "lucide-react";
 
 // Categorias de Receita conforme especificado
@@ -21,6 +23,11 @@ const categoriasReceita = [
     { id: "vendas", label: "Vendas Online", icone: "📦", cor: "from-blue-500 to-blue-400" },
     { id: "reembolso", label: "Reembolso", icone: "back", cor: "from-teal-500 to-teal-400" },
     { id: "anterior", label: "Saldo Anterior", icone: "🏦", cor: "from-indigo-500 to-indigo-400" },
+];
+
+const mesesNomes = [
+    "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+    "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
 ];
 
 interface IncomeItem {
@@ -41,42 +48,81 @@ export default function ReceitasPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoadingData, setIsLoadingData] = useState(true);
 
+    // Estado do mês selecionado
+    const now = new Date();
+    const [selectedMonth, setSelectedMonth] = useState(now.getMonth()); // 0-11
+    const [selectedYear, setSelectedYear] = useState(now.getFullYear());
+
+    const mesAnoLabel = `${mesesNomes[selectedMonth]} ${selectedYear}`;
+
+    const handlePrevMonth = () => {
+        if (selectedMonth === 0) {
+            setSelectedMonth(11);
+            setSelectedYear(prev => prev - 1);
+        } else {
+            setSelectedMonth(prev => prev - 1);
+        }
+    };
+
+    const handleNextMonth = () => {
+        if (selectedMonth === 11) {
+            setSelectedMonth(0);
+            setSelectedYear(prev => prev + 1);
+        } else {
+            setSelectedMonth(prev => prev + 1);
+        }
+    };
+
+    const loadData = useCallback(async (userId: string) => {
+        setIsLoadingData(true);
+
+        // Calcula range do mês: primeiro dia até primeiro dia do próximo mês
+        const startDate = `${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-01`;
+        const nextMonth = selectedMonth === 11 ? 0 : selectedMonth + 1;
+        const nextYear = selectedMonth === 11 ? selectedYear + 1 : selectedYear;
+        const endDate = `${nextYear}-${String(nextMonth + 1).padStart(2, '0')}-01`;
+
+        const { data, error } = await supabase
+            .from('receitas')
+            .select('*')
+            .eq('user_id', userId)
+            .gte('data', startDate)
+            .lt('data', endDate)
+            .order('data', { ascending: false });
+
+        if (error) {
+            console.error("Erro ao carregar receitas (Tabela pode não existir):", error);
+            setIsLoadingData(false);
+            return;
+        }
+
+        const mappedData = data.map((dbItem: any) => {
+            const [year, month, day] = dbItem.data.split('-');
+            return {
+                id: dbItem.id,
+                description: dbItem.descricao,
+                value: Number(dbItem.valor),
+                date: `${day}/${month}/${year}`,
+                category: dbItem.categoria_id
+            };
+        });
+
+        setIncomeData(mappedData);
+        setIsLoadingData(false);
+    }, [selectedMonth, selectedYear, supabase]);
+
     useEffect(() => {
-        const loadData = async () => {
+        const init = async () => {
             const { data: { session } } = await supabase.auth.getSession();
-            if (!session) return;
-            setUser(session.user);
-            
-            const { data, error } = await supabase
-                .from('receitas')
-                .select('*')
-                .eq('user_id', session.user.id)
-                .order('data', { ascending: false });
-                
-            if (error) {
-                console.error("Erro ao carregar receitas (Tabela pode não existir):", error);
+            if (!session) {
                 setIsLoadingData(false);
                 return;
             }
-            
-            const mappedData = data.map((dbItem: any) => {
-                // Formata "YYYY-MM-DD" para "DD/MM/YYYY" localmente
-                const [year, month, day] = dbItem.data.split('-');
-                return {
-                    id: dbItem.id,
-                    description: dbItem.descricao,
-                    value: Number(dbItem.valor),
-                    date: `${day}/${month}/${year}`,
-                    category: dbItem.categoria_id
-                };
-            });
-            
-            setIncomeData(mappedData);
-            setIsLoadingData(false);
+            setUser(session.user);
+            await loadData(session.user.id);
         };
-        
-        loadData();
-    }, []);
+        init();
+    }, [selectedMonth, selectedYear]);
 
     const handleSaveIncome = async (newIncome: { description: string; value: number; date: string; category: string }) => {
         if (!user) {
@@ -163,7 +209,7 @@ export default function ReceitasPage() {
                             </p>
                         </div>
                         <div className="flex items-center gap-3">
-                            <PrintExportButtons title="Receitas" period="Janeiro 2026" />
+                            <PrintExportButtons title="Receitas" period={mesAnoLabel} />
                             <button
                                 onClick={() => setIsModalOpen(true)}
                                 className="flex items-center gap-2 px-5 py-3 text-foreground font-medium rounded-xl transition-all hover:shadow-lg no-print"
@@ -187,9 +233,25 @@ export default function ReceitasPage() {
                                     R$ {totalReceitas.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                                 </h2>
                             </div>
-                            <div className="flex items-center gap-2 text-emerald-400">
-                                <Calendar size={18} />
-                                <span className="text-sm font-medium">Janeiro 2026</span>
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={handlePrevMonth}
+                                    className="p-2 rounded-lg hover:bg-white/10 text-muted hover:text-foreground transition-colors"
+                                    aria-label="Mês anterior"
+                                >
+                                    <ChevronLeft size={20} />
+                                </button>
+                                <div className="flex items-center gap-2 text-emerald-400 min-w-[160px] justify-center">
+                                    <Calendar size={18} />
+                                    <span className="text-sm font-medium">{mesAnoLabel}</span>
+                                </div>
+                                <button
+                                    onClick={handleNextMonth}
+                                    className="p-2 rounded-lg hover:bg-white/10 text-muted hover:text-foreground transition-colors"
+                                    aria-label="Próximo mês"
+                                >
+                                    <ChevronRight size={20} />
+                                </button>
                             </div>
                         </div>
                     </div>
