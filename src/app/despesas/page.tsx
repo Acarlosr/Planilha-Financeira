@@ -19,6 +19,9 @@ import {
     Smartphone,
     GraduationCap,
     Shirt,
+    Wifi,
+    Tv,
+    MoreHorizontal,
 } from "lucide-react";
 
 // Categorias de Despesas
@@ -31,6 +34,9 @@ const categoriasDespesa = [
     { id: "lazer", label: "Lazer", icone: Smartphone, cor: "from-pink-500 to-pink-400" },
     { id: "vestuario", label: "Vestuário", icone: Shirt, cor: "from-indigo-500 to-indigo-400" },
     { id: "compras", label: "Compras", icone: ShoppingCart, cor: "from-teal-500 to-teal-400" },
+    { id: "telecom", label: "Internet/TV/Telefone", icone: Wifi, cor: "from-cyan-500 to-cyan-400" },
+    { id: "streaming", label: "Streaming", icone: Tv, cor: "from-rose-500 to-rose-400" },
+    { id: "outros", label: "Outros", icone: MoreHorizontal, cor: "from-gray-500 to-gray-400" },
 ];
 
 interface ExpenseItem {
@@ -84,6 +90,9 @@ const mockCategoriasDB = [
     { id: "lazer", nome: "Lazer", icone: "Smartphone", cor: "pink", tipo: "despesa", user_id: "1", created_at: "" },
     { id: "vestuario", nome: "Vestuário", icone: "Shirt", cor: "indigo", tipo: "despesa", user_id: "1", created_at: "" },
     { id: "compras", nome: "Compras", icone: "ShoppingCart", cor: "teal", tipo: "despesa", user_id: "1", created_at: "" },
+    { id: "telecom", nome: "Internet/TV/Telefone", icone: "Wifi", cor: "cyan", tipo: "despesa", user_id: "1", created_at: "" },
+    { id: "streaming", nome: "Streaming", icone: "Tv", cor: "rose", tipo: "despesa", user_id: "1", created_at: "" },
+    { id: "outros", nome: "Outros", icone: "MoreHorizontal", cor: "gray", tipo: "despesa", user_id: "1", created_at: "" },
 ] as any[]; // Type mocking
 
 function DespesasContent() {
@@ -194,7 +203,7 @@ function DespesasContent() {
                 </header>
 
                 {/* Category Cards */}
-                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 mb-8">
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4 mb-8">
                     {categoriasDespesa.map((cat) => {
                         const total = getTotalByCategory(cat.id);
                         const isActive = activeCategory === cat.id;
