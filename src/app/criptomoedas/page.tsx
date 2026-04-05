@@ -1,12 +1,28 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
+import MonthYearPicker from "@/components/MonthYearPicker";
 import CryptoPortfolio from "@/components/CryptoPortfolio";
 import CryptoModal from "@/components/CryptoModal";
 import { Coins, LineChart, Wallet, Plus } from "lucide-react";
 
-export default function CriptoPage() {
+function CriptoContent() {
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+
+    const currentMonth = searchParams.get("month") ? parseInt(searchParams.get("month")!) : new Date().getMonth() + 1;
+    const currentYear = searchParams.get("year") ? parseInt(searchParams.get("year")!) : new Date().getFullYear();
+
+    const handleDateChange = (newDate: { month: number; year: number }) => {
+        const params = new URLSearchParams(searchParams);
+        params.set("month", newDate.month.toString());
+        params.set("year", newDate.year.toString());
+        router.push(`${pathname}?${params.toString()}`);
+    };
+
     const [currency, setCurrency] = useState<"brl" | "usd">("brl");
     const [activeTab, setActiveTab] = useState<"market" | "portfolio">("market");
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -105,6 +121,18 @@ export default function CriptoPage() {
                         </div>
                     </div>
                 </header>
+
+                {/* Filtro de Período */}
+                <div className="mb-6 glass-card p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <p className="text-muted text-sm font-medium">Período de Referência</p>
+                        <h2 className="text-xl font-bold text-foreground mt-1">Filtro Visual</h2>
+                    </div>
+                    <MonthYearPicker
+                        date={{ month: currentMonth, year: currentYear }}
+                        onChange={handleDateChange}
+                    />
+                </div>
 
                 {/* Tabs */}
                 <div className="flex items-center gap-2 mb-6 border-b border-white/10">
@@ -209,5 +237,13 @@ export default function CriptoPage() {
                 }}
             />
         </div>
+    );
+}
+
+export default function CriptoPage() {
+    return (
+        <Suspense fallback={<div>Carregando...</div>}>
+            <CriptoContent />
+        </Suspense>
     );
 }

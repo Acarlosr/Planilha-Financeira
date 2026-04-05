@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
+import MonthYearPicker from "@/components/MonthYearPicker";
 import InvestmentModal from "@/components/InvestmentModal";
 import {
     Plus,
@@ -28,7 +30,21 @@ import { aplicacaoData } from "@/constants/financialData";
 // Dados vindos da constant
 const { rentabilidade: rentabilidadeData, tipos: tiposInvestimento, transacoes } = aplicacaoData;
 
-export default function AplicacaoPage() {
+function AplicacaoContent() {
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+
+    const currentMonth = searchParams.get("month") ? parseInt(searchParams.get("month")!) : new Date().getMonth() + 1;
+    const currentYear = searchParams.get("year") ? parseInt(searchParams.get("year")!) : new Date().getFullYear();
+
+    const handleDateChange = (newDate: { month: number; year: number }) => {
+        const params = new URLSearchParams(searchParams);
+        params.set("month", newDate.month.toString());
+        params.set("year", newDate.year.toString());
+        router.push(`${pathname}?${params.toString()}`);
+    };
+
     const [activeFilter, setActiveFilter] = useState<string | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [transacoesData, setTransacoesData] = useState(transacoes);
@@ -78,6 +94,17 @@ export default function AplicacaoPage() {
                             <Plus size={20} />
                             Novo Aporte
                         </button>
+                    </div>
+
+                    <div className="mt-6 glass-card p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <p className="text-muted text-sm font-medium">Período de Referência</p>
+                            <h2 className="text-xl font-bold text-foreground mt-1">Filtro de Visualização</h2>
+                        </div>
+                        <MonthYearPicker
+                            date={{ month: currentMonth, year: currentYear }}
+                            onChange={handleDateChange}
+                        />
                     </div>
 
                     {/* Summary Cards */}
@@ -276,5 +303,13 @@ export default function AplicacaoPage() {
                 onSave={handleSaveInvestment}
             />
         </div>
+    );
+}
+
+export default function AplicacaoPage() {
+    return (
+        <Suspense fallback={<div>Carregando...</div>}>
+            <AplicacaoContent />
+        </Suspense>
     );
 }

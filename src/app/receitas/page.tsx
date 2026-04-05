@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { createBrowserSupabaseClient } from "@/lib/supabase";
 import Sidebar from "@/components/Sidebar";
+import MonthYearPicker from "@/components/MonthYearPicker";
 import PrintExportButtons from "@/components/PrintExportButtons";
 import IncomeModal from "@/components/IncomeModal";
 import {
@@ -40,47 +42,38 @@ interface IncomeItem {
 
 const initialIncomeData: IncomeItem[] = [];
 
-export default function ReceitasPage() {
+function ReceitasContent() {
     const supabase = createBrowserSupabaseClient();
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+
     const [user, setUser] = useState<any>(null);
     const [activeCategory, setActiveCategory] = useState<string | null>(null);
     const [incomeData, setIncomeData] = useState<IncomeItem[]>(initialIncomeData);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoadingData, setIsLoadingData] = useState(true);
 
-    // Estado do mês selecionado
-    const now = new Date();
-    const [selectedMonth, setSelectedMonth] = useState(now.getMonth()); // 0-11
-    const [selectedYear, setSelectedYear] = useState(now.getFullYear());
+    const currentMonth = searchParams.get("month") ? parseInt(searchParams.get("month")!) : new Date().getMonth() + 1;
+    const currentYear = searchParams.get("year") ? parseInt(searchParams.get("year")!) : new Date().getFullYear();
 
-    const mesAnoLabel = `${mesesNomes[selectedMonth]} ${selectedYear}`;
+    const mesAnoLabel = `${mesesNomes[currentMonth - 1]} ${currentYear}`;
 
-    const handlePrevMonth = () => {
-        if (selectedMonth === 0) {
-            setSelectedMonth(11);
-            setSelectedYear(prev => prev - 1);
-        } else {
-            setSelectedMonth(prev => prev - 1);
-        }
-    };
-
-    const handleNextMonth = () => {
-        if (selectedMonth === 11) {
-            setSelectedMonth(0);
-            setSelectedYear(prev => prev + 1);
-        } else {
-            setSelectedMonth(prev => prev + 1);
-        }
+    const handleDateChange = (newDate: { month: number; year: number }) => {
+        const params = new URLSearchParams(searchParams);
+        params.set("month", newDate.month.toString());
+        params.set("year", newDate.year.toString());
+        router.push(`${pathname}?${params.toString()}`);
     };
 
     const loadData = useCallback(async (userId: string) => {
         setIsLoadingData(true);
 
         // Calcula range do mês: primeiro dia até primeiro dia do próximo mês
-        const startDate = `${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-01`;
-        const nextMonth = selectedMonth === 11 ? 0 : selectedMonth + 1;
-        const nextYear = selectedMonth === 11 ? selectedYear + 1 : selectedYear;
-        const endDate = `${nextYear}-${String(nextMonth + 1).padStart(2, '0')}-01`;
+        const startDate = `${currentYear}-${String(currentMonth).padStart(2, '0')}-01`;
+        const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
+        const nextYear = currentMonth === 12 ? currentYear + 1 : currentYear;
+        const endDate = `${nextYear}-${String(nextMonth).padStart(2, '0')}-01`;
 
         const { data, error } = await supabase
             .from('receitas')
@@ -109,7 +102,7 @@ export default function ReceitasPage() {
 
         setIncomeData(mappedData);
         setIsLoadingData(false);
-    }, [selectedMonth, selectedYear, supabase]);
+    }, [currentMonth, currentYear, supabase]);
 
     useEffect(() => {
         const init = async () => {
@@ -122,7 +115,7 @@ export default function ReceitasPage() {
             await loadData(session.user.id);
         };
         init();
-    }, [selectedMonth, selectedYear]);
+    }, [currentMonth, currentYear, loadData]);
 
     const handleSaveIncome = async (newIncome: { description: string; value: number; date: string; category: string }) => {
         if (!user) {
@@ -225,35 +218,21 @@ export default function ReceitasPage() {
                         </div>
                     </div>
 
-                    {/* Month Selector */}
-                    <div className="mt-4 flex items-center justify-center gap-1">
-                        <button
-                            onClick={handlePrevMonth}
-                            className="p-2 rounded-lg hover:bg-white/10 active:bg-white/20 text-muted hover:text-foreground transition-colors"
-                            aria-label="Mês anterior"
-                        >
-                            <ChevronLeft size={22} />
-                        </button>
-                        <div className="flex items-center gap-2 text-emerald-400 min-w-[150px] md:min-w-[180px] justify-center">
-                            <Calendar size={16} />
-                            <span className="text-sm md:text-base font-semibold">{mesAnoLabel}</span>
-                        </div>
-                        <button
-                            onClick={handleNextMonth}
-                            className="p-2 rounded-lg hover:bg-white/10 active:bg-white/20 text-muted hover:text-foreground transition-colors"
-                            aria-label="Próximo mês"
-                        >
-                            <ChevronRight size={22} />
-                        </button>
-                    </div>
-
                     {/* Total Summary */}
-                    <div className="mt-4 glass-card p-4 md:p-6">
-                        <div className="text-center">
-                            <p className="text-muted text-xs md:text-sm font-medium">Total de Receitas</p>
-                            <h2 className="text-2xl md:text-3xl font-bold text-emerald-400 mt-1">
-                                R$ {totalReceitas.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                            </h2>
+                    <div className="mt-6 glass-card p-6">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-muted text-sm font-medium">Total de Receitas</p>
+                                <h2 className="text-3xl font-bold text-emerald-400 mt-1">
+                                    R$ {totalReceitas.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                                </h2>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <MonthYearPicker
+                                    date={{ month: currentMonth, year: currentYear }}
+                                    onChange={handleDateChange}
+                                />
+                            </div>
                         </div>
                     </div>
                 </header>
@@ -385,5 +364,13 @@ export default function ReceitasPage() {
                 onSave={handleSaveIncome}
             />
         </div>
+    );
+}
+
+export default function ReceitasPage() {
+    return (
+        <Suspense fallback={<div>Carregando...</div>}>
+            <ReceitasContent />
+        </Suspense>
     );
 }

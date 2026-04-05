@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
+import MonthYearPicker from "@/components/MonthYearPicker";
 import SavingsModal from "@/components/SavingsModal";
 import {
     Plus,
@@ -28,7 +30,21 @@ import { poupancaData } from "@/constants/financialData";
 // Dados do gráfico de evolução e metas vindos da constant
 const { evolucao: evolucaoData, metas, transacoes } = poupancaData;
 
-export default function PoupancaPage() {
+function PoupancaContent() {
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+
+    const currentMonth = searchParams.get("month") ? parseInt(searchParams.get("month")!) : new Date().getMonth() + 1;
+    const currentYear = searchParams.get("year") ? parseInt(searchParams.get("year")!) : new Date().getFullYear();
+
+    const handleDateChange = (newDate: { month: number; year: number }) => {
+        const params = new URLSearchParams(searchParams);
+        params.set("month", newDate.month.toString());
+        params.set("year", newDate.year.toString());
+        router.push(`${pathname}?${params.toString()}`);
+    };
+
     const [activeMeta, setActiveMeta] = useState<string | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [transacoesData, setTransacoesData] = useState(transacoes);
@@ -88,6 +104,17 @@ export default function PoupancaPage() {
                             <Plus size={20} />
                             Novo Depósito
                         </button>
+                    </div>
+
+                    <div className="mt-6 glass-card p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <p className="text-muted text-sm font-medium">Período de Referência</p>
+                            <h2 className="text-xl font-bold text-foreground mt-1">Filtro de Visualização</h2>
+                        </div>
+                        <MonthYearPicker
+                            date={{ month: currentMonth, year: currentYear }}
+                            onChange={handleDateChange}
+                        />
                     </div>
 
                     {/* Summary Cards */}
@@ -333,5 +360,13 @@ export default function PoupancaPage() {
                 metas={metas.map(m => ({ id: m.id, nome: m.nome, icone: m.icone }))}
             />
         </div>
+    );
+}
+
+export default function PoupancaPage() {
+    return (
+        <Suspense fallback={<div>Carregando...</div>}>
+            <PoupancaContent />
+        </Suspense>
     );
 }
