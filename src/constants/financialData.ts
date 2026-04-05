@@ -1,3 +1,12 @@
+export interface Transacao {
+    id: number;
+    descricao: string;
+    valor: number;
+    data: string;
+    tipo: string;
+    investimento: string;
+}
+
 export const poupancaData = {
     evolucao: [
         { mes: "Jul", valor: 10200 },
@@ -34,7 +43,7 @@ export const poupancaData = {
             icone: "🚗",
         },
     ],
-    transacoes: []
+    transacoes: [] as Transacao[]
 };
 
 export const aplicacaoData = {
@@ -81,5 +90,5 @@ export const aplicacaoData = {
             icone: "💰",
         },
     ],
-    transacoes: []
+    transacoes: [] as Transacao[]
 };
