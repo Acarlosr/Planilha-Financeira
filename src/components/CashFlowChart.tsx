@@ -27,9 +27,10 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
             <div
                 className="p-4 rounded-xl border border-white/20"
                 style={{
-                    background: "rgba(10, 22, 40, 0.95)",
+                    background: "var(--card-bg-solid)",
+                    color: "var(--foreground)",
                     backdropFilter: "blur(10px)",
-                    boxShadow: "0 10px 40px rgba(0, 0, 0, 0.3)",
+                    boxShadow: "var(--shadow-glass)",
                 }}
             >
                 <p className="font-semibold text-foreground mb-2">{label}</p>
@@ -60,11 +61,11 @@ export default function CashFlowChart() {
                 </div>
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full bg-emerald-500" />
+                        <div className="w-3 h-3 rounded-full" style={{ background: "var(--success)" }} />
                         <span className="text-sm text-muted">Entradas</span>
                     </div>
                     <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full bg-red-400" />
+                        <div className="w-3 h-3 rounded-full" style={{ background: "var(--danger)" }} />
                         <span className="text-sm text-muted">Saídas</span>
                     </div>
                 </div>
@@ -83,12 +84,12 @@ export default function CashFlowChart() {
                     >
                         <defs>
                             <linearGradient id="colorEntradas" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#10B981" stopOpacity={0.4} />
-                                <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
+                                <stop offset="5%" stopColor="#2f8f67" stopOpacity={0.22} />
+                                <stop offset="95%" stopColor="#2f8f67" stopOpacity={0} />
                             </linearGradient>
                             <linearGradient id="colorSaidas" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#F87171" stopOpacity={0.4} />
-                                <stop offset="95%" stopColor="#F87171" stopOpacity={0} />
+                                <stop offset="5%" stopColor="#d94d4d" stopOpacity={0.2} />
+                                <stop offset="95%" stopColor="#d94d4d" stopOpacity={0} />
                             </linearGradient>
                         </defs>
                         <CartesianGrid
@@ -114,7 +115,7 @@ export default function CashFlowChart() {
                         <Area
                             type="monotone"
                             dataKey="entradas"
-                            stroke="#10B981"
+                            stroke="#2f8f67"
                             strokeWidth={3}
                             fillOpacity={1}
                             fill="url(#colorEntradas)"
@@ -122,7 +123,7 @@ export default function CashFlowChart() {
                         <Area
                             type="monotone"
                             dataKey="saidas"
-                            stroke="#F87171"
+                            stroke="#d94d4d"
                             strokeWidth={3}
                             fillOpacity={1}
                             fill="url(#colorSaidas)"

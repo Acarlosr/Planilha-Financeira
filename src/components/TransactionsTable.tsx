@@ -8,7 +8,7 @@ import { useDashboardOverview } from "@/hooks/useDashboardOverview";
 const categoryColors: { [key: string]: string } = {
     Salário: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
     Moradia: "bg-blue-500/20 text-blue-400 border-blue-500/30",
-    Freelance: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
+    Freelance: "bg-blue-500/15 text-blue-400 border-blue-500/25",
     Alimentação: "bg-orange-500/20 text-orange-400 border-orange-500/30",
     Utilidades: "bg-slate-500/20 text-slate-400 border-slate-500/30",
     Investimentos: "bg-indigo-500/20 text-indigo-400 border-indigo-500/30",
@@ -40,7 +40,8 @@ export default function TransactionsTable() {
                 </div>
                 <Link
                     href="/receitas"
-                    className="px-4 py-2 text-sm font-medium text-cyan-400 hover:bg-white/5 rounded-xl transition-colors border border-white/10"
+                    className="px-4 py-2 text-sm font-medium hover:bg-white/5 rounded-lg transition-colors border"
+                    style={{ color: "var(--accent)", borderColor: "var(--card-border)" }}
                 >
                     Ver todas
                 </Link>
@@ -89,7 +90,7 @@ export default function TransactionsTable() {
                                                 <ArrowDownRight size={16} className="text-red-400" />
                                             )}
                                         </div>
-                                        <span className="font-medium text-foreground group-hover:text-cyan-400 transition-colors">
+                                        <span className="font-medium text-foreground transition-colors group-hover:opacity-80">
                                             {transaction.description}
                                         </span>
                                     </div>
@@ -157,7 +158,7 @@ export default function TransactionsTable() {
                     <button className="px-3 py-1.5 text-sm text-muted hover:bg-white/5 rounded-lg transition-colors">
                         Anterior
                     </button>
-                    <button className="px-3 py-1.5 text-sm text-white bg-blue-600 rounded-lg">
+                    <button className="px-3 py-1.5 text-sm text-white rounded-lg" style={{ background: "var(--accent)" }}>
                         1
                     </button>
                     <button className="px-3 py-1.5 text-sm text-muted hover:bg-white/5 rounded-lg transition-colors">

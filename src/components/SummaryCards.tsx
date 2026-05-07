@@ -35,7 +35,7 @@ const getChangeColor = (type: CardData["changeType"]) => {
         case "negative":
             return "text-red-400";
         case "neutral":
-            return "text-cyan-400";
+            return "text-blue-400";
         case "investment":
             return "text-blue-400";
         default:
@@ -46,13 +46,13 @@ const getChangeColor = (type: CardData["changeType"]) => {
 const getShadowColor = (type: CardData["changeType"]) => {
     switch (type) {
         case "positive":
-            return "rgba(16, 185, 129, 0.3)";
+            return "rgba(47, 143, 103, 0.18)";
         case "negative":
-            return "rgba(239, 68, 68, 0.3)";
+            return "rgba(217, 77, 77, 0.18)";
         case "neutral":
-            return "rgba(56, 189, 248, 0.3)";
+            return "rgba(37, 99, 235, 0.16)";
         case "investment":
-            return "rgba(59, 130, 246, 0.3)";
+            return "rgba(239, 124, 47, 0.18)";
         default:
             return "rgba(0, 0, 0, 0.1)";
     }
@@ -69,8 +69,8 @@ export default function SummaryCards() {
             change: loading ? "..." : formatChange(currentIncome, previousIncome),
             changeType: "positive",
             icon: <TrendingUp size={24} className="text-white" />,
-            iconBg: "linear-gradient(135deg, #10B981 0%, #34D399 100%)",
-            progressColor: "#10B981",
+            iconBg: "linear-gradient(135deg, #2f8f67 0%, #65a985 100%)",
+            progressColor: "#2f8f67",
         },
         {
             title: "Despesas do Mês",
@@ -78,8 +78,8 @@ export default function SummaryCards() {
             change: loading ? "..." : formatChange(currentExpenses, previousExpenses),
             changeType: "negative",
             icon: <TrendingDown size={24} className="text-white" />,
-            iconBg: "linear-gradient(135deg, #EF4444 0%, #F87171 100%)",
-            progressColor: "#EF4444",
+            iconBg: "linear-gradient(135deg, #d94d4d 0%, #e97979 100%)",
+            progressColor: "#d94d4d",
         },
         {
             title: "Saldo do Mês",
@@ -87,8 +87,8 @@ export default function SummaryCards() {
             change: loading ? "..." : formatChange(saldo, previousSaldo),
             changeType: saldo >= 0 ? "neutral" : "negative",
             icon: <Wallet size={24} className="text-white" />,
-            iconBg: "linear-gradient(135deg, #7CFF6B 0%, #6FEB5A 100%)",
-            progressColor: "#7CFF6B",
+            iconBg: "linear-gradient(135deg, #2563eb 0%, #5f8fc4 100%)",
+            progressColor: "#2563eb",
         },
         {
             title: "Total Investido",
@@ -96,8 +96,8 @@ export default function SummaryCards() {
             change: "+5,4%",
             changeType: "investment",
             icon: <LineChart size={24} className="text-white" />,
-            iconBg: "linear-gradient(135deg, #FFD700 0%, #FFC700 100%)",
-            progressColor: "#3b82f6",
+            iconBg: "linear-gradient(135deg, #ef7c2f 0%, #f5a166 100%)",
+            progressColor: "#ef7c2f",
         },
     ];
 
@@ -124,7 +124,7 @@ export default function SummaryCards() {
                             </div>
                         </div>
                         <div
-                            className="w-12 h-12 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 shrink-0"
+                            className="w-11 h-11 rounded-lg flex items-center justify-center transition-transform duration-300 group-hover:scale-105 shrink-0"
                             style={{
                                 background: card.iconBg,
                                 boxShadow: `0 8px 20px ${getShadowColor(card.changeType)}`,
@@ -136,7 +136,7 @@ export default function SummaryCards() {
 
                     {/* Progress Bar */}
                     <div className="mt-4">
-                        <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "color-mix(in srgb, var(--foreground) 8%, transparent)" }}>
                             <div
                                 className="h-full rounded-full transition-all duration-500"
                                 style={{

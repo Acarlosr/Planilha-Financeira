@@ -28,9 +28,10 @@ export default function Home() {
           <div className="flex flex-wrap items-center gap-3">
             {/* Search */}
             <div
-              className="hidden md:flex items-center gap-3 px-4 py-2.5 rounded-xl border border-white/10"
+              className="hidden md:flex items-center gap-3 px-4 py-2.5 rounded-lg border"
               style={{
-                background: "rgba(255, 255, 255, 0.05)",
+                background: "var(--card-bg)",
+                borderColor: "var(--card-border)",
                 backdropFilter: "blur(10px)",
               }}
             >
@@ -38,19 +39,20 @@ export default function Home() {
               <input
                 type="text"
                 placeholder="Buscar transações..."
-                className="bg-transparent outline-none text-sm text-white w-48 placeholder:text-muted"
+                className="bg-transparent outline-none text-sm text-foreground w-48 placeholder:text-muted"
               />
             </div>
 
             {/* Notifications */}
             <button
-              className="relative w-11 h-11 rounded-xl flex items-center justify-center transition-all hover:bg-white/10 border border-white/10"
+              className="relative w-11 h-11 rounded-lg flex items-center justify-center transition-all hover:bg-white/10 border"
               style={{
-                background: "rgba(255, 255, 255, 0.05)",
+                background: "var(--card-bg)",
+                borderColor: "var(--card-border)",
               }}
             >
               <Bell size={20} className="text-muted" />
-              <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-[#7CFF6B] rounded-full border-2 border-[#0a1628]" />
+              <span className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full border-2" style={{ background: "var(--accent)", borderColor: "var(--background-light)" }} />
             </button>
 
             {/* Theme Toggle */}
@@ -67,7 +69,12 @@ export default function Home() {
         <section className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-3">
           <Link
             href="/receitas"
-            className="group flex items-center justify-between rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-4 text-emerald-200 transition hover:border-emerald-400/40 hover:bg-emerald-500/15"
+            className="group flex items-center justify-between rounded-lg border px-4 py-4 transition"
+            style={{
+              background: "color-mix(in srgb, var(--success) 10%, transparent)",
+              borderColor: "color-mix(in srgb, var(--success) 20%, transparent)",
+              color: "var(--success)",
+            }}
           >
             <span className="flex items-center gap-3 font-medium">
               <TrendingUp size={18} />
@@ -77,7 +84,12 @@ export default function Home() {
           </Link>
           <Link
             href="/despesas"
-            className="group flex items-center justify-between rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-4 text-red-200 transition hover:border-red-400/40 hover:bg-red-500/15"
+            className="group flex items-center justify-between rounded-lg border px-4 py-4 transition"
+            style={{
+              background: "color-mix(in srgb, var(--danger) 10%, transparent)",
+              borderColor: "color-mix(in srgb, var(--danger) 20%, transparent)",
+              color: "var(--danger)",
+            }}
           >
             <span className="flex items-center gap-3 font-medium">
               <TrendingDown size={18} />
@@ -87,7 +99,12 @@ export default function Home() {
           </Link>
           <Link
             href="/settings/subscription"
-            className="group flex items-center justify-between rounded-xl border border-[#7CFF6B]/20 bg-[#7CFF6B]/10 px-4 py-4 text-[#D8FFD2] transition hover:border-[#7CFF6B]/50 hover:bg-[#7CFF6B]/15"
+            className="group flex items-center justify-between rounded-lg border px-4 py-4 transition"
+            style={{
+              background: "color-mix(in srgb, var(--accent) 10%, transparent)",
+              borderColor: "color-mix(in srgb, var(--accent) 20%, transparent)",
+              color: "var(--accent)",
+            }}
           >
             <span className="flex items-center gap-3 font-medium">
               <WalletCards size={18} />

@@ -65,16 +65,16 @@ export default function UserMenu() {
             <div className="flex items-center gap-3">
                 <Link
                     href="/login"
-                    className="px-4 py-2 text-muted font-medium hover:text-white hover:bg-white/5 rounded-xl transition-colors"
+                    className="px-4 py-2 text-muted font-medium hover:text-foreground hover:bg-white/5 rounded-lg transition-colors"
                 >
                     Entrar
                 </Link>
                 <Link
                     href="/cadastro"
-                    className="px-4 py-2 text-foreground font-medium rounded-xl transition-all hover:brightness-110"
+                    className="px-4 py-2 text-white font-medium rounded-lg transition-all hover:brightness-105"
                     style={{
-                        background: "linear-gradient(135deg, #7CFF6B 0%, #6FEB5A 100%)",
-                        boxShadow: "0 4px 15px rgba(30, 64, 175, 0.4)",
+                        background: "var(--accent)",
+                        boxShadow: "0 10px 24px color-mix(in srgb, var(--accent) 22%, transparent)",
                     }}
                 >
                     Criar Conta
@@ -88,15 +88,16 @@ export default function UserMenu() {
         <div className="relative" ref={menuRef}>
             <div
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center gap-3 px-3 py-2 rounded-xl cursor-pointer transition-all hover:bg-white/10 border border-white/10"
+                className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-all hover:bg-white/10 border"
                 style={{
-                    background: "rgba(255, 255, 255, 0.05)",
+                    background: "var(--card-bg)",
+                    borderColor: "var(--card-border)",
                 }}
             >
                 <div
-                    className="w-9 h-9 rounded-xl flex items-center justify-center"
+                    className="w-9 h-9 rounded-lg flex items-center justify-center"
                     style={{
-                        background: "linear-gradient(135deg, #7CFF6B 0%, #6FEB5A 100%)",
+                        background: "var(--accent)",
                     }}
                 >
                     <User size={18} className="text-white" />
@@ -114,11 +115,12 @@ export default function UserMenu() {
             {/* Dropdown Menu */}
             {isOpen && (
                 <div
-                    className="absolute right-0 mt-2 w-56 rounded-xl overflow-hidden z-50 border border-white/10"
+                    className="absolute right-0 mt-2 w-56 rounded-lg overflow-hidden z-50 border"
                     style={{
-                        background: "rgba(10, 22, 40, 0.95)",
+                        background: "var(--card-bg-solid)",
+                        borderColor: "var(--card-border)",
                         backdropFilter: "blur(20px)",
-                        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
+                        boxShadow: "var(--shadow-glass)",
                     }}
                 >
                     <div className="p-3 border-b border-white/10">

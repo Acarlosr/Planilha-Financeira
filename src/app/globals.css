@@ -1,67 +1,65 @@
 @import "tailwindcss";
 
-/* Neon Green Financial Dashboard - Global Styles with Theme Support */
+/* FinançasPro - subtle product dashboard theme */
 
 :root {
-  /* Graph Colors - From Reference Image */
-  --graph-primary: #2D5F3F;
-  --graph-accent: #C7FF3D;
-  --graph-secondary: #7CFF6B;
-  --graph-orange: #FF8C00;
-  --graph-red: #EF4444;
+  --graph-primary: #2563eb;
+  --graph-accent: #ef7c2f;
+  --graph-secondary: #7c8aa5;
+  --graph-orange: #ef7c2f;
+  --graph-red: #e05252;
+  --radius-card: 10px;
+  --radius-control: 8px;
 }
 
 /* Dark Theme (Default) */
 :root,
 [data-theme="dark"] {
-  /* Core Colors - Darker Theme inspired by reference */
-  --background: #0F0F0F;
-  --background-light: #1A1A1A;
-  --foreground: #FFFFFF;
-  --accent: #C7FF3D;
-  --accent-hover: #E4FF1A;
-  --accent-dark: #5EDB49;
-  --secondary: #FFD700;
-  --secondary-light: #FFC700;
-  --card-bg: rgba(255, 255, 255, 0.05);
-  --card-bg-solid: #242424;
-  --card-border: rgba(255, 255, 255, 0.08);
-  --text-primary: #FFFFFF;
-  --text-secondary: #A0A0A0;
-  --text-tertiary: #6B6B6B;
-  --success: #7CFF6B;
-  --danger: #EF4444;
-  --warning: #FFD700;
-  --orange: #FF8C00;
-
-  /* Glassmorphism Shadows - Enhanced for darker theme */
-  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  --shadow-glass-hover: 0 12px 40px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(199, 255, 61, 0.1);
-  --blur-glass: blur(20px);
+  --background: #111312;
+  --background-light: #181b1a;
+  --foreground: #f4f2ed;
+  --accent: #ef7c2f;
+  --accent-hover: #f49a5a;
+  --accent-dark: #ba5517;
+  --secondary: #3f6fa3;
+  --secondary-light: #5f8fc4;
+  --card-bg: rgba(255, 255, 255, 0.055);
+  --card-bg-solid: #1d201f;
+  --card-border: rgba(244, 242, 237, 0.1);
+  --text-primary: #f4f2ed;
+  --text-secondary: #a7aaa6;
+  --text-tertiary: #72776f;
+  --success: #65a985;
+  --danger: #e05252;
+  --warning: #d99a3d;
+  --orange: #ef7c2f;
+  --shadow-glass: 0 16px 40px rgba(0, 0, 0, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.035);
+  --shadow-glass-hover: 0 20px 48px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.055);
+  --blur-glass: blur(16px);
 }
 
 /* Light Theme */
 [data-theme="light"] {
-  --background: #FFFFFF;
-  --background-light: #F5F5F5;
-  --foreground: #1A1A1A;
-  --accent: #2D5F3F;
-  --accent-hover: #3A7550;
-  --accent-dark: #1F4A2F;
-  --secondary: #FF8C00;
-  --secondary-light: #FFA726;
-  --card-bg: rgba(255, 255, 255, 0.9);
-  --card-border: rgba(45, 95, 63, 0.2);
-  --text-primary: #1A1A1A;
-  --text-secondary: #666666;
-  --text-tertiary: #999999;
-  --success: #2D5F3F;
-  --danger: #EF4444;
-  --warning: #FF8C00;
-  --orange: #FF8C00;
-
-  --shadow-glass: 0 4px 16px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  --shadow-glass-hover: 0 8px 24px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  --background: #f4f6fa;
+  --background-light: #ffffff;
+  --foreground: #121826;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-dark: #183b7a;
+  --secondary: #ef7c2f;
+  --secondary-light: #f5a166;
+  --card-bg: rgba(255, 255, 255, 0.86);
+  --card-bg-solid: #ffffff;
+  --card-border: rgba(18, 24, 38, 0.09);
+  --text-primary: #121826;
+  --text-secondary: #657084;
+  --text-tertiary: #9aa3b3;
+  --success: #2f8f67;
+  --danger: #d94d4d;
+  --warning: #b7791f;
+  --orange: #ef7c2f;
+  --shadow-glass: 0 18px 45px rgba(30, 41, 59, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  --shadow-glass-hover: 0 22px 55px rgba(30, 41, 59, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.95);
 }
 
 @theme inline {
@@ -84,15 +82,17 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Dark theme gradient background */
 [data-theme="dark"] body {
-  background: linear-gradient(135deg, #0F0F0F 0%, #1A1A1A 50%, #0F0F0F 100%);
+  background:
+    radial-gradient(circle at top left, rgba(239, 124, 47, 0.08), transparent 34rem),
+    linear-gradient(135deg, #111312 0%, #181b1a 52%, #101211 100%);
   background-attachment: fixed;
 }
 
-/* Light theme clean background */
 [data-theme="light"] body {
-  background: linear-gradient(135deg, #FFFFFF 0%, #F5F5F5 50%, #ECECEC 100%);
+  background:
+    radial-gradient(circle at top left, rgba(37, 99, 235, 0.08), transparent 30rem),
+    linear-gradient(135deg, #f8fafc 0%, #f4f6fa 50%, #eef2f8 100%);
   background-attachment: fixed;
 }
 
@@ -102,22 +102,34 @@ body {
   backdrop-filter: var(--blur-glass);
   -webkit-backdrop-filter: var(--blur-glass);
   border: 1px solid var(--card-border);
-  border-radius: 20px;
+  border-radius: var(--radius-card);
   box-shadow: var(--shadow-glass);
-  transition: all 0.3s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .glass-card:hover {
   box-shadow: var(--shadow-glass-hover);
-  border-color: rgba(255, 255, 255, 0.25);
+  border-color: color-mix(in srgb, var(--accent) 20%, var(--card-border));
+}
+
+.soft-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-glass);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.soft-card:hover {
+  border-color: color-mix(in srgb, var(--accent) 20%, var(--card-border));
 }
 
 /* Glass Button Styles */
 .glass-button {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--card-bg);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-control);
   transition: all 0.2s ease;
 }
 
@@ -128,8 +140,9 @@ body {
 
 /* Primary Button */
 .btn-primary {
-  background: linear-gradient(135deg, #7CFF6B 0%, #6FEB5A 100%);
-  box-shadow: 0 4px 20px rgba(124, 255, 107, 0.4);
+  background: var(--accent);
+  box-shadow: 0 10px 26px color-mix(in srgb, var(--accent) 24%, transparent);
+  color: white;
 }
 
 .btn-primary:hover {
@@ -148,26 +161,26 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(124, 255, 107, 0.3);
+  background: color-mix(in srgb, var(--accent) 28%, transparent);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(124, 255, 107, 0.5);
+  background: color-mix(in srgb, var(--accent) 42%, transparent);
 }
 
 /* Glass Input Styles */
 .glass-input {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  color: white;
+  background: color-mix(in srgb, var(--card-bg-solid) 80%, transparent);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-control);
+  color: var(--foreground);
   transition: all 0.3s ease;
 }
 
 .glass-input:focus {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(56, 189, 248, 0.5);
+  background: var(--card-bg-solid);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--card-border));
   outline: none;
 }
 

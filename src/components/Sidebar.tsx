@@ -48,19 +48,26 @@ export default function Sidebar() {
     return (
         <>
             {/* Beta Banner */}
-            <div className="fixed top-0 left-0 w-full z-[100] bg-orange-500/10 text-orange-400 border-b border-orange-500/20 text-center flex items-center justify-center gap-2 h-8 text-xs font-medium backdrop-blur-md shadow-lg">
+            <div className="fixed top-0 left-0 w-full z-[100] text-center flex items-center justify-center gap-2 h-8 text-xs font-medium backdrop-blur-md border-b"
+                style={{
+                    background: "color-mix(in srgb, var(--accent) 9%, transparent)",
+                    borderColor: "color-mix(in srgb, var(--accent) 18%, transparent)",
+                    color: "var(--accent)",
+                }}
+            >
                 <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-50" style={{ background: "var(--accent)" }}></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2" style={{ background: "var(--accent)" }}></span>
                 </span>
                 FinançasPro Beta - dados reais em evolução
             </div>
 
             {/* Mobile Top Bar */}
             <div 
-                className="md:hidden fixed top-8 left-0 w-full z-40 p-4 flex items-center justify-between border-b border-white/10"
+                className="md:hidden fixed top-8 left-0 w-full z-40 p-4 flex items-center justify-between border-b"
                 style={{
-                    background: "rgba(15, 23, 42, 0.8)",
+                    background: "color-mix(in srgb, var(--background-light) 88%, transparent)",
+                    borderColor: "var(--card-border)",
                     backdropFilter: "blur(12px)",
                 }}
             >
@@ -68,13 +75,13 @@ export default function Sidebar() {
                     <div
                         className="w-10 h-10 rounded-xl flex items-center justify-center"
                         style={{
-                            background: "linear-gradient(135deg, #7CFF6B 0%, #6FEB5A 100%)",
-                            boxShadow: "0 4px 15px rgba(124, 255, 107, 0.4)",
+                            background: "var(--accent)",
+                            boxShadow: "0 10px 24px color-mix(in srgb, var(--accent) 22%, transparent)",
                         }}
                     >
-                        <TrendingUp className="text-[#0a0f16]" size={20} />
+                        <TrendingUp className="text-white" size={20} />
                     </div>
-                    <span className="font-semibold text-[#7CFF6B] text-lg">FinançasPro</span>
+                    <span className="font-semibold text-foreground text-lg">FinançasPro</span>
                 </Link>
                 <button 
                     onClick={() => setMobileOpen(!mobileOpen)}
@@ -104,19 +111,19 @@ export default function Sidebar() {
                 }}
             >
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-white/10">
+            <div className="flex items-center justify-between p-6 border-b" style={{ borderColor: "var(--card-border)" }}>
                 {!collapsed && (
                     <Link href="/landing" className="flex items-center gap-3">
                         <div
                             className="w-10 h-10 rounded-xl flex items-center justify-center"
                             style={{
-                                background: "linear-gradient(135deg, #7CFF6B 0%, #6FEB5A 100%)",
-                                boxShadow: "0 4px 15px rgba(14, 165, 233, 0.4)",
+                                background: "var(--accent)",
+                                boxShadow: "0 10px 24px color-mix(in srgb, var(--accent) 22%, transparent)",
                             }}
                         >
-                            <TrendingUp className="text-[#0a0f16]" size={20} />
+                            <TrendingUp className="text-white" size={20} />
                         </div>
-                        <span className="font-semibold text-[#7CFF6B] text-lg">FinançasPro</span>
+                        <span className="font-semibold text-foreground text-lg">FinançasPro</span>
                     </Link>
                 )}
                 {collapsed && (
@@ -124,11 +131,11 @@ export default function Sidebar() {
                         href="/landing"
                         className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto"
                         style={{
-                            background: "linear-gradient(135deg, #7CFF6B 0%, #6FEB5A 100%)",
-                            boxShadow: "0 4px 15px rgba(124, 255, 107, 0.4)",
+                            background: "var(--accent)",
+                            boxShadow: "0 10px 24px color-mix(in srgb, var(--accent) 22%, transparent)",
                         }}
                     >
-                        <TrendingUp className="text-[#0a0f16]" size={20} />
+                        <TrendingUp className="text-white" size={20} />
                     </Link>
                 )}
             </div>
@@ -140,14 +147,14 @@ export default function Sidebar() {
                         key={index}
                         href={item.href}
                         onClick={() => setMobileOpen(false)}
-                        className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 ${isActive(item.href) ? "" : "hover:bg-white/5"
+                        className={`w-full flex items-center gap-4 px-4 py-3 rounded-lg transition-all duration-200 ${isActive(item.href) ? "" : "hover:bg-white/5"
                             }`}
                         style={
                             isActive(item.href)
                                 ? {
-                                    background: "linear-gradient(135deg, #7CFF6B 0%, #6FEB5A 100%)",
-                                    boxShadow: "0 4px 15px rgba(124, 255, 107, 0.4)",
-                                    color: "#000000",
+                                    background: "color-mix(in srgb, var(--accent) 13%, transparent)",
+                                    border: "1px solid color-mix(in srgb, var(--accent) 22%, transparent)",
+                                    color: "var(--foreground)",
                                 }
                                 : {
                                     color: "var(--text-secondary)",

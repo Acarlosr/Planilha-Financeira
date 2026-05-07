@@ -17,10 +17,15 @@ export default function TrialBanner() {
 
     return (
         <div
-            className={`relative rounded-xl border p-4 mb-6 ${urgency
-                    ? 'border-yellow-500/30 bg-yellow-500/10'
-                    : 'border-[#7CFF6B]/20 bg-[#7CFF6B]/5'
-                }`}
+            className="relative rounded-lg border p-4 mb-6"
+            style={{
+                background: urgency
+                    ? "color-mix(in srgb, var(--warning) 10%, transparent)"
+                    : "color-mix(in srgb, var(--accent) 8%, transparent)",
+                borderColor: urgency
+                    ? "color-mix(in srgb, var(--warning) 24%, transparent)"
+                    : "color-mix(in srgb, var(--accent) 18%, transparent)",
+            }}
         >
             <button
                 onClick={() => setDismissed(true)}
@@ -31,13 +36,17 @@ export default function TrialBanner() {
 
             <div className="flex items-start gap-4 pr-8">
                 <div
-                    className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${urgency ? 'bg-yellow-500/20' : 'bg-[#7CFF6B]/20'
-                        }`}
+                    className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
+                    style={{
+                        background: urgency
+                            ? "color-mix(in srgb, var(--warning) 16%, transparent)"
+                            : "color-mix(in srgb, var(--accent) 14%, transparent)",
+                    }}
                 >
                     {urgency ? (
                         <Clock size={24} className="text-yellow-500" />
                     ) : (
-                        <Sparkles size={24} className="text-[#7CFF6B]" />
+                        <Sparkles size={24} style={{ color: "var(--accent)" }} />
                     )}
                 </div>
 
@@ -58,9 +67,9 @@ export default function TrialBanner() {
                     <div className="flex items-center gap-3">
                         <Link
                             href="/pricing"
-                            className="px-4 py-2 rounded-lg text-black font-medium text-sm transition-all hover:brightness-110"
+                            className="px-4 py-2 rounded-lg text-white font-medium text-sm transition-all hover:brightness-105"
                             style={{
-                                background: "linear-gradient(135deg, #7CFF6B 0%, #6FEB5A 100%)"
+                                background: "var(--accent)"
                             }}
                         >
                             {urgency ? 'Assinar Agora' : 'Ver Planos'}

@@ -9,9 +9,10 @@ export default function ThemeToggle() {
     return (
         <button
             onClick={toggleTheme}
-            className="relative flex items-center justify-center w-10 h-10 rounded-xl transition-all hover:scale-105 border border-white/10"
+            className="relative flex items-center justify-center w-10 h-10 rounded-lg transition-all hover:scale-105 border"
             style={{
-                background: "rgba(255, 255, 255, 0.05)",
+                background: "var(--card-bg)",
+                borderColor: "var(--card-border)",
             }}
             title={theme === "dark" ? "Alternar para tema claro" : "Alternar para tema escuro"}
             aria-label="Alternar tema"
@@ -24,7 +25,7 @@ export default function ThemeToggle() {
                             ? "opacity-100 rotate-0 scale-100"
                             : "opacity-0 rotate-90 scale-0"
                         }`}
-                    style={{ color: "#C7FF3D" }}
+                    style={{ color: "var(--accent)" }}
                 />
 
                 {/* Moon Icon - visible in light mode */}
@@ -34,7 +35,7 @@ export default function ThemeToggle() {
                             ? "opacity-100 rotate-0 scale-100"
                             : "opacity-0 -rotate-90 scale-0"
                         }`}
-                    style={{ color: "#2D5F3F" }}
+                    style={{ color: "var(--accent)" }}
                 />
             </div>
         </button>
