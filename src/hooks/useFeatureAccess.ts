@@ -1,5 +1,5 @@
 import { useSubscription } from "@/contexts/SubscriptionContext";
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 
 export interface FeatureAccess {
     hasAccess: boolean;
@@ -22,7 +22,7 @@ export interface FeatureAccess {
  * }
  */
 export function useFeatureAccess(feature: string): FeatureAccess {
-    const { plan, user, hasActiveSubscription } = useSubscription();
+    const { plan, hasActiveSubscription } = useSubscription();
 
     return useMemo(() => {
         // Se não tiver plano ou assinatura inativa
@@ -140,10 +140,13 @@ export function useCanPerformAction(
     };
 
     const featureAccess = useFeatureAccess(featureMap[action] || action);
-    const quotaType = quotaMap[action];
-    const quotaAccess = quotaType && currentUsage !== undefined
-        ? useQuotaLimit(quotaType, currentUsage)
-        : { hasAccess: true };
+    const quotaType = quotaMap[action] ?? 'transactions';
+    const quotaAccessResult = useQuotaLimit(quotaType, currentUsage ?? 0);
+    const shouldCheckQuota = quotaMap[action] !== null && currentUsage !== undefined;
+    const quotaAccess = useMemo(
+        () => shouldCheckQuota ? quotaAccessResult : { hasAccess: true },
+        [quotaAccessResult, shouldCheckQuota]
+    );
 
     return useMemo(() => {
         // Verificar feature primeiro

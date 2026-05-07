@@ -2,19 +2,15 @@
 
 import { useState, useEffect, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { createBrowserSupabaseClient } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase";
 import Sidebar from "@/components/Sidebar";
 import MonthYearPicker from "@/components/MonthYearPicker";
 import PrintExportButtons from "@/components/PrintExportButtons";
 import IncomeModal from "@/components/IncomeModal";
 import {
     Plus,
-    Calendar,
-    Edit,
     Trash2,
     RotateCcw,
-    ChevronLeft,
-    ChevronRight,
 } from "lucide-react";
 
 // Categorias de Receita conforme especificado
@@ -43,7 +39,6 @@ interface IncomeItem {
 const initialIncomeData: IncomeItem[] = [];
 
 function ReceitasContent() {
-    const supabase = createBrowserSupabaseClient();
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -102,7 +97,7 @@ function ReceitasContent() {
 
         setIncomeData(mappedData);
         setIsLoadingData(false);
-    }, [currentMonth, currentYear, supabase]);
+    }, [currentMonth, currentYear]);
 
     useEffect(() => {
         const init = async () => {

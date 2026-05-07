@@ -10,7 +10,6 @@ import {
     TrendingDown,
     LineChart,
     PiggyBank,
-    CreditCard,
     ChevronLeft,
     ChevronRight,
     Bitcoin,
@@ -54,7 +53,7 @@ export default function Sidebar() {
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
                 </span>
-                Dapp Versão Beta - algumas opções podem não funcionar direito
+                FinançasPro Beta - dados reais em evolução
             </div>
 
             {/* Mobile Top Bar */}
@@ -115,9 +114,9 @@ export default function Sidebar() {
                                 boxShadow: "0 4px 15px rgba(14, 165, 233, 0.4)",
                             }}
                         >
-                            <TrendingUp className="text-white" size={20} />
+                            <TrendingUp className="text-[#0a0f16]" size={20} />
                         </div>
-                        <span className="font-semibold text-cyan-400 text-lg">FinançasPro</span>
+                        <span className="font-semibold text-[#7CFF6B] text-lg">FinançasPro</span>
                     </Link>
                 )}
                 {collapsed && (
@@ -125,11 +124,11 @@ export default function Sidebar() {
                         href="/landing"
                         className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto"
                         style={{
-                            background: "linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%)",
-                            boxShadow: "0 4px 15px rgba(14, 165, 233, 0.4)",
+                            background: "linear-gradient(135deg, #7CFF6B 0%, #6FEB5A 100%)",
+                            boxShadow: "0 4px 15px rgba(124, 255, 107, 0.4)",
                         }}
                     >
-                        <TrendingUp className="text-white" size={20} />
+                        <TrendingUp className="text-[#0a0f16]" size={20} />
                     </Link>
                 )}
             </div>

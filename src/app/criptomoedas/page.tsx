@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import Image from "next/image";
 import Sidebar from "@/components/Sidebar";
 import MonthYearPicker from "@/components/MonthYearPicker";
 import CryptoPortfolio from "@/components/CryptoPortfolio";
@@ -161,6 +162,11 @@ function CriptoContent() {
                         <div className="flex items-center gap-2">
                             <Wallet size={18} />
                             Minhas Criptos
+                            {myCryptos.length > 0 && (
+                                <span className="rounded-full bg-amber-400/20 px-2 py-0.5 text-xs text-amber-300">
+                                    {myCryptos.length}
+                                </span>
+                            )}
                         </div>
                         {activeTab === "portfolio" && (
                             <div className="absolute bottom-0 left-0 w-full h-0.5 bg-amber-400 rounded-t-full" />
@@ -192,7 +198,7 @@ function CriptoContent() {
                                                 <tr key={coin.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                                                     <td className="py-4 pl-4">
                                                         <div className="flex items-center gap-3">
-                                                            <img src={coin.image} alt={coin.name} className="w-8 h-8 rounded-full" />
+                                                            <Image src={coin.image} alt={coin.name} width={32} height={32} unoptimized className="rounded-full" />
                                                             <div>
                                                                 <p className="font-semibold text-foreground">{coin.name}</p>
                                                                 <p className="text-xs text-muted uppercase">{coin.symbol}</p>

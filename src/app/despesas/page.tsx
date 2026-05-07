@@ -5,10 +5,13 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import MonthYearPicker from "@/components/MonthYearPicker";
 import ExpenseModal from "@/components/ExpenseModal";
+import { supabase } from "@/lib/supabase";
+import { useCartoes } from "@/hooks/useCartoes";
+import { useCategorias } from "@/hooks/useCategorias";
+import { useDespesas } from "@/hooks/useDespesas";
 import PrintExportButtons from "@/components/PrintExportButtons";
 import {
     Plus,
-    Calendar,
     Edit,
     Trash2,
     ShoppingCart,
@@ -22,78 +25,44 @@ import {
     Wifi,
     Tv,
     MoreHorizontal,
+    Loader2,
 } from "lucide-react";
 
-// Categorias de Despesas
-const categoriasDespesa = [
-    { id: "moradia", label: "Moradia", icone: Home, cor: "from-blue-500 to-blue-400" },
-    { id: "alimentacao", label: "Alimentação", icone: Utensils, cor: "from-orange-500 to-orange-400" },
-    { id: "transporte", label: "Transporte", icone: Car, cor: "from-purple-500 to-purple-400" },
-    { id: "saude", label: "Saúde", icone: Heart, cor: "from-red-500 to-red-400" },
-    { id: "educacao", label: "Educação", icone: GraduationCap, cor: "from-green-500 to-green-400" },
-    { id: "lazer", label: "Lazer", icone: Smartphone, cor: "from-pink-500 to-pink-400" },
-    { id: "vestuario", label: "Vestuário", icone: Shirt, cor: "from-indigo-500 to-indigo-400" },
-    { id: "compras", label: "Compras", icone: ShoppingCart, cor: "from-teal-500 to-teal-400" },
-    { id: "telecom", label: "Internet/TV/Telefone", icone: Wifi, cor: "from-cyan-500 to-cyan-400" },
-    { id: "streaming", label: "Streaming", icone: Tv, cor: "from-rose-500 to-rose-400" },
-    { id: "outros", label: "Outros", icone: MoreHorizontal, cor: "from-gray-500 to-gray-400" },
-];
+const iconMap = {
+    Home,
+    Utensils,
+    Car,
+    Heart,
+    GraduationCap,
+    Smartphone,
+    Shirt,
+    ShoppingCart,
+    Wifi,
+    Tv,
+    MoreHorizontal,
+};
+
+const colorMap: Record<string, string> = {
+    blue: "from-blue-500 to-blue-400",
+    orange: "from-orange-500 to-orange-400",
+    purple: "from-purple-500 to-purple-400",
+    red: "from-red-500 to-red-400",
+    green: "from-green-500 to-green-400",
+    pink: "from-pink-500 to-pink-400",
+    indigo: "from-indigo-500 to-indigo-400",
+    teal: "from-teal-500 to-teal-400",
+    cyan: "from-cyan-500 to-cyan-400",
+    rose: "from-rose-500 to-rose-400",
+    gray: "from-gray-500 to-gray-400",
+};
 
 interface ExpenseItem {
-    id: number;
+    id: string;
     description: string;
     value: number;
     date: string;
     category: string;
 }
-
-const expenseData: ExpenseItem[] = [];
-
-// Mock Data for UI Testing
-const mockCartoes = [
-    {
-        id: "1",
-        nome: "Nubank",
-        banco: "Nubank",
-        bandeira: "Mastercard" as "Mastercard",
-        ultimos_digitos: "1234",
-        cor: "purple",
-        limite: 5000,
-        dia_fechamento: 1,
-        dia_vencimento: 10,
-        user_id: "1",
-        created_at: "",
-        updated_at: ""
-    },
-    {
-        id: "2",
-        nome: "XP Visa",
-        banco: "XP",
-        bandeira: "Visa" as "Visa",
-        ultimos_digitos: "5678",
-        cor: "black",
-        limite: 15000,
-        dia_fechamento: 5,
-        dia_vencimento: 15,
-        user_id: "1",
-        created_at: "",
-        updated_at: ""
-    },
-];
-
-const mockCategoriasDB = [
-    { id: "moradia", nome: "Moradia", icone: "Home", cor: "blue", tipo: "despesa", user_id: "1", created_at: "" },
-    { id: "alimentacao", nome: "Alimentação", icone: "Utensils", cor: "orange", tipo: "despesa", user_id: "1", created_at: "" },
-    { id: "transporte", nome: "Transporte", icone: "Car", cor: "purple", tipo: "despesa", user_id: "1", created_at: "" },
-    { id: "saude", nome: "Saúde", icone: "Heart", cor: "red", tipo: "despesa", user_id: "1", created_at: "" },
-    { id: "educacao", nome: "Educação", icone: "GraduationCap", cor: "green", tipo: "despesa", user_id: "1", created_at: "" },
-    { id: "lazer", nome: "Lazer", icone: "Smartphone", cor: "pink", tipo: "despesa", user_id: "1", created_at: "" },
-    { id: "vestuario", nome: "Vestuário", icone: "Shirt", cor: "indigo", tipo: "despesa", user_id: "1", created_at: "" },
-    { id: "compras", nome: "Compras", icone: "ShoppingCart", cor: "teal", tipo: "despesa", user_id: "1", created_at: "" },
-    { id: "telecom", nome: "Internet/TV/Telefone", icone: "Wifi", cor: "cyan", tipo: "despesa", user_id: "1", created_at: "" },
-    { id: "streaming", nome: "Streaming", icone: "Tv", cor: "rose", tipo: "despesa", user_id: "1", created_at: "" },
-    { id: "outros", nome: "Outros", icone: "MoreHorizontal", cor: "gray", tipo: "despesa", user_id: "1", created_at: "" },
-] as any[]; // Type mocking
 
 function DespesasContent() {
     const router = useRouter();
@@ -105,8 +74,10 @@ function DespesasContent() {
     const currentYear = searchParams.get("year") ? parseInt(searchParams.get("year")!) : new Date().getFullYear();
 
     const [activeCategory, setActiveCategory] = useState<string | null>(null);
-    const [expenses, setExpenses] = useState<ExpenseItem[]>(expenseData);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const { despesas, loading: loadingDespesas, error, refetch } = useDespesas(currentMonth, currentYear);
+    const { cartoes } = useCartoes();
+    const { categorias, loading: loadingCategorias } = useCategorias();
 
     const handleDateChange = (newDate: { month: number; year: number }) => {
         const params = new URLSearchParams(searchParams);
@@ -115,26 +86,24 @@ function DespesasContent() {
         router.push(`${pathname}?${params.toString()}`);
     };
 
-    const handleSaveExpense = (newExpenses: any[]) => {
-        // Add new expenses to the beginning of the list
-        const formattedExpenses = newExpenses.map(e => ({
-            id: e.id,
-            description: e.description,
-            value: e.value,
-            date: e.date,
-            category: e.category,
-        }));
-        setExpenses(prev => [...formattedExpenses, ...prev]);
+    const handleDeleteExpense = async (id: string) => {
+        const { error } = await supabase.from("despesas").delete().eq("id", id);
+        if (error) {
+            alert("Erro ao excluir despesa. Tente novamente.");
+            return;
+        }
+        refetch();
     };
 
-    const handleDeleteExpense = (id: number) => {
-        setExpenses(prev => prev.filter(item => item.id !== id));
-    };
-
-    // Filter items by selected month/year
-    const filteredExpenses = expenses.filter(item => {
-        const [day, month, year] = item.date.split('/').map(Number);
-        return month === currentMonth && year === currentYear;
+    const filteredExpenses: ExpenseItem[] = despesas.map((item) => {
+        const [year, month, day] = item.data.split("-");
+        return {
+            id: item.id,
+            description: item.descricao,
+            value: Number(item.valor),
+            date: `${day}/${month}/${year}`,
+            category: item.categoria_id,
+        };
     });
 
     const getItemsByCategory = (categoryId: string) => {
@@ -149,9 +118,17 @@ function DespesasContent() {
 
     const totalDespesas = filteredExpenses.reduce((sum, item) => sum + item.value, 0);
 
+    const categoriasDespesa = categorias.map((cat) => ({
+        id: cat.id,
+        label: cat.nome,
+        icone: iconMap[cat.icone as keyof typeof iconMap] ?? MoreHorizontal,
+        cor: colorMap[cat.cor] ?? "from-gray-500 to-gray-400",
+    }));
+
     const getCategoryById = (id: string) => {
         return categoriasDespesa.find((c) => c.id === id);
     };
+    const loading = loadingDespesas || loadingCategorias;
 
     return (
         <div className="min-h-screen">
@@ -255,6 +232,20 @@ function DespesasContent() {
                         )}
                     </div>
 
+                    {error && (
+                        <div className="mb-4 rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-300">
+                            Não foi possível carregar suas despesas: {error}
+                        </div>
+                    )}
+
+                    {loading && (
+                        <div className="flex items-center justify-center py-12 text-muted">
+                            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                            Carregando despesas...
+                        </div>
+                    )}
+
+                    {!loading && (
                     <div className="space-y-3">
                         {(activeCategory
                             ? getItemsByCategory(activeCategory)
@@ -307,14 +298,15 @@ function DespesasContent() {
                             );
                         })}
                     </div>
+                    )}
 
                     {/* Empty State */}
-                    {filteredExpenses.length === 0 && (
+                    {!loading && filteredExpenses.length === 0 && (
                         <div className="text-center py-12">
                             <p className="text-muted">Nenhuma despesa encontrada para este período.</p>
                         </div>
                     )}
-                    {filteredExpenses.length > 0 && activeCategory && getItemsByCategory(activeCategory).length === 0 && (
+                    {!loading && filteredExpenses.length > 0 && activeCategory && getItemsByCategory(activeCategory).length === 0 && (
                         <div className="text-center py-12">
                             <p className="text-muted">Nenhuma despesa nesta categoria</p>
                         </div>
@@ -325,10 +317,9 @@ function DespesasContent() {
             <ExpenseModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                onSave={() => { }}
-                onSaveLocal={handleSaveExpense}
-                cartoes={mockCartoes}
-                categorias={mockCategoriasDB}
+                onSave={refetch}
+                cartoes={cartoes}
+                categorias={categorias}
             />
         </div>
     );

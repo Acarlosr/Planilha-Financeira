@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { format, addMonths } from "date-fns";
-import { Calendar, CreditCard, Divide } from "lucide-react";
+import { Divide } from "lucide-react";
 import { Database } from "@/types/database.types";
 
 type Cartao = Database["public"]["Tables"]["cartoes"]["Row"];

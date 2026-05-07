@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useCallback, useEffect, Suspense, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
@@ -18,21 +18,16 @@ function CheckoutContent() {
     const [processing, setProcessing] = useState(false);
     const [user, setUser] = useState<any>(null);
 
-    useEffect(() => {
-        loadPlan();
-        checkUser();
-    }, [planSlug]);
-
-    const checkUser = async () => {
+    const checkUser = useCallback(async () => {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
             router.push(`/login?redirect=/checkout?plan=${planSlug}`);
             return;
         }
         setUser(user);
-    };
+    }, [planSlug, router]);
 
-    const loadPlan = async () => {
+    const loadPlan = useCallback(async () => {
         if (!planSlug) {
             router.push("/pricing");
             return;
@@ -51,20 +46,35 @@ function CheckoutContent() {
             router.push("/pricing");
         }
         setLoading(false);
-    };
+    }, [planSlug, router]);
+
+    useEffect(() => {
+        loadPlan();
+        checkUser();
+    }, [checkUser, loadPlan]);
 
     const handleSubscribe = async () => {
         if (!plan || !user) return;
 
         setProcessing(true);
 
-        // TODO: Implement Stripe/payment integration here
-        // For now, simulate processing
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+        const { error } = await supabase
+            .from("user_profiles")
+            .update({
+                subscription_plan_id: plan.id,
+                subscription_status: "active",
+                subscription_started_at: new Date().toISOString(),
+            })
+            .eq("id", user.id);
 
-        alert("🚧 Integração de pagamento em desenvolvimento!\n\nEm breve você poderá assinar o plano " + plan.name);
+        if (error) {
+            alert("Não foi possível ativar o plano. Verifique sua sessão e tente novamente.");
+            setProcessing(false);
+            return;
+        }
 
         setProcessing(false);
+        router.push("/settings/subscription?updated=1");
     };
 
     const formatPrice = (price: number) => {
@@ -193,34 +203,33 @@ function CheckoutContent() {
                         </div>
                     </div>
 
-                    {/* Payment Form */}
+                        {/* Beta Activation */}
                     <div
                         className="rounded-2xl p-8 border border-white/10"
                         style={{ background: "rgba(255, 255, 255, 0.03)" }}
                     >
                         <div className="flex items-center gap-2 mb-6">
                             <CreditCard size={20} className="text-[#7CFF6B]" />
-                            <h2 className="text-xl font-bold text-foreground">Pagamento</h2>
+                            <h2 className="text-xl font-bold text-foreground">Ativação Beta</h2>
                         </div>
 
                         {/* Security Badge */}
                         <div className="flex items-center gap-2 mb-6 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
                             <Lock size={16} className="text-emerald-400" />
                             <span className="text-sm text-emerald-400">
-                                Pagamento seguro com criptografia SSL
+                                Ambiente beta: ativação imediata do plano selecionado
                             </span>
                         </div>
 
-                        {/* Coming Soon Message */}
                         <div className="text-center py-8">
                             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-amber-500/20 flex items-center justify-center">
                                 <CreditCard size={32} className="text-amber-400" />
                             </div>
                             <h3 className="text-lg font-semibold text-foreground mb-2">
-                                Integração de Pagamento
+                                Gateway em preparação
                             </h3>
                             <p className="text-muted text-sm mb-6">
-                                A integração com gateway de pagamento (Stripe/PagSeguro) está em desenvolvimento.
+                                Por enquanto, esta tela ativa o plano para teste. O próximo passo de produção é conectar Stripe, Mercado Pago ou PagSeguro por webhook.
                             </p>
                         </div>
 
@@ -237,7 +246,7 @@ function CheckoutContent() {
                             {processing ? (
                                 <Loader2 className="w-5 h-5 animate-spin mx-auto" />
                             ) : (
-                                `Assinar ${plan.name} - ${formatPrice(currentPrice || 0)}/${billingCycle === "monthly" ? "mês" : "ano"}`
+                                `Ativar ${plan.name} - ${formatPrice(currentPrice || 0)}/${billingCycle === "monthly" ? "mês" : "ano"}`
                             )}
                         </button>
 

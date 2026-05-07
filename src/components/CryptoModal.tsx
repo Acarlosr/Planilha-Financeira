@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { X, Bitcoin, TrendingUp, TrendingDown, Loader2 } from "lucide-react";
 
 interface CryptoModalProps {
@@ -202,10 +203,13 @@ export default function CryptoModal({ isOpen, onClose, onSave }: CryptoModalProp
                     {/* Selected Coin Preview */}
                     {selectedCoin && (
                         <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10">
-                            <img
+                            <Image
                                 src={selectedCoin.image}
                                 alt={selectedCoin.name}
-                                className="w-8 h-8 rounded-full"
+                                width={32}
+                                height={32}
+                                unoptimized
+                                className="rounded-full"
                             />
                             <div className="flex-1">
                                 <p className="font-medium text-foreground">{selectedCoin.name}</p>

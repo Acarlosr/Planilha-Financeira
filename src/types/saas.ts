@@ -85,7 +85,7 @@ export interface UserActivityLog {
     resource_id: string | null;
     ip_address: string | null;
     user_agent: string | null;
-    metadata: Record<string, any>;
+    metadata: Record<string, unknown>;
     created_at: string;
 }
 

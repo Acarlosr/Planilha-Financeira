@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, DollarSign, Calendar, Tag, AlignLeft, CreditCard } from "lucide-react";
+import { X, DollarSign, Calendar, Tag, AlignLeft } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import InstallmentsForm, { InstallmentsData } from "./InstallmentsForm";
 import { Database } from "@/types/database.types";

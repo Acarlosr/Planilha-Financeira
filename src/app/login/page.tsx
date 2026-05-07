@@ -11,7 +11,6 @@ export default function LoginPage() {
     const [loading, setLoading] = useState(false);
     const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
     const [email, setEmail] = useState("");
-    const [showEmailForm, setShowEmailForm] = useState(false);
     const [emailSent, setEmailSent] = useState(false);
     const [otp, setOtp] = useState("");
     const [erro, setErro] = useState("");
@@ -73,7 +72,7 @@ export default function LoginPage() {
             if (error) throw error;
             router.push("/");
             router.refresh();
-        } catch (error: any) {
+        } catch {
             setErro("Código inválido ou expirado.");
         } finally {
             setLoading(false);

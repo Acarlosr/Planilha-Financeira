@@ -1,6 +1,6 @@
 "use client";
 
-import { CreditCard, Plus, LayoutGrid } from "lucide-react";
+import { Plus, LayoutGrid } from "lucide-react";
 import type { Database } from "@/types/database.types";
 
 type Cartao = Database["public"]["Tables"]["cartoes"]["Row"];
@@ -11,12 +11,6 @@ interface CardTabsProps {
     onSelectCard: (id: string | null) => void;
     onAddCard: () => void;
 }
-
-const getFlagIcon = (bandeira: string) => {
-    // Aqui você poderia retornar ícones SVG específicos para cada bandeira
-    // Por enquanto retornamos um texto ou ícone genérico colorido
-    return bandeira.substring(0, 1).toUpperCase();
-};
 
 const getCardGradient = (bandeira: string) => {
     switch (bandeira.toLowerCase()) {

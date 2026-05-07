@@ -9,21 +9,7 @@ import {
     Tooltip,
     ResponsiveContainer,
 } from "recharts";
-
-const data = [
-    { month: "Jan", entradas: 4000, saidas: 2400 },
-    { month: "Fev", entradas: 3000, saidas: 1398 },
-    { month: "Mar", entradas: 5000, saidas: 3800 },
-    { month: "Abr", entradas: 4780, saidas: 3908 },
-    { month: "Mai", entradas: 5890, saidas: 4800 },
-    { month: "Jun", entradas: 6390, saidas: 3800 },
-    { month: "Jul", entradas: 5490, saidas: 4300 },
-    { month: "Ago", entradas: 7200, saidas: 4100 },
-    { month: "Set", entradas: 6800, saidas: 3600 },
-    { month: "Out", entradas: 8100, saidas: 5200 },
-    { month: "Nov", entradas: 7400, saidas: 4600 },
-    { month: "Dez", entradas: 9200, saidas: 5800 },
-];
+import { useDashboardOverview } from "@/hooks/useDashboardOverview";
 
 interface CustomTooltipProps {
     active?: boolean;
@@ -62,6 +48,9 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
 };
 
 export default function CashFlowChart() {
+    const { monthlyCashFlow, loading } = useDashboardOverview();
+    const data = monthlyCashFlow.length > 0 ? monthlyCashFlow : [{ month: "Atual", entradas: 0, saidas: 0 }];
+
     return (
         <div className="glass-card p-6">
             <div className="flex items-center justify-between mb-6">
@@ -82,6 +71,11 @@ export default function CashFlowChart() {
             </div>
 
             <div className="h-[350px] w-full">
+                {loading ? (
+                    <div className="flex h-full items-center justify-center text-muted">
+                        Carregando fluxo de caixa...
+                    </div>
+                ) : (
                 <ResponsiveContainer width="100%" height="100%">
                     <AreaChart
                         data={data}
@@ -135,6 +129,7 @@ export default function CashFlowChart() {
                         />
                     </AreaChart>
                 </ResponsiveContainer>
+                )}
             </div>
         </div>
     );

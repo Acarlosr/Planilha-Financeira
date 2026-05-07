@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X, CreditCard, Hash, Type } from "lucide-react";
+import { X, Hash, Type } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 interface CardFormModalProps {

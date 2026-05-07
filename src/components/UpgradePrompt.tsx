@@ -12,7 +12,6 @@ interface UpgradePromptProps {
 }
 
 export default function UpgradePrompt({
-    feature,
     planRequired = 'pro',
     reason,
     onClose,

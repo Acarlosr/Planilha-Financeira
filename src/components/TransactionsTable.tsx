@@ -1,83 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import { ArrowUpRight, ArrowDownRight, Trash2 } from "lucide-react";
-
-interface Transaction {
-    id: number;
-    date: string;
-    description: string;
-    category: string;
-    value: number;
-    type: "entrada" | "saida";
-}
-
-const initialTransactions: Transaction[] = [
-    {
-        id: 1,
-        date: "02/01/2026",
-        description: "Salário Janeiro",
-        category: "Salário",
-        value: 8500.0,
-        type: "entrada",
-    },
-    {
-        id: 2,
-        date: "02/01/2026",
-        description: "Aluguel",
-        category: "Moradia",
-        value: 1800.0,
-        type: "saida",
-    },
-    {
-        id: 3,
-        date: "01/01/2026",
-        description: "Freelance - Projeto Web",
-        category: "Freelance",
-        value: 3200.0,
-        type: "entrada",
-    },
-    {
-        id: 4,
-        date: "31/12/2025",
-        description: "Supermercado",
-        category: "Alimentação",
-        value: 650.0,
-        type: "saida",
-    },
-    {
-        id: 5,
-        date: "30/12/2025",
-        description: "Conta de Luz",
-        category: "Utilidades",
-        value: 180.0,
-        type: "saida",
-    },
-    {
-        id: 6,
-        date: "28/12/2025",
-        description: "Dividendos - Ações",
-        category: "Investimentos",
-        value: 420.0,
-        type: "entrada",
-    },
-    {
-        id: 7,
-        date: "27/12/2025",
-        description: "Internet",
-        category: "Utilidades",
-        value: 120.0,
-        type: "saida",
-    },
-    {
-        id: 8,
-        date: "25/12/2025",
-        description: "Presente de Natal",
-        category: "Outros",
-        value: 350.0,
-        type: "saida",
-    },
-];
+import Link from "next/link";
+import { supabase } from "@/lib/supabase";
+import { useDashboardOverview } from "@/hooks/useDashboardOverview";
 
 const categoryColors: { [key: string]: string } = {
     Salário: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
@@ -90,10 +16,19 @@ const categoryColors: { [key: string]: string } = {
 };
 
 export default function TransactionsTable() {
-    const [transactions, setTransactions] = useState<Transaction[]>(initialTransactions);
+    const { recentTransactions: transactions, loading, refetch } = useDashboardOverview();
 
-    const handleDelete = (id: number) => {
-        setTransactions(prev => prev.filter(t => t.id !== id));
+    const handleDelete = async (id: string) => {
+        const separatorIndex = id.indexOf("-");
+        const type = id.slice(0, separatorIndex);
+        const realId = id.slice(separatorIndex + 1);
+        const table = type === "receita" ? "receitas" : "despesas";
+        const { error } = await supabase.from(table).delete().eq("id", realId);
+        if (error) {
+            alert("Erro ao excluir transação. Tente novamente.");
+            return;
+        }
+        refetch();
     };
 
     return (
@@ -103,11 +38,12 @@ export default function TransactionsTable() {
                     <h2 className="text-xl font-bold text-foreground">Transações Recentes</h2>
                     <p className="text-muted text-sm">Últimas movimentações da sua conta</p>
                 </div>
-                <button
+                <Link
+                    href="/receitas"
                     className="px-4 py-2 text-sm font-medium text-cyan-400 hover:bg-white/5 rounded-xl transition-colors border border-white/10"
                 >
                     Ver todas
-                </button>
+                </Link>
             </div>
 
             <div className="overflow-x-auto">
@@ -131,7 +67,7 @@ export default function TransactionsTable() {
                         </tr>
                     </thead>
                     <tbody>
-                        {transactions.map((transaction) => (
+                        {!loading && transactions.map((transaction) => (
                             <tr
                                 key={transaction.id}
                                 className="border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer group"
@@ -194,7 +130,14 @@ export default function TransactionsTable() {
                                 </td>
                             </tr>
                         ))}
-                        {transactions.length === 0 && (
+                        {loading && (
+                            <tr>
+                                <td colSpan={5} className="py-12 text-center text-muted">
+                                    Carregando transações...
+                                </td>
+                            </tr>
+                        )}
+                        {!loading && transactions.length === 0 && (
                             <tr>
                                 <td colSpan={5} className="py-12 text-center text-muted">
                                     Nenhuma transação encontrada.

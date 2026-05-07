@@ -12,22 +12,22 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-    const [theme, setTheme] = useState<Theme>("dark");
+    const [theme, setTheme] = useState<Theme>(() => {
+        if (typeof window === "undefined") return "dark";
+        const savedTheme = localStorage.getItem("theme");
+        return savedTheme === "light" || savedTheme === "dark" ? savedTheme : "dark";
+    });
 
     useEffect(() => {
-        // Load theme from localStorage
-        const savedTheme = localStorage.getItem("theme") as Theme;
-        if (savedTheme) {
-            setTheme(savedTheme);
-            document.documentElement.setAttribute("data-theme", savedTheme);
+        document.documentElement.setAttribute("data-theme", theme);
+        if (typeof window !== "undefined") {
+            localStorage.setItem("theme", theme);
         }
-    }, []);
+    }, [theme]);
 
     const toggleTheme = () => {
         const newTheme = theme === "dark" ? "light" : "dark";
         setTheme(newTheme);
-        localStorage.setItem("theme", newTheme);
-        document.documentElement.setAttribute("data-theme", newTheme);
     };
 
     return (

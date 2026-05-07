@@ -25,10 +25,10 @@ export default function FeatureGate({
     fallback,
     variant = 'inline'
 }: FeatureGateProps) {
-    const featureAccess = feature ? useFeatureAccess(feature) : { hasAccess: true };
-    const quotaAccess = quotaType && currentUsage !== undefined
-        ? useQuotaLimit(quotaType, currentUsage)
-        : { hasAccess: true };
+    const featureAccessResult = useFeatureAccess(feature ?? "basic_dashboard");
+    const quotaAccessResult = useQuotaLimit(quotaType ?? "transactions", currentUsage ?? 0);
+    const featureAccess = feature ? featureAccessResult : { hasAccess: true };
+    const quotaAccess = quotaType && currentUsage !== undefined ? quotaAccessResult : { hasAccess: true };
 
     // Check feature first, then quota
     if (!featureAccess.hasAccess) {

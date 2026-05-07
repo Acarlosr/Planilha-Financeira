@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { Database } from "@/types/database.types";
-import { CATEGORIAS_DESPESA } from "@/constants/categories";
 
 type Categoria = Database["public"]["Tables"]["categorias_despesa"]["Row"];
 

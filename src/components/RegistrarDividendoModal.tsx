@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, X, HandCoins, CalendarDays, DollarSign, Hash } from "lucide-react";
+import { X, HandCoins, CalendarDays, DollarSign, Hash } from "lucide-react";
 
 interface RegistrarDividendoModalProps {
     isOpen: boolean;

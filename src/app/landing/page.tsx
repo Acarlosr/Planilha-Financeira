@@ -7,7 +7,6 @@ import {
     PiggyBank,
     CreditCard,
     LineChart,
-    Shield,
     Zap,
     BarChart3,
     Wallet,

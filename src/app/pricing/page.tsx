@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { Check, Crown, Zap, Building2, ArrowLeft } from "lucide-react";
@@ -10,13 +10,9 @@ import { useSubscription } from "@/contexts/SubscriptionContext";
 export default function PricingPage() {
     const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
     const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
-    const { user, plan: currentPlan } = useSubscription();
+    const { plan: currentPlan } = useSubscription();
 
-    useEffect(() => {
-        loadPlans();
-    }, []);
-
-    const loadPlans = async () => {
+    const loadPlans = useCallback(async () => {
         const { data } = await supabase
             .from('subscription_plans')
             .select('*')
@@ -26,7 +22,11 @@ export default function PricingPage() {
         if (data) {
             setPlans(data);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        loadPlans();
+    }, [loadPlans]);
 
     const getPlanIcon = (slug: string) => {
         switch (slug) {

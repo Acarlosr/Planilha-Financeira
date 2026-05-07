@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X, Plus, Calendar } from "lucide-react";
+import { X, Plus } from "lucide-react";
 
 interface IncomeModalProps {
     isOpen: boolean;
