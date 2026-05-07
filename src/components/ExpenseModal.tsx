@@ -18,9 +18,10 @@ interface ExpenseModalProps {
     cartoes: Cartao[];
     categorias: Categoria[];
     onSaveLocal?: (expenses: any[]) => void;
+    initialCategoryId?: string | null;
 }
 
-export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categorias, onSaveLocal }: ExpenseModalProps) {
+export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categorias, onSaveLocal, initialCategoryId }: ExpenseModalProps) {
     const [loading, setLoading] = useState(false);
 
     // Dados básicos
@@ -43,7 +44,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
             setDescription("");
             setAmount("");
             setDate(new Date().toISOString().split('T')[0]);
-            setCategoryId(categorias.length > 0 ? categorias[0].id : "");
+            setCategoryId(initialCategoryId || (categorias.length > 0 ? categorias[0].id : ""));
             setInstallmentsData({
                 parcelada: false,
                 numeroParcelas: 2,
@@ -51,7 +52,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                 cartaoId: null,
             });
         }
-    }, [isOpen, categorias]);
+    }, [isOpen, categorias, initialCategoryId]);
 
     if (!isOpen) return null;
 
@@ -229,20 +230,33 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
 
                         <div className="col-span-1 md:col-span-2">
                             <label className="block text-sm font-medium text-muted mb-1">Categoria</label>
-                            <div className="relative">
-                                <Tag className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
-                                <select
-                                    required
-                                    value={categoryId}
-                                    onChange={(e) => setCategoryId(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2.5 rounded-xl text-white outline-none transition-all border border-white/10 focus:border-red-500/50 appearance-none"
-                                    style={{ background: "rgba(255, 255, 255, 0.05)" }}
-                                >
-                                    <option value="" disabled className="text-gray-800">Selecione uma categoria</option>
-                                    {categorias.map(cat => (
-                                        <option key={cat.id} value={cat.id} className="text-gray-800">{cat.nome}</option>
-                                    ))}
-                                </select>
+                            <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
+                                {categorias.map(cat => {
+                                    const selected = categoryId === cat.id;
+                                    return (
+                                        <button
+                                            key={cat.id}
+                                            type="button"
+                                            onClick={() => setCategoryId(cat.id)}
+                                            className="rounded-lg border px-3 py-2 text-left text-sm transition-all"
+                                            style={{
+                                                background: selected
+                                                    ? "color-mix(in srgb, var(--accent) 16%, transparent)"
+                                                    : "rgba(255, 255, 255, 0.04)",
+                                                borderColor: selected
+                                                    ? "color-mix(in srgb, var(--secondary) 42%, transparent)"
+                                                    : "rgba(255, 255, 255, 0.1)",
+                                                color: selected ? "var(--foreground)" : "var(--text-secondary)",
+                                            }}
+                                        >
+                                            {cat.nome}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                            <div className="mt-2 flex items-center gap-2 text-xs text-muted">
+                                <Tag size={14} />
+                                A categoria selecionada será usada no card e no histórico.
                             </div>
                         </div>
                     </div>

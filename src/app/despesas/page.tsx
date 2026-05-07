@@ -26,6 +26,11 @@ import {
     Tv,
     MoreHorizontal,
     Loader2,
+    CreditCard,
+    Dumbbell,
+    Droplets,
+    Lightbulb,
+    Plane,
 } from "lucide-react";
 
 const iconMap = {
@@ -40,21 +45,42 @@ const iconMap = {
     Wifi,
     Tv,
     MoreHorizontal,
+    CreditCard,
+    Dumbbell,
+    Droplets,
+    Lightbulb,
+    Plane,
 };
 
 const colorMap: Record<string, string> = {
-    blue: "from-blue-500 to-blue-400",
-    orange: "from-orange-500 to-orange-400",
-    purple: "from-purple-500 to-purple-400",
+    blue: "from-[#0098F0] to-[#54E0FF]",
+    orange: "from-[#0098F0] to-[#002890]",
+    purple: "from-[#002890] to-[#0098F0]",
     red: "from-red-500 to-red-400",
-    green: "from-green-500 to-green-400",
-    pink: "from-pink-500 to-pink-400",
-    indigo: "from-indigo-500 to-indigo-400",
-    teal: "from-teal-500 to-teal-400",
-    cyan: "from-cyan-500 to-cyan-400",
-    rose: "from-rose-500 to-rose-400",
-    gray: "from-gray-500 to-gray-400",
+    green: "from-[#54E0FF] to-[#0098F0]",
+    pink: "from-[#0098F0] to-[#54E0FF]",
+    indigo: "from-[#002890] to-[#0098F0]",
+    teal: "from-[#54E0FF] to-[#0098F0]",
+    cyan: "from-[#54E0FF] to-[#0098F0]",
+    rose: "from-[#0098F0] to-[#002890]",
+    gray: "from-slate-500 to-slate-400",
 };
+
+const commonExpenseCategories = [
+    { id: "650e8400-e29b-41d4-a716-446655440003", nome: "Transporte", icone: "Car", cor: "blue", tipo: "despesa", user_id: null, created_at: "" },
+    { id: "local-cartao-credito", nome: "Cartão de crédito", icone: "CreditCard", cor: "indigo", tipo: "despesa", user_id: null, created_at: "" },
+    { id: "local-streaming", nome: "Streaming", icone: "Tv", cor: "cyan", tipo: "despesa", user_id: null, created_at: "" },
+    { id: "local-internet", nome: "Internet", icone: "Wifi", cor: "teal", tipo: "despesa", user_id: null, created_at: "" },
+    { id: "local-tv-cabo", nome: "TV a cabo", icone: "Tv", cor: "blue", tipo: "despesa", user_id: null, created_at: "" },
+    { id: "650e8400-e29b-41d4-a716-446655440002", nome: "Delivery", icone: "Utensils", cor: "orange", tipo: "despesa", user_id: null, created_at: "" },
+    { id: "local-academia", nome: "Academia", icone: "Dumbbell", cor: "cyan", tipo: "despesa", user_id: null, created_at: "" },
+    { id: "local-agua", nome: "Água", icone: "Droplets", cor: "blue", tipo: "despesa", user_id: null, created_at: "" },
+    { id: "local-luz", nome: "Luz", icone: "Lightbulb", cor: "teal", tipo: "despesa", user_id: null, created_at: "" },
+    { id: "650e8400-e29b-41d4-a716-446655440004", nome: "Saúde", icone: "Heart", cor: "red", tipo: "despesa", user_id: null, created_at: "" },
+    { id: "650e8400-e29b-41d4-a716-446655440005", nome: "Educação", icone: "GraduationCap", cor: "green", tipo: "despesa", user_id: null, created_at: "" },
+    { id: "local-viagens", nome: "Viagens", icone: "Plane", cor: "indigo", tipo: "despesa", user_id: null, created_at: "" },
+    { id: "650e8400-e29b-41d4-a716-446655440008", nome: "Outros", icone: "MoreHorizontal", cor: "gray", tipo: "despesa", user_id: null, created_at: "" },
+];
 
 interface ExpenseItem {
     id: string;
@@ -74,10 +100,13 @@ function DespesasContent() {
     const currentYear = searchParams.get("year") ? parseInt(searchParams.get("year")!) : new Date().getFullYear();
 
     const [activeCategory, setActiveCategory] = useState<string | null>(null);
+    const [selectedCategoryForModal, setSelectedCategoryForModal] = useState<string | null>(null);
+    const [localExpenses, setLocalExpenses] = useState<ExpenseItem[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { despesas, loading: loadingDespesas, error, refetch } = useDespesas(currentMonth, currentYear);
     const { cartoes } = useCartoes();
     const { categorias, loading: loadingCategorias } = useCategorias();
+    const databaseUnavailable = Boolean(error?.includes("Could not find the table") || error?.includes("schema cache"));
 
     const handleDateChange = (newDate: { month: number; year: number }) => {
         const params = new URLSearchParams(searchParams);
@@ -87,6 +116,11 @@ function DespesasContent() {
     };
 
     const handleDeleteExpense = async (id: string) => {
+        if (databaseUnavailable || id.startsWith("local-")) {
+            setLocalExpenses(prev => prev.filter(item => item.id !== id));
+            return;
+        }
+
         const { error } = await supabase.from("despesas").delete().eq("id", id);
         if (error) {
             alert("Erro ao excluir despesa. Tente novamente.");
@@ -95,7 +129,7 @@ function DespesasContent() {
         refetch();
     };
 
-    const filteredExpenses: ExpenseItem[] = despesas.map((item) => {
+    const databaseExpenses: ExpenseItem[] = despesas.map((item) => {
         const [year, month, day] = item.data.split("-");
         return {
             id: item.id,
@@ -105,6 +139,7 @@ function DespesasContent() {
             category: item.categoria_id,
         };
     });
+    const filteredExpenses = databaseUnavailable ? localExpenses : databaseExpenses;
 
     const getItemsByCategory = (categoryId: string) => {
         return filteredExpenses.filter((item) => item.category === categoryId);
@@ -118,17 +153,38 @@ function DespesasContent() {
 
     const totalDespesas = filteredExpenses.reduce((sum, item) => sum + item.value, 0);
 
-    const categoriasDespesa = categorias.map((cat) => ({
+    const categorySource = [
+        ...commonExpenseCategories,
+        ...categorias.filter((cat) => !commonExpenseCategories.some((common) => common.id === cat.id || common.nome === cat.nome)),
+    ];
+
+    const categoriasDespesa = categorySource.map((cat) => ({
         id: cat.id,
         label: cat.nome,
         icone: iconMap[cat.icone as keyof typeof iconMap] ?? MoreHorizontal,
-        cor: colorMap[cat.cor] ?? "from-gray-500 to-gray-400",
+        cor: colorMap[cat.cor] ?? cat.cor ?? "from-gray-500 to-gray-400",
     }));
 
     const getCategoryById = (id: string) => {
         return categoriasDespesa.find((c) => c.id === id);
     };
-    const loading = loadingDespesas || loadingCategorias;
+    const loading = !databaseUnavailable && (loadingDespesas || loadingCategorias);
+
+    const openExpenseModal = (categoryId?: string) => {
+        setSelectedCategoryForModal(categoryId ?? activeCategory);
+        setIsModalOpen(true);
+    };
+
+    const handleSaveLocalExpenses = (newExpenses: any[]) => {
+        const formattedExpenses = newExpenses.map((expense) => ({
+            id: `local-${Date.now()}-${Math.random()}`,
+            description: expense.description,
+            value: Number(expense.value),
+            date: expense.date,
+            category: expense.category,
+        }));
+        setLocalExpenses(prev => [...formattedExpenses, ...prev]);
+    };
 
     return (
         <div className="min-h-screen">
@@ -147,7 +203,7 @@ function DespesasContent() {
                         <div className="flex items-center gap-3">
                             <PrintExportButtons title="Despesas" period={`${currentMonth}/${currentYear}`} />
                             <button
-                                onClick={() => setIsModalOpen(true)}
+                                onClick={() => openExpenseModal()}
                                 className="flex items-center gap-2 px-5 py-3 text-foreground font-medium rounded-xl transition-all hover:shadow-lg no-print"
                                 style={{
                                     background: "linear-gradient(135deg, #EF4444 0%, #F87171 100%)",
@@ -189,7 +245,10 @@ function DespesasContent() {
                         return (
                             <div
                                 key={cat.id}
-                                onClick={() => setActiveCategory(isActive ? null : cat.id)}
+                                onClick={() => {
+                                    setActiveCategory(isActive ? null : cat.id);
+                                    setSelectedCategoryForModal(cat.id);
+                                }}
                                 className={`soft-card p-4 cursor-pointer transition-all duration-300 ${isActive ? "ring-2 ring-red-400 ring-offset-2 scale-105" : "hover:scale-102"
                                     }`}
                             >
@@ -207,6 +266,18 @@ function DespesasContent() {
                                         <h3 className="text-lg font-bold text-foreground mt-1">
                                             R$ {total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                                         </h3>
+                                        <button
+                                            type="button"
+                                            onClick={(event) => {
+                                                event.stopPropagation();
+                                                setActiveCategory(cat.id);
+                                                openExpenseModal(cat.id);
+                                            }}
+                                            className="mt-2 text-[11px] font-medium"
+                                            style={{ color: "var(--secondary)" }}
+                                        >
+                                            Lançar aqui
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -233,8 +304,21 @@ function DespesasContent() {
                     </div>
 
                     {error && (
-                        <div className="mb-4 rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-300">
-                            Não foi possível carregar suas despesas: {error}
+                        <div
+                            className="mb-4 rounded-xl border p-4 text-sm"
+                            style={{
+                                background: databaseUnavailable
+                                    ? "color-mix(in srgb, var(--accent) 8%, transparent)"
+                                    : "rgba(239, 68, 68, 0.1)",
+                                borderColor: databaseUnavailable
+                                    ? "color-mix(in srgb, var(--accent) 18%, transparent)"
+                                    : "rgba(239, 68, 68, 0.2)",
+                                color: databaseUnavailable ? "var(--text-secondary)" : "#fca5a5",
+                            }}
+                        >
+                            {databaseUnavailable
+                                ? "Modo beta local ativo: a tabela de despesas ainda não foi criada no Supabase. Você pode testar os lançamentos nesta sessão."
+                                : `Não foi possível carregar suas despesas: ${error}`}
                         </div>
                     )}
 
@@ -318,8 +402,10 @@ function DespesasContent() {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onSave={refetch}
+                onSaveLocal={databaseUnavailable ? handleSaveLocalExpenses : undefined}
                 cartoes={cartoes}
-                categorias={categorias}
+                categorias={categorySource as any}
+                initialCategoryId={selectedCategoryForModal}
             />
         </div>
     );

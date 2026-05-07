@@ -4,7 +4,7 @@ import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Eye, EyeOff, Loader2, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff, Loader2, ArrowLeft, Info } from "lucide-react";
 
 export default function CadastroPage() {
     const router = useRouter();
@@ -172,6 +172,20 @@ export default function CadastroPage() {
                     }}
                 >
                     <h2 className="text-2xl font-bold text-foreground mb-6">Create Account</h2>
+
+                    <div
+                        className="mb-5 flex items-start gap-3 rounded-xl border p-3 text-sm"
+                        style={{
+                            background: "color-mix(in srgb, var(--accent) 10%, transparent)",
+                            borderColor: "color-mix(in srgb, var(--accent) 22%, transparent)",
+                            color: "var(--text-secondary)",
+                        }}
+                    >
+                        <Info size={18} className="mt-0.5 shrink-0" style={{ color: "var(--secondary)" }} />
+                        <p>
+                            Esta é uma versão beta do FinançasPro. Algumas funções ainda estão em evolução e podem receber ajustes nos próximos dias.
+                        </p>
+                    </div>
 
                     {/* Error Message */}
                     {erro && (
