@@ -44,7 +44,7 @@ export default function TrialBanner() {
                     }}
                 >
                     {urgency ? (
-                        <Clock size={24} className="text-yellow-500" />
+                        <Clock size={24} style={{ color: "var(--secondary)" }} />
                     ) : (
                         <Sparkles size={24} style={{ color: "var(--accent)" }} />
                     )}

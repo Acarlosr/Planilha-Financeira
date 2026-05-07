@@ -31,13 +31,13 @@ const formatChange = (current: number, previous: number) => {
 const getChangeColor = (type: CardData["changeType"]) => {
     switch (type) {
         case "positive":
-            return "text-emerald-400";
+            return "text-cyan-300";
         case "negative":
             return "text-red-400";
         case "neutral":
             return "text-blue-400";
         case "investment":
-            return "text-blue-400";
+            return "text-cyan-300";
         default:
             return "text-gray-400";
     }
@@ -46,13 +46,13 @@ const getChangeColor = (type: CardData["changeType"]) => {
 const getShadowColor = (type: CardData["changeType"]) => {
     switch (type) {
         case "positive":
-            return "rgba(47, 143, 103, 0.18)";
+            return "rgba(84, 224, 255, 0.18)";
         case "negative":
             return "rgba(217, 77, 77, 0.18)";
         case "neutral":
-            return "rgba(37, 99, 235, 0.16)";
+            return "rgba(0, 152, 240, 0.18)";
         case "investment":
-            return "rgba(239, 124, 47, 0.18)";
+            return "rgba(0, 40, 144, 0.2)";
         default:
             return "rgba(0, 0, 0, 0.1)";
     }
@@ -69,8 +69,8 @@ export default function SummaryCards() {
             change: loading ? "..." : formatChange(currentIncome, previousIncome),
             changeType: "positive",
             icon: <TrendingUp size={24} className="text-white" />,
-            iconBg: "linear-gradient(135deg, #2f8f67 0%, #65a985 100%)",
-            progressColor: "#2f8f67",
+            iconBg: "linear-gradient(135deg, #0098F0 0%, #54E0FF 100%)",
+            progressColor: "#0098F0",
         },
         {
             title: "Despesas do Mês",
@@ -87,8 +87,8 @@ export default function SummaryCards() {
             change: loading ? "..." : formatChange(saldo, previousSaldo),
             changeType: saldo >= 0 ? "neutral" : "negative",
             icon: <Wallet size={24} className="text-white" />,
-            iconBg: "linear-gradient(135deg, #2563eb 0%, #5f8fc4 100%)",
-            progressColor: "#2563eb",
+            iconBg: "linear-gradient(135deg, #002890 0%, #0098F0 100%)",
+            progressColor: "#0098F0",
         },
         {
             title: "Total Investido",
@@ -96,8 +96,8 @@ export default function SummaryCards() {
             change: "+5,4%",
             changeType: "investment",
             icon: <LineChart size={24} className="text-white" />,
-            iconBg: "linear-gradient(135deg, #ef7c2f 0%, #f5a166 100%)",
-            progressColor: "#ef7c2f",
+            iconBg: "linear-gradient(135deg, #54E0FF 0%, #0098F0 100%)",
+            progressColor: "#54E0FF",
         },
     ];
 

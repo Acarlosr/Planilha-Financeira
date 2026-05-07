@@ -6,10 +6,10 @@ import { supabase } from "@/lib/supabase";
 import { useDashboardOverview } from "@/hooks/useDashboardOverview";
 
 const categoryColors: { [key: string]: string } = {
-    Salário: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
+    Salário: "bg-cyan-500/15 text-cyan-300 border-cyan-500/25",
     Moradia: "bg-blue-500/20 text-blue-400 border-blue-500/30",
     Freelance: "bg-blue-500/15 text-blue-400 border-blue-500/25",
-    Alimentação: "bg-orange-500/20 text-orange-400 border-orange-500/30",
+    Alimentação: "bg-sky-500/15 text-sky-300 border-sky-500/25",
     Utilidades: "bg-slate-500/20 text-slate-400 border-slate-500/30",
     Investimentos: "bg-indigo-500/20 text-indigo-400 border-indigo-500/30",
     Outros: "bg-pink-500/20 text-pink-400 border-pink-500/30",
@@ -80,12 +80,12 @@ export default function TransactionsTable() {
                                     <div className="flex items-center gap-3">
                                         <div
                                             className={`w-8 h-8 rounded-lg flex items-center justify-center ${transaction.type === "entrada"
-                                                ? "bg-emerald-500/20"
+                                                ? "bg-cyan-500/15"
                                                 : "bg-red-500/20"
                                                 }`}
                                         >
                                             {transaction.type === "entrada" ? (
-                                                <ArrowUpRight size={16} className="text-emerald-400" />
+                                                <ArrowUpRight size={16} className="text-cyan-300" />
                                             ) : (
                                                 <ArrowDownRight size={16} className="text-red-400" />
                                             )}
@@ -106,7 +106,7 @@ export default function TransactionsTable() {
                                 <td className="py-4 px-4 text-right">
                                     <span
                                         className={`font-semibold ${transaction.type === "entrada"
-                                            ? "text-emerald-400"
+                                            ? "text-cyan-300"
                                             : "text-red-400"
                                             }`}
                                     >

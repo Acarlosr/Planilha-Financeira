@@ -84,8 +84,8 @@ export default function CashFlowChart() {
                     >
                         <defs>
                             <linearGradient id="colorEntradas" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#2f8f67" stopOpacity={0.22} />
-                                <stop offset="95%" stopColor="#2f8f67" stopOpacity={0} />
+                                <stop offset="5%" stopColor="#54E0FF" stopOpacity={0.28} />
+                                <stop offset="95%" stopColor="#54E0FF" stopOpacity={0} />
                             </linearGradient>
                             <linearGradient id="colorSaidas" x1="0" y1="0" x2="0" y2="1">
                                 <stop offset="5%" stopColor="#d94d4d" stopOpacity={0.2} />
@@ -115,7 +115,7 @@ export default function CashFlowChart() {
                         <Area
                             type="monotone"
                             dataKey="entradas"
-                            stroke="#2f8f67"
+                            stroke="#54E0FF"
                             strokeWidth={3}
                             fillOpacity={1}
                             fill="url(#colorEntradas)"

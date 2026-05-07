@@ -3,10 +3,10 @@
 /* FinançasPro - subtle product dashboard theme */
 
 :root {
-  --graph-primary: #2563eb;
-  --graph-accent: #ef7c2f;
-  --graph-secondary: #7c8aa5;
-  --graph-orange: #ef7c2f;
+  --graph-primary: #0098F0;
+  --graph-accent: #54E0FF;
+  --graph-secondary: #002890;
+  --graph-orange: #54E0FF;
   --graph-red: #e05252;
   --radius-card: 10px;
   --radius-control: 8px;
@@ -15,51 +15,51 @@
 /* Dark Theme (Default) */
 :root,
 [data-theme="dark"] {
-  --background: #111312;
-  --background-light: #181b1a;
-  --foreground: #f4f2ed;
-  --accent: #ef7c2f;
-  --accent-hover: #f49a5a;
-  --accent-dark: #ba5517;
-  --secondary: #3f6fa3;
-  --secondary-light: #5f8fc4;
-  --card-bg: rgba(255, 255, 255, 0.055);
-  --card-bg-solid: #1d201f;
-  --card-border: rgba(244, 242, 237, 0.1);
-  --text-primary: #f4f2ed;
-  --text-secondary: #a7aaa6;
-  --text-tertiary: #72776f;
-  --success: #65a985;
+  --background: #020518;
+  --background-light: #071026;
+  --foreground: #ffffff;
+  --accent: #0098F0;
+  --accent-hover: #54E0FF;
+  --accent-dark: #002890;
+  --secondary: #54E0FF;
+  --secondary-light: #b8f4ff;
+  --card-bg: rgba(255, 255, 255, 0.065);
+  --card-bg-solid: #091229;
+  --card-border: rgba(84, 224, 255, 0.16);
+  --text-primary: #ffffff;
+  --text-secondary: #aebbd4;
+  --text-tertiary: #667594;
+  --success: #54E0FF;
   --danger: #e05252;
-  --warning: #d99a3d;
-  --orange: #ef7c2f;
-  --shadow-glass: 0 16px 40px rgba(0, 0, 0, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.035);
-  --shadow-glass-hover: 0 20px 48px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.055);
+  --warning: #54E0FF;
+  --orange: #0098F0;
+  --shadow-glass: 0 18px 48px rgba(0, 12, 48, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --shadow-glass-hover: 0 24px 62px rgba(0, 40, 144, 0.28), inset 0 1px 0 rgba(84, 224, 255, 0.08);
   --blur-glass: blur(16px);
 }
 
 /* Light Theme */
 [data-theme="light"] {
-  --background: #f4f6fa;
+  --background: #f3f7ff;
   --background-light: #ffffff;
-  --foreground: #121826;
-  --accent: #2563eb;
-  --accent-hover: #1d4ed8;
-  --accent-dark: #183b7a;
-  --secondary: #ef7c2f;
-  --secondary-light: #f5a166;
+  --foreground: #020518;
+  --accent: #0098F0;
+  --accent-hover: #007bcc;
+  --accent-dark: #002890;
+  --secondary: #54E0FF;
+  --secondary-light: #d9f8ff;
   --card-bg: rgba(255, 255, 255, 0.86);
   --card-bg-solid: #ffffff;
-  --card-border: rgba(18, 24, 38, 0.09);
-  --text-primary: #121826;
-  --text-secondary: #657084;
-  --text-tertiary: #9aa3b3;
-  --success: #2f8f67;
+  --card-border: rgba(0, 40, 144, 0.12);
+  --text-primary: #020518;
+  --text-secondary: #59677f;
+  --text-tertiary: #8a99b4;
+  --success: #0098F0;
   --danger: #d94d4d;
-  --warning: #b7791f;
-  --orange: #ef7c2f;
-  --shadow-glass: 0 18px 45px rgba(30, 41, 59, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  --shadow-glass-hover: 0 22px 55px rgba(30, 41, 59, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  --warning: #002890;
+  --orange: #0098F0;
+  --shadow-glass: 0 18px 45px rgba(0, 40, 144, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.92);
+  --shadow-glass-hover: 0 22px 55px rgba(0, 152, 240, 0.13), inset 0 1px 0 rgba(255, 255, 255, 0.96);
 }
 
 @theme inline {
@@ -84,15 +84,17 @@ body {
 
 [data-theme="dark"] body {
   background:
-    radial-gradient(circle at top left, rgba(239, 124, 47, 0.08), transparent 34rem),
-    linear-gradient(135deg, #111312 0%, #181b1a 52%, #101211 100%);
+    radial-gradient(circle at 18% 24%, rgba(0, 152, 240, 0.36), transparent 22rem),
+    radial-gradient(circle at 58% 78%, rgba(84, 224, 255, 0.18), transparent 26rem),
+    linear-gradient(135deg, #020518 0%, #071026 52%, #020518 100%);
   background-attachment: fixed;
 }
 
 [data-theme="light"] body {
   background:
-    radial-gradient(circle at top left, rgba(37, 99, 235, 0.08), transparent 30rem),
-    linear-gradient(135deg, #f8fafc 0%, #f4f6fa 50%, #eef2f8 100%);
+    radial-gradient(circle at 18% 12%, rgba(0, 152, 240, 0.16), transparent 28rem),
+    radial-gradient(circle at 70% 78%, rgba(84, 224, 255, 0.22), transparent 30rem),
+    linear-gradient(135deg, #ffffff 0%, #f3f7ff 50%, #eaf1ff 100%);
   background-attachment: fixed;
 }
 
