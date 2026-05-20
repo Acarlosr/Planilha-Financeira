@@ -98,12 +98,14 @@ function DespesasContent() {
     // Get date from URL or default to current date
     const currentMonth = searchParams.get("month") ? parseInt(searchParams.get("month")!) : new Date().getMonth() + 1;
     const currentYear = searchParams.get("year") ? parseInt(searchParams.get("year")!) : new Date().getFullYear();
+    const statementScope = searchParams.get("scope") === "annual" ? "annual" : "monthly";
+    const periodLabel = statementScope === "annual" ? `Ano ${currentYear}` : `${currentMonth}/${currentYear}`;
 
     const [activeCategory, setActiveCategory] = useState<string | null>(null);
     const [selectedCategoryForModal, setSelectedCategoryForModal] = useState<string | null>(null);
     const [localExpenses, setLocalExpenses] = useState<ExpenseItem[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const { despesas, loading: loadingDespesas, error, refetch } = useDespesas(currentMonth, currentYear);
+    const { despesas, loading: loadingDespesas, error, refetch } = useDespesas(currentMonth, currentYear, statementScope);
     const { cartoes } = useCartoes();
     const { categorias, loading: loadingCategorias } = useCategorias();
     const databaseUnavailable = Boolean(error?.includes("Could not find the table") || error?.includes("schema cache"));
@@ -112,6 +114,12 @@ function DespesasContent() {
         const params = new URLSearchParams(searchParams);
         params.set("month", newDate.month.toString());
         params.set("year", newDate.year.toString());
+        router.push(`${pathname}?${params.toString()}`);
+    };
+
+    const handleScopeChange = (scope: "monthly" | "annual") => {
+        const params = new URLSearchParams(searchParams);
+        params.set("scope", scope);
         router.push(`${pathname}?${params.toString()}`);
     };
 
@@ -201,7 +209,25 @@ function DespesasContent() {
                             </p>
                         </div>
                         <div className="flex items-center gap-3">
-                            <PrintExportButtons title="Despesas" period={`${currentMonth}/${currentYear}`} />
+                            <PrintExportButtons title="Despesas" period={periodLabel} />
+                            <div className="no-print flex rounded-lg border p-1" style={{ borderColor: "var(--card-border)", background: "var(--card-bg)" }}>
+                                <button
+                                    type="button"
+                                    onClick={() => handleScopeChange("monthly")}
+                                    className="rounded-md px-3 py-2 text-sm font-medium"
+                                    style={statementScope === "monthly" ? { background: "var(--accent)", color: "white" } : { color: "var(--text-secondary)" }}
+                                >
+                                    Mensal
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => handleScopeChange("annual")}
+                                    className="rounded-md px-3 py-2 text-sm font-medium"
+                                    style={statementScope === "annual" ? { background: "var(--accent)", color: "white" } : { color: "var(--text-secondary)" }}
+                                >
+                                    Anual
+                                </button>
+                            </div>
                             <button
                                 onClick={() => openExpenseModal()}
                                 className="flex items-center gap-2 px-5 py-3 text-foreground font-medium rounded-xl transition-all hover:shadow-lg no-print"
@@ -341,6 +367,7 @@ function DespesasContent() {
                             return (
                                 <div
                                     key={item.id}
+                                    data-print-row="true"
                                     className="flex items-center justify-between p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors group"
                                 >
                                     <div className="flex items-center gap-4">

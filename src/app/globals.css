@@ -187,7 +187,7 @@ body {
   color: rgba(148, 163, 184, 0.7);
 }
 
-/* Print Styles - Fit on single A4 page */
+/* Print Styles - A4 statements with controlled pagination */
 @media print {
   @page {
     size: A4 portrait;
@@ -204,8 +204,7 @@ body {
     print-color-adjust: exact;
     transform-origin: top left;
     width: 100%;
-    max-height: 100vh;
-    overflow: hidden;
+    overflow: visible;
   }
 
   /* Hide sidebar and non-printable elements */
@@ -223,8 +222,38 @@ body {
     margin-left: 0 !important;
     padding: 5px !important;
     width: 100% !important;
-    transform: scale(0.85);
     transform-origin: top left;
+  }
+
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    page-break-inside: auto;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  tfoot {
+    display: table-footer-group;
+  }
+
+  tr,
+  [data-print-row="true"] {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .print-page-break {
+    break-before: page;
+    page-break-before: always;
+  }
+
+  th,
+  td {
+    padding: 5px 7px !important;
+    line-height: 1.25 !important;
   }
 
   /* Compact spacing */

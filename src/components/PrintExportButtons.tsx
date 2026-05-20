@@ -8,13 +8,29 @@ interface PrintExportButtonsProps {
 }
 
 export default function PrintExportButtons({ title, period }: PrintExportButtonsProps) {
+    const applyPrintPagination = (root: ParentNode = document) => {
+        const rows = Array.from(root.querySelectorAll('tbody tr, [data-print-row="true"]'));
+        rows.forEach((row, index) => {
+            row.classList.remove("print-page-break");
+            if (index > 0 && index % 48 === 0) {
+                row.classList.add("print-page-break");
+            }
+        });
+    };
+
+    const clearPrintPagination = () => {
+        document.querySelectorAll(".print-page-break").forEach((row) => {
+            row.classList.remove("print-page-break");
+        });
+    };
+
     const handlePrint = () => {
-        // Adiciona classe para esconder elementos não imprimíveis
+        applyPrintPagination();
         document.body.classList.add('printing');
         window.print();
-        // Remove a classe após a impressão
         setTimeout(() => {
             document.body.classList.remove('printing');
+            clearPrintPagination();
         }, 100);
     };
 
@@ -33,9 +49,10 @@ export default function PrintExportButtons({ title, period }: PrintExportButtons
                         <title>${title}${period ? ` - ${period}` : ''}</title>
                         <style>
                             * { margin: 0; padding: 0; box-sizing: border-box; }
+                            @page { size: A4 portrait; margin: 10mm; }
                             body { 
                                 font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                                padding: 40px;
+                                padding: 0;
                                 background: white;
                                 color: #1f2937;
                             }
@@ -48,14 +65,20 @@ export default function PrintExportButtons({ title, period }: PrintExportButtons
                             }
                             .header-print h1 { font-size: 24px; }
                             .header-print p { color: #6b7280; font-size: 14px; }
-                            table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-                            th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+                            table { width: 100%; border-collapse: collapse; margin: 14px 0; page-break-inside: auto; }
+                            thead { display: table-header-group; }
+                            tfoot { display: table-footer-group; }
+                            tr { page-break-inside: avoid; break-inside: avoid; }
+                            th, td { padding: 7px 8px; text-align: left; border-bottom: 1px solid #e5e7eb; font-size: 10px; line-height: 1.25; }
                             th { background: #f9fafb; font-weight: 600; }
+                            [data-print-row="true"] { page-break-inside: avoid; break-inside: avoid; min-height: 16px; padding: 5px 8px !important; border-bottom: 1px solid #e5e7eb; }
+                            .print-page-break { break-before: page; page-break-before: always; }
+                            .glass-card, .soft-card { box-shadow: none !important; border: 1px solid #e5e7eb !important; background: white !important; }
                             .value-positive { color: #059669; font-weight: bold; }
                             .value-negative { color: #dc2626; font-weight: bold; }
                             .total { font-size: 18px; font-weight: bold; margin-top: 20px; }
                             @media print {
-                                body { padding: 20px; }
+                                body { padding: 0; }
                             }
                         </style>
                     </head>
@@ -77,6 +100,10 @@ export default function PrintExportButtons({ title, period }: PrintExportButtons
                         <script>
                             // Limpa elementos desnecessários
                             document.querySelectorAll('button, .no-print, nav, header').forEach(el => el.remove());
+                            const rows = Array.from(document.querySelectorAll('tbody tr, [data-print-row="true"]'));
+                            rows.forEach((row, index) => {
+                                if (index > 0 && index % 48 === 0) row.classList.add('print-page-break');
+                            });
                             // Ajusta cores para impressão
                             document.querySelectorAll('[class*="text-emerald"]').forEach(el => {
                                 el.style.color = '#059669';
@@ -114,7 +141,8 @@ export default function PrintExportButtons({ title, period }: PrintExportButtons
         <div className="flex items-center gap-2">
             <button
                 onClick={handlePrint}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-muted hover:text-white hover:bg-white/10 border border-white/10 transition-all"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-muted hover:text-foreground border transition-all"
+                style={{ background: "var(--card-bg)", borderColor: "var(--card-border)" }}
                 title="Imprimir"
             >
                 <Printer size={18} />
@@ -122,7 +150,8 @@ export default function PrintExportButtons({ title, period }: PrintExportButtons
             </button>
             <button
                 onClick={handleExportPDF}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-muted hover:text-white hover:bg-white/10 border border-white/10 transition-all"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-muted hover:text-foreground border transition-all"
+                style={{ background: "var(--card-bg)", borderColor: "var(--card-border)" }}
                 title="Salvar PDF"
             >
                 <Download size={18} />

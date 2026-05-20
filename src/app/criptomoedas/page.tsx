@@ -7,6 +7,7 @@ import Sidebar from "@/components/Sidebar";
 import MonthYearPicker from "@/components/MonthYearPicker";
 import CryptoPortfolio from "@/components/CryptoPortfolio";
 import CryptoModal from "@/components/CryptoModal";
+import PrintExportButtons from "@/components/PrintExportButtons";
 import { Coins, LineChart, Wallet, Plus } from "lucide-react";
 
 function CriptoContent() {
@@ -86,10 +87,11 @@ function CriptoContent() {
                     </div>
 
                     <div className="flex items-center gap-3">
+                        <PrintExportButtons title="Criptomoedas" period={`${currentMonth}/${currentYear}`} />
                         {/* New Crypto Button */}
                         <button
                             onClick={() => setIsModalOpen(true)}
-                            className="flex items-center gap-2 px-5 py-3 text-foreground font-medium rounded-xl transition-all hover:shadow-lg"
+                            className="no-print flex items-center gap-2 px-5 py-3 text-foreground font-medium rounded-xl transition-all hover:shadow-lg"
                             style={{
                                 background: "linear-gradient(135deg, #FFD700 0%, #FFC700 100%)",
                                 boxShadow: "0 4px 15px rgba(255, 215, 0, 0.4)",

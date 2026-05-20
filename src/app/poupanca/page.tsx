@@ -5,6 +5,7 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import MonthYearPicker from "@/components/MonthYearPicker";
 import SavingsModal from "@/components/SavingsModal";
+import PrintExportButtons from "@/components/PrintExportButtons";
 import {
     Plus,
     Target,
@@ -93,17 +94,20 @@ function PoupancaContent() {
                                 Acompanhe suas economias e metas financeiras
                             </p>
                         </div>
-                        <button
-                            onClick={() => setIsModalOpen(true)}
-                            className="flex items-center gap-2 px-5 py-3 text-foreground font-medium rounded-xl transition-all hover:shadow-lg"
-                            style={{
-                                background: "linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)",
-                                boxShadow: "0 4px 15px rgba(245, 158, 11, 0.4)",
-                            }}
-                        >
-                            <Plus size={20} />
-                            Novo Depósito
-                        </button>
+                        <div className="flex items-center gap-3">
+                            <PrintExportButtons title="Poupança" period={`${currentMonth}/${currentYear}`} />
+                            <button
+                                onClick={() => setIsModalOpen(true)}
+                                className="no-print flex items-center gap-2 px-5 py-3 text-foreground font-medium rounded-xl transition-all hover:shadow-lg"
+                                style={{
+                                    background: "linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)",
+                                    boxShadow: "0 4px 15px rgba(245, 158, 11, 0.4)",
+                                }}
+                            >
+                                <Plus size={20} />
+                                Novo Depósito
+                            </button>
+                        </div>
                     </div>
 
                     <div className="mt-6 glass-card p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -299,6 +303,7 @@ function PoupancaContent() {
                             return (
                                 <div
                                     key={transacao.id}
+                                    data-print-row="true"
                                     className="flex items-center justify-between p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors group"
                                 >
                                     <div className="flex items-center gap-4">

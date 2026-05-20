@@ -5,7 +5,7 @@ import { startOfMonth, endOfMonth, format } from "date-fns";
 
 type Despesa = Database["public"]["Tables"]["despesas"]["Row"];
 
-export function useDespesas(month: number, year: number) {
+export function useDespesas(month: number, year: number, scope: "monthly" | "annual" = "monthly") {
     const [despesas, setDespesas] = useState<Despesa[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -23,8 +23,12 @@ export function useDespesas(month: number, year: number) {
                 return;
             }
 
-            const startDate = format(startOfMonth(new Date(year, month - 1)), 'yyyy-MM-dd');
-            const endDate = format(endOfMonth(new Date(year, month - 1)), 'yyyy-MM-dd');
+            const startDate = scope === "annual"
+                ? `${year}-01-01`
+                : format(startOfMonth(new Date(year, month - 1)), 'yyyy-MM-dd');
+            const endDate = scope === "annual"
+                ? `${year}-12-31`
+                : format(endOfMonth(new Date(year, month - 1)), 'yyyy-MM-dd');
 
             const { data, error } = await supabase
                 .from("despesas")
@@ -43,7 +47,7 @@ export function useDespesas(month: number, year: number) {
         } finally {
             setLoading(false);
         }
-    }, [month, year]);
+    }, [month, year, scope]);
 
     useEffect(() => {
         fetchDespesas();

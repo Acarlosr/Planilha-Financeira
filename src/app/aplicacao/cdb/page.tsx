@@ -6,6 +6,7 @@ import BotaoVoltar from "@/components/BotaoVoltar";
 import CardResumo from "@/components/CardResumo";
 import TabelaRendaFixa from "@/components/TabelaRendaFixa";
 import NovoTituloRFModal from "@/components/NovoTituloRFModal";
+import PrintExportButtons from "@/components/PrintExportButtons";
 import { Plus, Building2, TrendingUp, AlertTriangle } from "lucide-react";
 import { mockRendaFixaPrivada } from "@/data/aplicacoes-mock";
 
@@ -44,16 +45,19 @@ export default function RendaFixaPage() {
                             Renda Fixa privada com garantia do FGC
                         </p>
                     </div>
-                    <button
-                        onClick={() => setIsModalOpen(true)}
-                        className="flex items-center justify-center gap-2 px-5 py-3 text-white font-medium rounded-xl transition-all hover:shadow-[0_0_20px_rgba(245,158,11,0.5)] hover:scale-105"
-                        style={{
-                            background: "linear-gradient(135deg, #F59E0B 0%, #D97706 100%)",
-                        }}
-                    >
-                        <Plus size={20} />
-                        Novo Título
-                    </button>
+                    <div className="flex items-center gap-3">
+                        <PrintExportButtons title="CDB LCI LCA" period="Extrato de posições" />
+                        <button
+                            onClick={() => setIsModalOpen(true)}
+                            className="no-print flex items-center justify-center gap-2 px-5 py-3 text-white font-medium rounded-xl transition-all hover:shadow-[0_0_20px_rgba(245,158,11,0.5)] hover:scale-105"
+                            style={{
+                                background: "linear-gradient(135deg, #F59E0B 0%, #D97706 100%)",
+                            }}
+                        >
+                            <Plus size={20} />
+                            Novo Título
+                        </button>
+                    </div>
                 </header>
 
                 {/* Resumo */}

@@ -9,6 +9,7 @@ import TabelaDividendos from "@/components/TabelaDividendos";
 import ResumoDividendos from "@/components/ResumoDividendos";
 import NovaPosicaoModal from "@/components/NovaPosicaoModal";
 import RegistrarDividendoModal from "@/components/RegistrarDividendoModal";
+import PrintExportButtons from "@/components/PrintExportButtons";
 import { Plus, HandCoins, Briefcase, TrendingUp, Calendar as CalIcon } from "lucide-react";
 import { mockAcoes, mockDividendos } from "@/data/aplicacoes-mock";
 import { useMarketQuotes } from "@/hooks/useMarketQuotes";
@@ -68,6 +69,7 @@ export default function AcoesPage() {
                         </p>
                     </div>
                     <div className="flex gap-3">
+                        <PrintExportButtons title="Ações B3" period="Extrato de posições e proventos" />
                         <button
                             onClick={() => setDividendoModalOpen(true)}
                             className="flex items-center justify-center gap-2 px-4 py-3 text-foreground font-medium rounded-lg transition-all border"

@@ -59,7 +59,10 @@ export default function Sidebar() {
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-50" style={{ background: "var(--accent)" }}></span>
                     <span className="relative inline-flex rounded-full h-2 w-2" style={{ background: "var(--accent)" }}></span>
                 </span>
-                FinançasPro Beta - dados reais em evolução
+                <span className="rounded-full px-2 py-0.5 text-[11px] font-bold text-white" style={{ background: "var(--accent)" }}>
+                    FinançasPro Beta
+                </span>
+                <span>dados reais em evolução</span>
             </div>
 
             {/* Mobile Top Bar */}

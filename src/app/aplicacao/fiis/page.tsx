@@ -9,6 +9,7 @@ import TabelaDividendos from "@/components/TabelaDividendos";
 import ResumoDividendos from "@/components/ResumoDividendos";
 import NovaPosicaoFIIModal from "@/components/NovaPosicaoFIIModal";
 import RegistrarDividendoModal from "@/components/RegistrarDividendoModal";
+import PrintExportButtons from "@/components/PrintExportButtons";
 import { Plus, HandCoins, Building, TrendingUp, Percent } from "lucide-react";
 import { mockFIIs, mockDividendos } from "@/data/aplicacoes-mock";
 import { useMarketQuotes } from "@/hooks/useMarketQuotes";
@@ -70,6 +71,7 @@ export default function FIIsPage() {
                         </p>
                     </div>
                     <div className="flex gap-3">
+                        <PrintExportButtons title="Fundos Imobiliários" period="Extrato de posições e rendimentos" />
                         <button
                             onClick={() => setDividendoModalOpen(true)}
                             className="flex items-center justify-center gap-2 px-4 py-3 text-foreground font-medium rounded-lg transition-all border"

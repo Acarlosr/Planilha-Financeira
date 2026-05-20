@@ -6,6 +6,7 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import MonthYearPicker from "@/components/MonthYearPicker";
 import InvestmentModal from "@/components/InvestmentModal";
+import PrintExportButtons from "@/components/PrintExportButtons";
 import {
     Plus,
     TrendingUp,
@@ -83,17 +84,20 @@ function AplicacaoContent() {
                                 Acompanhe seus investimentos e rentabilidade
                             </p>
                         </div>
-                        <button
-                            onClick={() => setIsModalOpen(true)}
-                            className="flex items-center gap-2 px-5 py-3 text-foreground font-medium rounded-xl transition-all hover:shadow-lg"
-                            style={{
-                                background: "linear-gradient(135deg, #FFD700 0%, #FFC700 100%)",
-                                boxShadow: "0 4px 15px rgba(59, 130, 246, 0.4)",
-                            }}
-                        >
-                            <Plus size={20} />
-                            Novo Aporte
-                        </button>
+                        <div className="flex items-center gap-3">
+                            <PrintExportButtons title="Aplicações" period={`${currentMonth}/${currentYear}`} />
+                            <button
+                                onClick={() => setIsModalOpen(true)}
+                                className="no-print flex items-center gap-2 px-5 py-3 text-foreground font-medium rounded-xl transition-all hover:shadow-lg"
+                                style={{
+                                    background: "linear-gradient(135deg, #FFD700 0%, #FFC700 100%)",
+                                    boxShadow: "0 4px 15px rgba(59, 130, 246, 0.4)",
+                                }}
+                            >
+                                <Plus size={20} />
+                                Novo Aporte
+                            </button>
+                        </div>
                     </div>
 
                     <div className="mt-6 glass-card p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -256,6 +260,7 @@ function AplicacaoContent() {
                             return (
                                 <div
                                     key={transacao.id}
+                                    data-print-row="true"
                                     className="flex items-center justify-between p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
                                 >
                                     <div className="flex items-center gap-4">

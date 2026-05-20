@@ -51,8 +51,9 @@ function ReceitasContent() {
 
     const currentMonth = searchParams.get("month") ? parseInt(searchParams.get("month")!) : new Date().getMonth() + 1;
     const currentYear = searchParams.get("year") ? parseInt(searchParams.get("year")!) : new Date().getFullYear();
+    const statementScope = searchParams.get("scope") === "annual" ? "annual" : "monthly";
 
-    const mesAnoLabel = `${mesesNomes[currentMonth - 1]} ${currentYear}`;
+    const mesAnoLabel = statementScope === "annual" ? `Ano ${currentYear}` : `${mesesNomes[currentMonth - 1]} ${currentYear}`;
 
     const handleDateChange = (newDate: { month: number; year: number }) => {
         const params = new URLSearchParams(searchParams);
@@ -61,14 +62,23 @@ function ReceitasContent() {
         router.push(`${pathname}?${params.toString()}`);
     };
 
+    const handleScopeChange = (scope: "monthly" | "annual") => {
+        const params = new URLSearchParams(searchParams);
+        params.set("scope", scope);
+        router.push(`${pathname}?${params.toString()}`);
+    };
+
     const loadData = useCallback(async (userId: string) => {
         setIsLoadingData(true);
 
-        // Calcula range do mês: primeiro dia até primeiro dia do próximo mês
-        const startDate = `${currentYear}-${String(currentMonth).padStart(2, '0')}-01`;
+        const startDate = statementScope === "annual"
+            ? `${currentYear}-01-01`
+            : `${currentYear}-${String(currentMonth).padStart(2, '0')}-01`;
         const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
         const nextYear = currentMonth === 12 ? currentYear + 1 : currentYear;
-        const endDate = `${nextYear}-${String(nextMonth).padStart(2, '0')}-01`;
+        const endDate = statementScope === "annual"
+            ? `${currentYear + 1}-01-01`
+            : `${nextYear}-${String(nextMonth).padStart(2, '0')}-01`;
 
         const { data, error } = await supabase
             .from('receitas')
@@ -97,7 +107,7 @@ function ReceitasContent() {
 
         setIncomeData(mappedData);
         setIsLoadingData(false);
-    }, [currentMonth, currentYear]);
+    }, [currentMonth, currentYear, statementScope]);
 
     useEffect(() => {
         const init = async () => {
@@ -198,6 +208,24 @@ function ReceitasContent() {
                         </div>
                         <div className="flex items-center gap-2 sm:gap-3">
                             <PrintExportButtons title="Receitas" period={mesAnoLabel} />
+                            <div className="no-print flex rounded-lg border p-1" style={{ borderColor: "var(--card-border)", background: "var(--card-bg)" }}>
+                                <button
+                                    type="button"
+                                    onClick={() => handleScopeChange("monthly")}
+                                    className="rounded-md px-3 py-2 text-sm font-medium"
+                                    style={statementScope === "monthly" ? { background: "var(--accent)", color: "white" } : { color: "var(--text-secondary)" }}
+                                >
+                                    Mensal
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => handleScopeChange("annual")}
+                                    className="rounded-md px-3 py-2 text-sm font-medium"
+                                    style={statementScope === "annual" ? { background: "var(--accent)", color: "white" } : { color: "var(--text-secondary)" }}
+                                >
+                                    Anual
+                                </button>
+                            </div>
                             <button
                                 onClick={() => setIsModalOpen(true)}
                                 className="flex items-center gap-2 px-4 py-2.5 md:px-5 md:py-3 text-foreground font-medium rounded-xl transition-all hover:shadow-lg no-print text-sm md:text-base"
@@ -304,6 +332,7 @@ function ReceitasContent() {
                                     return (
                                         <div
                                             key={item.id}
+                                            data-print-row="true"
                                             className="flex items-center justify-between p-3 md:p-4 rounded-xl bg-white/5 hover:bg-white/10 active:bg-white/15 transition-colors group"
                                         >
                                             <div className="flex items-center gap-3 md:gap-4 min-w-0 flex-1">

@@ -6,6 +6,7 @@ import BotaoVoltar from "@/components/BotaoVoltar";
 import CardResumo from "@/components/CardResumo";
 import TabelaTesouros from "@/components/TabelaTesouros";
 import HistoricoAportes from "@/components/HistoricoAportes";
+import PrintExportButtons from "@/components/PrintExportButtons";
 import { Plus, Landmark, TrendingUp, CalendarDays } from "lucide-react";
 import { mockTesouroDireto } from "@/data/aplicacoes-mock";
 
@@ -40,15 +41,18 @@ export default function TesouroDiretoPage() {
                             Títulos públicos federais com garantia do Governo
                         </p>
                     </div>
-                    <button
-                        className="flex items-center justify-center gap-2 px-5 py-3 text-white font-medium rounded-xl transition-all hover:shadow-[0_0_20px_rgba(59,130,246,0.5)] hover:scale-105"
-                        style={{
-                            background: "linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)",
-                        }}
-                    >
-                        <Plus size={20} />
-                        Novo Título
-                    </button>
+                    <div className="flex items-center gap-3">
+                        <PrintExportButtons title="Tesouro Direto" period="Extrato de posições" />
+                        <button
+                            className="no-print flex items-center justify-center gap-2 px-5 py-3 text-white font-medium rounded-xl transition-all hover:shadow-[0_0_20px_rgba(59,130,246,0.5)] hover:scale-105"
+                            style={{
+                                background: "linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)",
+                            }}
+                        >
+                            <Plus size={20} />
+                            Novo Título
+                        </button>
+                    </div>
                 </header>
 
                 {/* Resumo */}
