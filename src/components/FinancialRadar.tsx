@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Activity, AlertTriangle, ArrowDownRight, ArrowUpRight, Bot, RefreshCw } from "lucide-react";
 
-type RadarCategory = "cambio" | "commodities" | "acoes" | "fiis";
+type RadarCategory = "cambio" | "commodities" | "acoes" | "fiis" | "cripto";
 type RadarTone = "positive" | "negative" | "neutral" | "warning";
 
 interface RadarInsight {
@@ -27,6 +27,7 @@ const categoryLabel: Record<RadarCategory, string> = {
     commodities: "Commodities",
     acoes: "Ações",
     fiis: "FIIs",
+    cripto: "Cripto",
 };
 
 const toneStyles: Record<RadarTone, { color: string; bg: string; icon: React.ReactNode }> = {
@@ -98,7 +99,7 @@ export default function FinancialRadar() {
                             </span>
                         </div>
                         <p className="mt-1 text-sm text-muted">
-                            Leituras automáticas de dólar, petróleo, ações e FIIs com dados de mercado.
+                            Leituras automáticas de dólar, petróleo, ações, FIIs e cripto com dados de mercado.
                         </p>
                     </div>
                 </div>
@@ -141,7 +142,7 @@ export default function FinancialRadar() {
 
                 {insights.length > 0 && (
                     <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
-                        {insights.slice(0, 8).map((insight) => {
+                        {insights.slice(0, 12).map((insight) => {
                             const tone = toneStyles[insight.tone];
                             return (
                                 <article

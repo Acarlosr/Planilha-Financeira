@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-type RadarCategory = "cambio" | "commodities" | "acoes" | "fiis";
+type RadarCategory = "cambio" | "commodities" | "acoes" | "fiis" | "cripto";
 type RadarTone = "positive" | "negative" | "neutral" | "warning";
 
 interface RadarAsset {
@@ -41,6 +41,11 @@ const assets: RadarAsset[] = [
     { label: "VISC11", symbol: "VISC11", yahooSymbol: "VISC11.SA", category: "fiis", currency: "BRL", sector: "Shopping" },
     { label: "RZAG11", symbol: "RZAG11", yahooSymbol: "RZAG11.SA", category: "fiis", currency: "BRL", sector: "Agro" },
     { label: "MXRF11", symbol: "MXRF11", yahooSymbol: "MXRF11.SA", category: "fiis", currency: "BRL", sector: "Papel" },
+    { label: "Bitcoin", symbol: "BTC", yahooSymbol: "BTC-USD", category: "cripto", currency: "USD" },
+    { label: "Ethereum", symbol: "ETH", yahooSymbol: "ETH-USD", category: "cripto", currency: "USD" },
+    { label: "Solana", symbol: "SOL", yahooSymbol: "SOL-USD", category: "cripto", currency: "USD" },
+    { label: "BNB", symbol: "BNB", yahooSymbol: "BNB-USD", category: "cripto", currency: "USD" },
+    { label: "Hyperliquid", symbol: "HYPE", yahooSymbol: "HYPE32196-USD", category: "cripto", currency: "USD" },
 ];
 
 const formatCurrency = (value: number | null, currency: "BRL" | "USD") => {
@@ -148,6 +153,18 @@ const buildInsight = (quote: RadarQuote): RadarInsight => {
         };
     }
 
+    if (quote.category === "cripto") {
+        return {
+            id: quote.symbol,
+            title: `${quote.label} (${quote.symbol})`,
+            summary: `${quote.symbol} ${movement}.`,
+            value: formatCurrency(quote.price, quote.currency),
+            detail: "Criptoativo de alta volatilidade. Use como leitura de mercado, não como recomendação.",
+            category: quote.category,
+            tone: getTone(quote.changePercent),
+        };
+    }
+
     return {
         id: quote.symbol,
         title: `${quote.symbol} - FII ${quote.sector}`,
@@ -164,7 +181,7 @@ export async function GET() {
     const insights = quotes
         .map(buildInsight)
         .sort((a, b) => {
-            const order: Record<RadarCategory, number> = { cambio: 0, commodities: 1, acoes: 2, fiis: 3 };
+            const order: Record<RadarCategory, number> = { cambio: 0, commodities: 1, acoes: 2, fiis: 3, cripto: 4 };
             return order[a.category] - order[b.category];
         });
 
