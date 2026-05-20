@@ -16,7 +16,10 @@ const normalizeSymbol = (symbol: string) => symbol.trim().toUpperCase().replace(
 
 const toYahooSymbol = (symbol: string) => {
     const normalized = normalizeSymbol(symbol);
-    return normalized.includes(".") ? normalized : `${normalized}.SA`;
+    if (normalized.includes("=") || normalized.includes("^") || normalized.includes(".")) {
+        return normalized;
+    }
+    return `${normalized}.SA`;
 };
 
 const fetchQuote = async (symbol: string): Promise<QuoteResponse> => {
@@ -39,7 +42,7 @@ const fetchQuote = async (symbol: string): Promise<QuoteResponse> => {
         }
 
         const price = Number(meta.regularMarketPrice ?? meta.previousClose ?? 0) || null;
-        const previousClose = Number(meta.previousClose ?? 0) || null;
+        const previousClose = Number(meta.previousClose ?? meta.chartPreviousClose ?? 0) || null;
         const change = price !== null && previousClose !== null ? price - previousClose : null;
         const changePercent = change !== null && previousClose ? (change / previousClose) * 100 : null;
         const marketTime = meta.regularMarketTime

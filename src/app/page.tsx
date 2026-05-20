@@ -6,6 +6,7 @@ import UserMenu from "@/components/UserMenu";
 import ThemeToggle from "@/components/ThemeToggle";
 import TrialBanner from "@/components/TrialBanner";
 import DataConnectionStatus from "@/components/DataConnectionStatus";
+import FinancialRadar from "@/components/FinancialRadar";
 import Link from "next/link";
 import { Bell, Search, Plus, TrendingDown, TrendingUp, WalletCards } from "lucide-react";
 
@@ -114,6 +115,8 @@ export default function Home() {
             <Plus size={18} className="transition group-hover:rotate-90" />
           </Link>
         </section>
+
+        <FinancialRadar />
 
         <DataConnectionStatus />
 
