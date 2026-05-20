@@ -11,20 +11,36 @@ import NovaPosicaoModal from "@/components/NovaPosicaoModal";
 import RegistrarDividendoModal from "@/components/RegistrarDividendoModal";
 import { Plus, HandCoins, Briefcase, TrendingUp, Calendar as CalIcon } from "lucide-react";
 import { mockAcoes, mockDividendos } from "@/data/aplicacoes-mock";
+import { useMarketQuotes } from "@/hooks/useMarketQuotes";
+import { Acao, Dividendo } from "@/types/aplicacoes";
+
+const currentMonthKey = new Date().toISOString().slice(0, 7);
+const currentMonthLabel = new Date().toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
 
 export default function AcoesPage() {
     const [acoes, setAcoes] = useState(mockAcoes);
     const [dividendos, setDividendos] = useState(mockDividendos.filter(d => ['dividendo', 'jcp'].includes(d.tipo)));
+    const { quotes, updatedAt, loading: quotesLoading, error: quotesError } = useMarketQuotes(acoes.map((acao) => acao.ticker));
 
     const [isPosicaoModalOpen, setPosicaoModalOpen] = useState(false);
     const [isDividendoModalOpen, setDividendoModalOpen] = useState(false);
 
+    const acoesComCotacao = acoes.map((acao) => {
+        const quote = quotes[acao.ticker];
+        if (!quote?.price) return acao;
+
+        return {
+            ...acao,
+            valorAtual: quote.price * acao.quantidade,
+        };
+    });
+
     // Totais
-    const patrimonioTotal = acoes.reduce((acc, acao) => acc + acao.valorAtual, 0);
-    const lucroAberto = acoes.reduce((acc, acao) => acc + (acao.valorAtual - (acao.quantidade * acao.precoMedio)), 0);
+    const patrimonioTotal = acoesComCotacao.reduce((acc, acao) => acc + acao.valorAtual, 0);
+    const lucroAberto = acoesComCotacao.reduce((acc, acao) => acc + (acao.valorAtual - (acao.quantidade * acao.precoMedio)), 0);
 
     const dividendosMes = dividendos
-        .filter(d => d.dataPagamento.startsWith('2026-01')) // mock: filtering by Jan 2026
+        .filter(d => d.dataPagamento.startsWith(currentMonthKey))
         .reduce((acc, d) => acc + d.valorTotal, 0);
 
     const dividendosAcumulados = dividendos.reduce((acc, d) => acc + d.valorTotal, 0);
@@ -54,17 +70,18 @@ export default function AcoesPage() {
                     <div className="flex gap-3">
                         <button
                             onClick={() => setDividendoModalOpen(true)}
-                            className="flex items-center justify-center gap-2 px-4 py-3 bg-white/5 text-foreground hover:bg-white/10 font-medium rounded-xl transition-all border border-white/10"
+                            className="flex items-center justify-center gap-2 px-4 py-3 text-foreground font-medium rounded-lg transition-all border"
+                            style={{
+                                background: "var(--card-bg)",
+                                borderColor: "var(--card-border)",
+                            }}
                         >
-                            <HandCoins size={18} className="text-amber-400" />
+                            <HandCoins size={18} style={{ color: "var(--accent)" }} />
                             Lançar Provento
                         </button>
                         <button
                             onClick={() => setPosicaoModalOpen(true)}
-                            className="flex items-center justify-center gap-2 px-5 py-3 text-white font-medium rounded-xl transition-all hover:shadow-[0_0_20px_rgba(16,185,129,0.5)] hover:scale-105"
-                            style={{
-                                background: "linear-gradient(135deg, #10B981 0%, #059669 100%)",
-                            }}
+                            className="btn-primary flex items-center justify-center gap-2 px-5 py-3 font-medium rounded-lg transition-all"
                         >
                             <Plus size={20} />
                             Nova Posição
@@ -78,7 +95,7 @@ export default function AcoesPage() {
                         titulo="Patrimônio em Ações"
                         valor={patrimonioTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                         icone={<Briefcase size={24} />}
-                        corGrafico="from-green-600 to-green-400"
+                        corGrafico="from-amber-500 to-orange-400"
                         subtexto={`<span class="${lucroAberto >= 0 ? 'text-emerald-400' : 'text-red-400'}">
               ${lucroAberto >= 0 ? '+' : ''}${lucroAberto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
             </span> de lucro aberto`}
@@ -93,8 +110,24 @@ export default function AcoesPage() {
                         titulo="Dividendos Acumulados"
                         valor={dividendosAcumulados.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                         icone={<TrendingUp size={24} />}
-                        corGrafico="from-blue-600 to-blue-400"
+                        corGrafico="from-indigo-700 to-blue-600"
                     />
+                </div>
+
+                <div className="glass-card mb-8 flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <p className="text-sm font-semibold text-foreground">Cotações da B3</p>
+                        <p className="text-sm text-muted">
+                            {quotesLoading
+                                ? "Atualizando valores de mercado..."
+                                : quotesError
+                                    ? "Usando os valores locais como fallback."
+                                    : "Valores atualizados a cada 60 segundos quando a fonte externa responde."}
+                        </p>
+                    </div>
+                    <div className="rounded-lg border px-3 py-2 text-sm font-medium" style={{ borderColor: "var(--card-border)", color: "var(--accent)" }}>
+                        {updatedAt ? new Date(updatedAt).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "Aguardando dados"}
+                    </div>
                 </div>
 
                 <div className="space-y-8">
@@ -104,7 +137,7 @@ export default function AcoesPage() {
                             Minhas Posições
                         </h2>
                         <div className="glass-card rounded-2xl p-1 overflow-hidden">
-                            <TabelaAcoes acoes={acoes} onDelete={handleDeleteAcao} />
+                            <TabelaAcoes acoes={acoesComCotacao} onDelete={handleDeleteAcao} />
                         </div>
                     </section>
 
@@ -115,9 +148,7 @@ export default function AcoesPage() {
                                 Proventos Recebidos
                             </h2>
                             <select className="px-3 py-1.5 bg-black/20 text-foreground border border-white/10 rounded-lg outline-none text-sm font-medium">
-                                <option value="2026-01">Janeiro/2026</option>
-                                <option value="2025-12">Dezembro/2025</option>
-                                <option value="2025-11">Novembro/2025</option>
+                                <option value={currentMonthKey}>{currentMonthLabel}</option>
                             </select>
                         </div>
 
@@ -129,7 +160,7 @@ export default function AcoesPage() {
                                 <ResumoDividendos
                                     totalMes={dividendosMes}
                                     totalAcumulado={dividendosAcumulados}
-                                    mesAberto="Janeiro/2026"
+                                    mesAberto={currentMonthLabel}
                                 />
                             </div>
                         </div>
@@ -140,12 +171,12 @@ export default function AcoesPage() {
             <NovaPosicaoModal
                 isOpen={isPosicaoModalOpen}
                 onClose={() => setPosicaoModalOpen(false)}
-                onSave={(acao) => console.log('Salvar ação', acao)}
+                onSave={(acao: Acao) => setAcoes((prev) => [acao, ...prev])}
             />
             <RegistrarDividendoModal
                 isOpen={isDividendoModalOpen}
                 onClose={() => setDividendoModalOpen(false)}
-                onSave={(div) => console.log('Salvar dividendo', div)}
+                onSave={(div: Dividendo) => setDividendos((prev) => [div, ...prev])}
             />
         </div>
     );

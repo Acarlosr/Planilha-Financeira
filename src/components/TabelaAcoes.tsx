@@ -13,7 +13,7 @@ export default function TabelaAcoes({ acoes, onDelete }: TabelaAcoesProps) {
         <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
                 <thead>
-                    <tr className="border-b border-white/10 text-muted text-sm">
+                    <tr className="border-b text-muted text-sm" style={{ borderColor: "var(--card-border)" }}>
                         <th className="pb-3 px-4 font-medium">Ticker</th>
                         <th className="pb-3 px-4 font-medium">Empresa</th>
                         <th className="pb-3 px-4 font-medium text-right">Qtd.</th>
@@ -31,9 +31,9 @@ export default function TabelaAcoes({ acoes, onDelete }: TabelaAcoesProps) {
                         const isPositivo = variacaoRS >= 0;
 
                         return (
-                            <tr key={acao.id} className="border-b border-white/5 hover:bg-white/5 transition-colors group">
+                            <tr key={acao.id} className="border-b transition-colors group hover:bg-black/5" style={{ borderColor: "var(--card-border)" }}>
                                 <td className="py-4 px-4 font-bold text-foreground">
-                                    <span className="px-2 py-1 bg-white/5 rounded mx-1 pb-1.5">{acao.ticker}</span>
+                                    <span className="px-2 py-1 rounded mx-1 pb-1.5" style={{ background: "color-mix(in srgb, var(--accent) 10%, transparent)" }}>{acao.ticker}</span>
                                 </td>
                                 <td className="py-4 px-4 text-foreground">{acao.empresa}</td>
                                 <td className="py-4 px-4 text-right text-muted">{acao.quantidade}</td>
@@ -44,7 +44,7 @@ export default function TabelaAcoes({ acoes, onDelete }: TabelaAcoesProps) {
                                     {acao.valorAtual.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                                 </td>
                                 <td className="py-4 px-4 text-right font-medium">
-                                    <div className={`flex flex-col ${isPositivo ? 'text-emerald-400' : 'text-red-400'}`}>
+                                    <div className={`flex flex-col ${isPositivo ? 'text-emerald-600' : 'text-red-500'}`}>
                                         <span>{isPositivo ? '+' : ''}{variacaoPerc.toFixed(2)}%</span>
                                     </div>
                                 </td>
@@ -56,10 +56,10 @@ export default function TabelaAcoes({ acoes, onDelete }: TabelaAcoesProps) {
                                                     onDelete(acao.id);
                                                 }
                                             }}
-                                            className="p-2 hover:bg-red-500/20 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                                            className="p-2 hover:bg-red-500/10 rounded-lg transition-all opacity-0 group-hover:opacity-100"
                                             title="Excluir"
                                         >
-                                            <Trash2 size={16} className="text-red-400" />
+                                            <Trash2 size={16} className="text-red-500" />
                                         </button>
                                     </td>
                                 )}

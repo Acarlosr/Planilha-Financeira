@@ -84,8 +84,8 @@ export default function CashFlowChart() {
                     >
                         <defs>
                             <linearGradient id="colorEntradas" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#54E0FF" stopOpacity={0.28} />
-                                <stop offset="95%" stopColor="#54E0FF" stopOpacity={0} />
+                                <stop offset="5%" stopColor="#22c55e" stopOpacity={0.22} />
+                                <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
                             </linearGradient>
                             <linearGradient id="colorSaidas" x1="0" y1="0" x2="0" y2="1">
                                 <stop offset="5%" stopColor="#d94d4d" stopOpacity={0.2} />
@@ -94,20 +94,20 @@ export default function CashFlowChart() {
                         </defs>
                         <CartesianGrid
                             strokeDasharray="3 3"
-                            stroke="rgba(255, 255, 255, 0.1)"
+                            stroke="color-mix(in srgb, var(--foreground) 10%, transparent)"
                             vertical={false}
                         />
                         <XAxis
                             dataKey="month"
                             axisLine={false}
                             tickLine={false}
-                            tick={{ fill: "#94a3b8", fontSize: 12 }}
+                            tick={{ fill: "var(--text-tertiary)", fontSize: 12 }}
                             dy={10}
                         />
                         <YAxis
                             axisLine={false}
                             tickLine={false}
-                            tick={{ fill: "#94a3b8", fontSize: 12 }}
+                            tick={{ fill: "var(--text-tertiary)", fontSize: 12 }}
                             tickFormatter={(value) => `${value / 1000}k`}
                             dx={-10}
                         />
@@ -115,7 +115,7 @@ export default function CashFlowChart() {
                         <Area
                             type="monotone"
                             dataKey="entradas"
-                            stroke="#54E0FF"
+                            stroke="#22c55e"
                             strokeWidth={3}
                             fillOpacity={1}
                             fill="url(#colorEntradas)"

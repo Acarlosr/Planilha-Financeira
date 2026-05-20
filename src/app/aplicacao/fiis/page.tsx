@@ -11,22 +11,38 @@ import NovaPosicaoFIIModal from "@/components/NovaPosicaoFIIModal";
 import RegistrarDividendoModal from "@/components/RegistrarDividendoModal";
 import { Plus, HandCoins, Building, TrendingUp, Percent } from "lucide-react";
 import { mockFIIs, mockDividendos } from "@/data/aplicacoes-mock";
+import { useMarketQuotes } from "@/hooks/useMarketQuotes";
+import { Dividendo, FII } from "@/types/aplicacoes";
+
+const currentMonthKey = new Date().toISOString().slice(0, 7);
+const currentMonthLabel = new Date().toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
 
 export default function FIIsPage() {
     const [fiis, setFiis] = useState(mockFIIs);
     const [dividendos, setDividendos] = useState(mockDividendos.filter(d => ['rendimento_fii', 'amortizacao'].includes(d.tipo)));
+    const { quotes, updatedAt, loading: quotesLoading, error: quotesError } = useMarketQuotes(fiis.map((fii) => fii.ticker));
 
     const [isPosicaoModalOpen, setPosicaoModalOpen] = useState(false);
     const [isDividendoModalOpen, setDividendoModalOpen] = useState(false);
 
+    const fiisComCotacao = fiis.map((fii) => {
+        const quote = quotes[fii.ticker];
+        if (!quote?.price) return fii;
+
+        return {
+            ...fii,
+            valorAtual: quote.price * fii.quantidade,
+        };
+    });
+
     // Totais
-    const patrimonioTotal = fiis.reduce((acc, fii) => acc + fii.valorAtual, 0);
-    const yieldMedio = fiis.length > 0
-        ? (fiis.reduce((acc, fii) => acc + fii.dyAnual, 0) / fiis.length).toFixed(2)
+    const patrimonioTotal = fiisComCotacao.reduce((acc, fii) => acc + fii.valorAtual, 0);
+    const yieldMedio = fiisComCotacao.length > 0
+        ? (fiisComCotacao.reduce((acc, fii) => acc + fii.dyAnual, 0) / fiisComCotacao.length).toFixed(2)
         : "0.00";
 
     const dividendosMes = dividendos
-        .filter(d => d.dataPagamento.startsWith('2026-01')) // mock
+        .filter(d => d.dataPagamento.startsWith(currentMonthKey))
         .reduce((acc, d) => acc + d.valorTotal, 0);
 
     const dividendosAcumulados = dividendos.reduce((acc, d) => acc + d.valorTotal, 0);
@@ -56,17 +72,18 @@ export default function FIIsPage() {
                     <div className="flex gap-3">
                         <button
                             onClick={() => setDividendoModalOpen(true)}
-                            className="flex items-center justify-center gap-2 px-4 py-3 bg-white/5 text-foreground hover:bg-white/10 font-medium rounded-xl transition-all border border-white/10"
+                            className="flex items-center justify-center gap-2 px-4 py-3 text-foreground font-medium rounded-lg transition-all border"
+                            style={{
+                                background: "var(--card-bg)",
+                                borderColor: "var(--card-border)",
+                            }}
                         >
-                            <HandCoins size={18} className="text-amber-400" />
+                            <HandCoins size={18} style={{ color: "var(--accent)" }} />
                             Lançar Rendimento
                         </button>
                         <button
                             onClick={() => setPosicaoModalOpen(true)}
-                            className="flex items-center justify-center gap-2 px-5 py-3 text-white font-medium rounded-xl transition-all hover:shadow-[0_0_20px_rgba(168,85,247,0.5)] hover:scale-105"
-                            style={{
-                                background: "linear-gradient(135deg, #A855F7 0%, #7E22CE 100%)",
-                            }}
+                            className="btn-primary flex items-center justify-center gap-2 px-5 py-3 font-medium rounded-lg transition-all"
                         >
                             <Plus size={20} />
                             Novo Fundo
@@ -81,7 +98,7 @@ export default function FIIsPage() {
                             titulo="Total Aplicado"
                             valor={patrimonioTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                             icone={<Building size={24} />}
-                            corGrafico="from-purple-600 to-purple-400"
+                            corGrafico="from-amber-500 to-orange-400"
                         />
                     </div>
                     <div className="xl:col-span-1">
@@ -105,8 +122,24 @@ export default function FIIsPage() {
                             titulo="Yield Médio (12m)"
                             valor={`${yieldMedio}%`}
                             icone={<Percent size={24} />}
-                            corGrafico="from-blue-600 to-blue-400"
+                            corGrafico="from-indigo-700 to-blue-600"
                         />
+                    </div>
+                </div>
+
+                <div className="glass-card mb-8 flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <p className="text-sm font-semibold text-foreground">Cotações dos FIIs</p>
+                        <p className="text-sm text-muted">
+                            {quotesLoading
+                                ? "Atualizando valores de mercado..."
+                                : quotesError
+                                    ? "Usando os valores locais como fallback."
+                                    : "Valores atualizados a cada 60 segundos quando a fonte externa responde."}
+                        </p>
+                    </div>
+                    <div className="rounded-lg border px-3 py-2 text-sm font-medium" style={{ borderColor: "var(--card-border)", color: "var(--accent)" }}>
+                        {updatedAt ? new Date(updatedAt).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "Aguardando dados"}
                     </div>
                 </div>
 
@@ -117,7 +150,7 @@ export default function FIIsPage() {
                             Meus Fundos
                         </h2>
                         <div className="glass-card rounded-2xl p-1 overflow-hidden">
-                            <TabelaFIIs fiis={fiis} onDelete={handleDeleteFII} />
+                            <TabelaFIIs fiis={fiisComCotacao} onDelete={handleDeleteFII} />
                         </div>
                     </section>
 
@@ -128,9 +161,7 @@ export default function FIIsPage() {
                                 Rendimentos Recebidos
                             </h2>
                             <select className="px-3 py-1.5 bg-black/20 text-foreground border border-white/10 rounded-lg outline-none text-sm font-medium">
-                                <option value="2026-01">Janeiro/2026</option>
-                                <option value="2025-12">Dezembro/2025</option>
-                                <option value="2025-11">Novembro/2025</option>
+                                <option value={currentMonthKey}>{currentMonthLabel}</option>
                             </select>
                         </div>
 
@@ -142,7 +173,7 @@ export default function FIIsPage() {
                                 <ResumoDividendos
                                     totalMes={dividendosMes}
                                     totalAcumulado={dividendosAcumulados}
-                                    mesAberto="Janeiro/2026"
+                                    mesAberto={currentMonthLabel}
                                 />
                             </div>
                         </div>
@@ -153,14 +184,14 @@ export default function FIIsPage() {
             <NovaPosicaoFIIModal
                 isOpen={isPosicaoModalOpen}
                 onClose={() => setPosicaoModalOpen(false)}
-                onSave={(fii) => console.log('Salvar FII', fii)}
+                onSave={(fii: FII) => setFiis((prev) => [fii, ...prev])}
             />
 
             {/* Reusing dividendos modal since they share structure */}
             <RegistrarDividendoModal
                 isOpen={isDividendoModalOpen}
                 onClose={() => setDividendoModalOpen(false)}
-                onSave={(div) => console.log('Salvar rendimento', div)}
+                onSave={(div: Dividendo) => setDividendos((prev) => [div, ...prev])}
             />
         </div>
     );

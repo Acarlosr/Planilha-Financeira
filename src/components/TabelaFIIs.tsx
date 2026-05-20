@@ -11,11 +11,11 @@ interface TabelaFIIsProps {
 export default function TabelaFIIs({ fiis, onDelete }: TabelaFIIsProps) {
     const getCorSector = (setor: string) => {
         switch (setor.toLowerCase()) {
-            case 'logística': return 'bg-blue-500/20 text-blue-400';
-            case 'papel': return 'bg-purple-500/20 text-purple-400';
-            case 'shoppings': return 'bg-pink-500/20 text-pink-400';
-            case 'lajes corporativas': return 'bg-cyan-500/20 text-cyan-400';
-            default: return 'bg-gray-500/20 text-gray-400';
+            case 'logística': return 'bg-blue-500/10 text-blue-700';
+            case 'papel': return 'bg-amber-500/15 text-amber-700';
+            case 'shoppings': return 'bg-rose-500/10 text-rose-700';
+            case 'lajes corporativas': return 'bg-cyan-500/10 text-cyan-700';
+            default: return 'bg-gray-500/10 text-gray-600';
         }
     };
 
@@ -23,7 +23,7 @@ export default function TabelaFIIs({ fiis, onDelete }: TabelaFIIsProps) {
         <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
                 <thead>
-                    <tr className="border-b border-white/10 text-muted text-sm">
+                    <tr className="border-b text-muted text-sm" style={{ borderColor: "var(--card-border)" }}>
                         <th className="pb-3 px-4 font-medium">Fundo</th>
                         <th className="pb-3 px-4 font-medium hidden md:table-cell">Setor</th>
                         <th className="pb-3 px-4 font-medium text-right">Qtd. Cotas</th>
@@ -35,10 +35,10 @@ export default function TabelaFIIs({ fiis, onDelete }: TabelaFIIsProps) {
                 </thead>
                 <tbody className="text-sm">
                     {fiis.map((fii) => (
-                        <tr key={fii.id} className="border-b border-white/5 hover:bg-white/5 transition-colors group">
+                        <tr key={fii.id} className="border-b transition-colors group hover:bg-black/5" style={{ borderColor: "var(--card-border)" }}>
                             <td className="py-4 px-4 font-bold text-foreground">
                                 <div className="flex flex-col">
-                                    <span className="px-2 py-1 bg-white/5 rounded w-fit pb-1.5">{fii.ticker}</span>
+                                    <span className="px-2 py-1 rounded w-fit pb-1.5" style={{ background: "color-mix(in srgb, var(--accent) 10%, transparent)" }}>{fii.ticker}</span>
                                     <span className="text-xs text-muted font-normal mt-1 hidden sm:block">{fii.nome}</span>
                                 </div>
                             </td>
@@ -55,7 +55,7 @@ export default function TabelaFIIs({ fiis, onDelete }: TabelaFIIsProps) {
                                 {fii.valorAtual.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                             </td>
                             <td className="py-4 px-4 text-right">
-                                <span className="font-bold text-emerald-400">
+                                <span className="font-bold text-emerald-600">
                                     {fii.dyAnual.toFixed(2)}%
                                 </span>
                             </td>
@@ -67,10 +67,10 @@ export default function TabelaFIIs({ fiis, onDelete }: TabelaFIIsProps) {
                                                 onDelete(fii.id);
                                             }
                                         }}
-                                        className="p-2 hover:bg-red-500/20 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                                            className="p-2 hover:bg-red-500/10 rounded-lg transition-all opacity-0 group-hover:opacity-100"
                                         title="Excluir"
                                     >
-                                        <Trash2 size={16} className="text-red-400" />
+                                            <Trash2 size={16} className="text-red-500" />
                                     </button>
                                 </td>
                             )}

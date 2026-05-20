@@ -5,8 +5,8 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 
 export const metadata: Metadata = {
-  title: "Dashboard Financeiro | Neon Green",
-  description: "Dashboard financeiro moderno para gerenciar suas finanças pessoais",
+  title: "FinançasPro | Dashboard financeiro",
+  description: "Dashboard financeiro para gerenciar suas finanças pessoais",
 };
 
 export default function RootLayout({

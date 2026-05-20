@@ -5,6 +5,7 @@ import TransactionsTable from "@/components/TransactionsTable";
 import UserMenu from "@/components/UserMenu";
 import ThemeToggle from "@/components/ThemeToggle";
 import TrialBanner from "@/components/TrialBanner";
+import DataConnectionStatus from "@/components/DataConnectionStatus";
 import Link from "next/link";
 import { Bell, Search, Plus, TrendingDown, TrendingUp, WalletCards } from "lucide-react";
 
@@ -114,6 +115,8 @@ export default function Home() {
           </Link>
         </section>
 
+        <DataConnectionStatus />
+
         {/* Summary Cards */}
         <section className="mb-8">
           <SummaryCards />
@@ -131,7 +134,7 @@ export default function Home() {
 
         {/* Footer */}
         <footer className="text-center py-6 text-muted text-sm">
-          © 2026 FinançasPro. Desenvolvido com ❤️ para suas finanças.
+          © 2026 FinançasPro. Desenvolvido para suas finanças.
         </footer>
       </main>
     </div>
