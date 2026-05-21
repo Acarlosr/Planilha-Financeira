@@ -250,6 +250,14 @@ body {
     page-break-before: always;
   }
 
+  [data-print-hide="true"] {
+    display: none !important;
+  }
+
+  [data-print-only="true"] {
+    display: block !important;
+  }
+
   th,
   td {
     padding: 5px 7px !important;

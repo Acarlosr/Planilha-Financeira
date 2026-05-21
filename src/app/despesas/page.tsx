@@ -243,7 +243,7 @@ function DespesasContent() {
                     </div>
 
                     {/* Total Summary */}
-                    <div className="mt-6 glass-card p-6">
+                    <div data-print-hide="true" className="mt-6 glass-card p-6">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-muted text-sm font-medium">Total de Despesas</p>
@@ -262,7 +262,7 @@ function DespesasContent() {
                 </header>
 
                 {/* Category Cards */}
-                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4 mb-8">
+                <div data-print-hide="true" className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4 mb-8">
                     {categoriasDespesa.map((cat) => {
                         const total = getTotalByCategory(cat.id);
                         const isActive = activeCategory === cat.id;
@@ -313,6 +313,49 @@ function DespesasContent() {
 
                 {/* Items List */}
                 <div className="glass-card p-6">
+                    <div data-print-only="true" className="hidden">
+                        <div className="mb-4">
+                            <h2 className="text-xl font-bold text-foreground">Histórico de Despesas</h2>
+                            <p className="text-sm text-muted">Período: {periodLabel}</p>
+                        </div>
+
+                        {filteredExpenses.length > 0 ? (
+                            <table className="w-full text-left">
+                                <thead>
+                                    <tr>
+                                        <th>Data</th>
+                                        <th>Descrição</th>
+                                        <th>Categoria</th>
+                                        <th style={{ textAlign: "right" }}>Valor</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredExpenses.map((item) => (
+                                        <tr key={`print-${item.id}`}>
+                                            <td>{item.date}</td>
+                                            <td>{item.description}</td>
+                                            <td>{getCategoryById(item.category)?.label ?? "Despesa"}</td>
+                                            <td style={{ textAlign: "right", color: "#dc2626", fontWeight: 700 }}>
+                                                - {item.value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colSpan={3} style={{ textAlign: "right", fontWeight: 700 }}>Total de despesas</td>
+                                        <td style={{ textAlign: "right", color: "#dc2626", fontWeight: 700 }}>
+                                            {totalDespesas.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        ) : (
+                            <p className="text-muted">Nenhuma despesa encontrada para este período.</p>
+                        )}
+                    </div>
+
+                    <div data-print-hide="true">
                     <div className="flex items-center justify-between mb-6">
                         <h2 className="text-xl font-bold text-foreground">
                             {activeCategory
@@ -422,6 +465,7 @@ function DespesasContent() {
                             <p className="text-muted">Nenhuma despesa nesta categoria</p>
                         </div>
                     )}
+                    </div>
                 </div>
             </main>
 

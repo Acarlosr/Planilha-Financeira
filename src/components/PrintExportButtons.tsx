@@ -71,6 +71,8 @@ export default function PrintExportButtons({ title, period }: PrintExportButtons
                             tr { page-break-inside: avoid; break-inside: avoid; }
                             th, td { padding: 7px 8px; text-align: left; border-bottom: 1px solid #e5e7eb; font-size: 10px; line-height: 1.25; }
                             th { background: #f9fafb; font-weight: 600; }
+                            [data-print-hide="true"] { display: none !important; }
+                            [data-print-only="true"] { display: block !important; }
                             [data-print-row="true"] { page-break-inside: avoid; break-inside: avoid; min-height: 16px; padding: 5px 8px !important; border-bottom: 1px solid #e5e7eb; }
                             .print-page-break { break-before: page; page-break-before: always; }
                             .glass-card, .soft-card { box-shadow: none !important; border: 1px solid #e5e7eb !important; background: white !important; }
@@ -100,6 +102,10 @@ export default function PrintExportButtons({ title, period }: PrintExportButtons
                         <script>
                             // Limpa elementos desnecessários
                             document.querySelectorAll('button, .no-print, nav, header').forEach(el => el.remove());
+                            document.querySelectorAll('[data-print-hide="true"]').forEach(el => el.remove());
+                            document.querySelectorAll('[data-print-only="true"]').forEach(el => {
+                                el.style.display = 'block';
+                            });
                             const rows = Array.from(document.querySelectorAll('tbody tr, [data-print-row="true"]'));
                             rows.forEach((row, index) => {
                                 if (index > 0 && index % 48 === 0) row.classList.add('print-page-break');

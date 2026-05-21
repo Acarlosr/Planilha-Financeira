@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, DollarSign, Calendar, Tag, AlignLeft } from "lucide-react";
+import { X, Calendar, Tag, AlignLeft } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import InstallmentsForm, { InstallmentsData } from "./InstallmentsForm";
 import { Database } from "@/types/database.types";
@@ -199,14 +199,14 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                         <div>
                             <label className="block text-sm font-medium text-muted mb-1">Valor</label>
                             <div className="relative">
-                                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-muted">R$</span>
                                 <input
                                     type="text"
                                     required
                                     value={amount}
                                     onChange={(e) => setAmount(e.target.value)}
                                     placeholder="0,00"
-                                    className="w-full pl-10 pr-4 py-2.5 rounded-xl text-white placeholder:text-muted outline-none transition-all border border-white/10 focus:border-red-500/50 font-medium"
+                                    className="w-full pl-11 pr-4 py-2.5 rounded-xl text-white placeholder:text-muted outline-none transition-all border border-white/10 focus:border-red-500/50 font-medium"
                                     style={{ background: "rgba(255, 255, 255, 0.05)" }}
                                 />
                             </div>
