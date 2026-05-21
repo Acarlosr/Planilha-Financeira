@@ -6,23 +6,26 @@ import BotaoVoltar from "@/components/BotaoVoltar";
 import CardResumo from "@/components/CardResumo";
 import TabelaTesouros from "@/components/TabelaTesouros";
 import HistoricoAportes from "@/components/HistoricoAportes";
+import NovoTituloModal from "@/components/NovoTituloModal";
 import PrintExportButtons from "@/components/PrintExportButtons";
 import { Plus, Landmark, TrendingUp, CalendarDays } from "lucide-react";
 import { mockTesouroDireto } from "@/data/aplicacoes-mock";
+import { TesouroDireto } from "@/types/aplicacoes";
 
 export default function TesouroDiretoPage() {
     const [titulos, setTitulos] = useState(mockTesouroDireto);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const handleDeleteTitulo = (id: string) => {
         setTitulos(prev => prev.filter(t => t.id !== id));
     };
 
-    // Mocks local history specifically for this view
-    const historico = [
-        { id: 1, data: '10/01/2026', descricao: 'Aporte Tesouro Selic 2029', valor: 500 },
-        { id: 2, data: '20/12/2025', descricao: 'Aporte Tesouro IPCA+ 2035', valor: 1500 },
-        { id: 3, data: '10/11/2025', descricao: 'Aporte Inicial Tesouro Prefixado', valor: 3000 }
-    ];
+    const historico = titulos.map((titulo, index) => ({
+        id: index + 1,
+        data: new Date(`${titulo.dataCompra}T00:00:00`).toLocaleDateString("pt-BR"),
+        descricao: `Aporte ${titulo.titulo}`,
+        valor: titulo.valorAplicado,
+    }));
 
     const totalAplicado = titulos.reduce((acc, t) => acc + t.valorAplicado, 0);
     const rendimentoTotal = titulos.reduce((acc, t) => acc + t.rendimentoAcumulado, 0);
@@ -44,6 +47,7 @@ export default function TesouroDiretoPage() {
                     <div className="flex items-center gap-3">
                         <PrintExportButtons title="Tesouro Direto" period="Extrato de posições" />
                         <button
+                            onClick={() => setIsModalOpen(true)}
                             className="no-print flex items-center justify-center gap-2 px-5 py-3 text-white font-medium rounded-xl transition-all hover:shadow-[0_0_20px_rgba(59,130,246,0.5)] hover:scale-105"
                             style={{
                                 background: "linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)",
@@ -71,10 +75,10 @@ export default function TesouroDiretoPage() {
                     />
                     <CardResumo
                         titulo="Rendimento no Mês"
-                        valor="+ R$ 45,20"
+                        valor="+ R$ 0,00"
                         icone={<CalendarDays size={24} />}
                         corGrafico="from-amber-500 to-amber-400"
-                        subtexto="<span class='text-emerald-400'>+1.2%</span> em Janeiro"
+                        subtexto="<span class='text-muted'>Sem rendimento lançado</span>"
                     />
                 </div>
 
@@ -100,6 +104,11 @@ export default function TesouroDiretoPage() {
                     </div>
                 </div>
             </main>
+            <NovoTituloModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSave={(titulo: TesouroDireto) => setTitulos((prev) => [titulo, ...prev])}
+            />
         </div>
     );
 }

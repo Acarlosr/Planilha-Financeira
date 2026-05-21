@@ -50,8 +50,18 @@ function AplicacaoContent() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [transacoesData, setTransacoesData] = useState(transacoes);
 
-    const totalInvestido = tiposInvestimento.reduce((sum, inv) => sum + inv.saldo, 0);
-    const rentabilidadeMedia = (tiposInvestimento.reduce((sum, inv) => sum + inv.rentabilidade, 0) / tiposInvestimento.length).toFixed(1);
+    const getSaldoPorInvestimento = (investmentId: string) => {
+        return transacoesData
+            .filter((t) => t.investimento === investmentId)
+            .reduce((sum, item) => sum + (item.tipo === "aporte" ? item.valor : -item.valor), 0);
+    };
+    const tiposComSaldo = tiposInvestimento.map((inv) => ({
+        ...inv,
+        saldo: getSaldoPorInvestimento(inv.id),
+    }));
+    const totalInvestido = tiposComSaldo.reduce((sum, inv) => sum + inv.saldo, 0);
+    const rentabilidadeMedia = "0.0";
+    const rendimentoSeteDias = 0;
 
     const getTransacoesFiltradas = () => {
         if (!activeFilter) return transacoesData;
@@ -154,7 +164,7 @@ function AplicacaoContent() {
                                 <p className="text-muted text-sm font-medium">Rendimento (7 dias)</p>
                             </div>
                             <h2 className="text-3xl font-bold text-[#FFD700]">
-                                + R$ 1.420,00
+                                + R$ {rendimentoSeteDias.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                             </h2>
                         </div>
                     </div>
@@ -162,7 +172,7 @@ function AplicacaoContent() {
 
                 {/* Investment Types */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                    {tiposInvestimento.map((inv) => {
+                    {tiposComSaldo.map((inv) => {
                         const isActive = activeFilter === inv.id;
                         return (
                             <Link href={`/aplicacao/${inv.id}`} key={inv.id}>
@@ -241,7 +251,7 @@ function AplicacaoContent() {
                     <div className="flex items-center justify-between mb-6">
                         <h2 className="text-xl font-bold text-foreground">
                             {activeFilter
-                                ? `Transações - ${tiposInvestimento.find((i) => i.id === activeFilter)?.nome}`
+                                ? `Transações - ${tiposComSaldo.find((i) => i.id === activeFilter)?.nome}`
                                 : "Todas as Transações"}
                         </h2>
                         {activeFilter && (

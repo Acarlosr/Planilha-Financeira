@@ -22,10 +22,9 @@ export default function RendaFixaPage() {
     const totalAplicado = titulos.reduce((acc, t) => acc + t.valorAplicado, 0);
     const rendimentoTotal = titulos.reduce((acc, t) => acc + t.rendimentoAcumulado, 0);
 
-    // Lógica mockada simples p/ vencimentos curtos
     const vencimentosProximos = titulos.filter(t => {
         const vencimentoRawDate = new Date(t.vencimento);
-        const currDate = new Date('2026-02-23'); // Mocking current date for demo stability
+        const currDate = new Date();
         const diffTime = vencimentoRawDate.getTime() - currDate.getTime();
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         return diffDays > 0 && diffDays <= 30;
@@ -99,7 +98,7 @@ export default function RendaFixaPage() {
             <NovoTituloRFModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                onSave={(titulo) => console.log('Salvar Título RF', titulo)}
+                onSave={(titulo) => setTitulos((prev) => [titulo, ...prev])}
             />
         </div>
     );

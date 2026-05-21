@@ -93,7 +93,7 @@ export default function SummaryCards() {
         {
             title: "Total Investido",
             value: totalInvestimentos.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
-            change: "+5,4%",
+            change: "0%",
             changeType: "investment",
             icon: <LineChart size={24} className="text-white" />,
             iconBg: "linear-gradient(135deg, #f59e0b 0%, #ffbf47 100%)",

@@ -20,6 +20,7 @@ export default function InvestmentModal({ isOpen, onClose, onSave }: InvestmentM
     const [value, setValue] = useState("");
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
     const [type, setType] = useState<"aporte" | "resgate">("aporte");
+    const [investmentType, setInvestmentType] = useState("tesouro");
     const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -33,7 +34,7 @@ export default function InvestmentModal({ isOpen, onClose, onSave }: InvestmentM
                 value: parseFloat(value.replace(',', '.')),
                 date: formattedDate,
                 type,
-                investmentType: "geral", // Fallback para compatibilidade //
+                investmentType,
             });
 
             // Reset form
@@ -41,6 +42,7 @@ export default function InvestmentModal({ isOpen, onClose, onSave }: InvestmentM
             setValue("");
             setDate(new Date().toISOString().split('T')[0]);
             setType("aporte");
+            setInvestmentType("tesouro");
             onClose();
         } catch (error) {
             console.error("Error saving investment:", error);
@@ -122,7 +124,23 @@ export default function InvestmentModal({ isOpen, onClose, onSave }: InvestmentM
                         </button>
                     </div>
 
-                    {/* Removed Investment Type Selector as specific routes handle specific assets now */}
+                    <div>
+                        <label className="block text-sm font-medium text-muted mb-2">
+                            Tipo de aplicação
+                        </label>
+                        <select
+                            required
+                            value={investmentType}
+                            onChange={(e) => setInvestmentType(e.target.value)}
+                            className="w-full px-4 py-3 rounded-xl text-white outline-none transition-all border border-white/10 focus:border-blue-500/50"
+                            style={{ background: "rgba(255, 255, 255, 0.05)" }}
+                        >
+                            <option value="tesouro" className="text-gray-900">Tesouro Direto</option>
+                            <option value="acoes" className="text-gray-900">Ações</option>
+                            <option value="fiis" className="text-gray-900">Fundos Imobiliários</option>
+                            <option value="cdb" className="text-gray-900">CDB/LCI/LCA</option>
+                        </select>
+                    </div>
 
                     {/* Description */}
                     <div>
