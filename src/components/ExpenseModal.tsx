@@ -226,9 +226,9 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-2 sm:items-center sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
             <div
-                className="relative w-full max-w-2xl rounded-2xl border border-white/10 p-6 animate-in zoom-in-95 duration-200 overflow-y-auto max-h-[90vh]"
+                className="relative my-auto w-full max-w-2xl rounded-xl border border-white/10 p-4 animate-in zoom-in-95 duration-200 sm:rounded-2xl sm:p-6"
                 style={{
                     background: "rgba(15, 23, 42, 0.95)",
                     backdropFilter: "blur(20px)",
@@ -243,9 +243,9 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
                     {/* Campos Básicos */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2">
                         <div className="col-span-1 md:col-span-2">
                             <label className="block text-sm font-medium text-muted mb-1">Descrição</label>
                             <div className="relative">
@@ -304,7 +304,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                                             key={cat.id}
                                             type="button"
                                             onClick={() => setCategoryId(cat.id)}
-                                            className="rounded-lg border px-3 py-2 text-left text-sm transition-all"
+                                            className="rounded-lg border px-2 py-2 text-center text-xs transition-all sm:px-3 sm:text-left sm:text-sm"
                                             style={{
                                                 background: selected
                                                     ? "color-mix(in srgb, var(--accent) 16%, transparent)"
@@ -335,7 +335,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                         />
                     </div>
 
-                    <div className="flex gap-3 pt-4">
+                    <div className="flex flex-col gap-3 pt-3 sm:flex-row sm:pt-4">
                         <button
                             type="button"
                             onClick={onClose}

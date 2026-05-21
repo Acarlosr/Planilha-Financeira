@@ -56,14 +56,14 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
     };
 
     return (
-        <div className="space-y-4 p-4 rounded-xl border border-white/10" style={{ background: "rgba(255, 255, 255, 0.03)" }}>
+        <div className="space-y-4 rounded-xl border border-white/10 p-3 sm:p-4" style={{ background: "rgba(255, 255, 255, 0.03)" }}>
             {/* Toggle Parcelado */}
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${data.parcelada ? 'bg-red-500/20 text-red-400' : 'bg-white/10 text-muted'}`}>
+                    <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${data.parcelada ? 'bg-red-500/20 text-red-400' : 'bg-white/10 text-muted'}`}>
                         <Divide size={18} />
                     </div>
-                    <div>
+                    <div className="min-w-0">
                         <p className="font-medium text-white">Repetir despesa?</p>
                         <p className="text-xs text-muted">Assinatura mensal ou compra parcelada no cartão</p>
                     </div>
@@ -87,12 +87,12 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
 
             {/* Campos de Parcelamento (Show/Hide) */}
             {data.parcelada && (
-                <div className="grid grid-cols-2 gap-4 pt-2 animate-in slide-in-from-top-2 duration-200">
-                    <div className="col-span-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <div className="grid grid-cols-1 gap-3 pt-2 animate-in slide-in-from-top-2 duration-200 sm:grid-cols-2 sm:gap-4">
+                    <div className="grid grid-cols-1 gap-2 sm:col-span-2 sm:grid-cols-2">
                         <button
                             type="button"
                             onClick={() => onChange({ ...data, tipoRepeticao: "recorrente" })}
-                            className="rounded-lg border px-3 py-2 text-left transition-all"
+                            className="rounded-lg border px-3 py-2 text-center transition-all sm:text-left"
                             style={{
                                 background: data.tipoRepeticao === "recorrente" ? "color-mix(in srgb, var(--accent) 13%, transparent)" : "rgba(255, 255, 255, 0.04)",
                                 borderColor: data.tipoRepeticao === "recorrente" ? "color-mix(in srgb, var(--secondary) 35%, transparent)" : "rgba(255, 255, 255, 0.1)",
@@ -104,7 +104,7 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
                         <button
                             type="button"
                             onClick={() => onChange({ ...data, tipoRepeticao: "parcelada" })}
-                            className="rounded-lg border px-3 py-2 text-left transition-all"
+                            className="rounded-lg border px-3 py-2 text-center transition-all sm:text-left"
                             style={{
                                 background: data.tipoRepeticao === "parcelada" ? "color-mix(in srgb, var(--accent) 13%, transparent)" : "rgba(255, 255, 255, 0.04)",
                                 borderColor: data.tipoRepeticao === "parcelada" ? "color-mix(in srgb, var(--secondary) 35%, transparent)" : "rgba(255, 255, 255, 0.1)",
@@ -116,15 +116,15 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
                     </div>
 
                     {isInstallmentPurchase && (
-                        <div className="col-span-2 space-y-2">
-                            <label className="block text-xs font-medium text-muted">
+                        <div className="space-y-2 sm:col-span-2">
+                            <label className="block text-center text-xs font-medium text-muted sm:text-left">
                                 O valor informado é:
                             </label>
                             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                                 <button
                                     type="button"
                                     onClick={() => onChange({ ...data, baseValorParcelado: "total" })}
-                                    className="rounded-lg border px-3 py-2 text-left transition-all"
+                                    className="rounded-lg border px-3 py-2 text-center transition-all sm:text-left"
                                     style={{
                                         background: data.baseValorParcelado === "total" ? "color-mix(in srgb, var(--accent) 13%, transparent)" : "rgba(255, 255, 255, 0.04)",
                                         borderColor: data.baseValorParcelado === "total" ? "color-mix(in srgb, var(--secondary) 35%, transparent)" : "rgba(255, 255, 255, 0.1)",
@@ -136,7 +136,7 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
                                 <button
                                     type="button"
                                     onClick={() => onChange({ ...data, baseValorParcelado: "parcela" })}
-                                    className="rounded-lg border px-3 py-2 text-left transition-all"
+                                    className="rounded-lg border px-3 py-2 text-center transition-all sm:text-left"
                                     style={{
                                         background: data.baseValorParcelado === "parcela" ? "color-mix(in srgb, var(--accent) 13%, transparent)" : "rgba(255, 255, 255, 0.04)",
                                         borderColor: data.baseValorParcelado === "parcela" ? "color-mix(in srgb, var(--secondary) 35%, transparent)" : "rgba(255, 255, 255, 0.1)",
@@ -184,14 +184,14 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
                     </div>
 
                     {/* Preview da projeção */}
-                    <div className="col-span-2 rounded-lg p-3 text-xs text-red-200 border border-red-500/20 bg-red-500/5">
-                        <p className="font-medium mb-1 text-red-400">Projeção:</p>
-                        <div className="flex justify-between opacity-80">
+                    <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-3 text-xs text-red-200 sm:col-span-2">
+                        <p className="mb-2 text-center font-medium text-red-400 sm:text-left">Projeção:</p>
+                        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 text-center opacity-80">
                             <span>{isInstallmentPurchase ? "1ª" : "1º"}: {data.dataPrimeiraParcela ? format(parseISO(data.dataPrimeiraParcela), 'dd/MM/yyyy') : '--'}</span>
                             <span>➜</span>
                             <span>{isInstallmentPurchase ? "Última" : "Último"}: {data.dataPrimeiraParcela ? format(addMonths(parseISO(data.dataPrimeiraParcela), data.numeroParcelas - 1), 'dd/MM/yyyy') : '--'}</span>
                         </div>
-                        <div className="mt-2 text-muted">
+                        <div className="mt-2 text-center text-muted sm:text-left">
                             {isInstallmentPurchase
                                 ? data.baseValorParcelado === "total"
                                     ? "O sistema vai dividir o valor informado pela quantidade de parcelas."
@@ -211,7 +211,7 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
                     <button
                         type="button"
                         onClick={() => onChange({ ...data, cartaoId: null, cartaoManual: false })}
-                        className="rounded-lg border px-3 py-2 text-left text-sm transition-all"
+                        className="rounded-lg border px-3 py-2 text-center text-sm transition-all sm:text-left"
                         style={{
                             background: noCardSelected ? "color-mix(in srgb, var(--accent) 13%, transparent)" : "rgba(255, 255, 255, 0.04)",
                             borderColor: noCardSelected ? "color-mix(in srgb, var(--secondary) 35%, transparent)" : "rgba(255, 255, 255, 0.1)",
@@ -223,7 +223,7 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
                     <button
                         type="button"
                         onClick={() => onChange({ ...data, cartaoId: null, cartaoManual: true })}
-                        className="rounded-lg border px-3 py-2 text-left text-sm transition-all"
+                        className="rounded-lg border px-3 py-2 text-center text-sm transition-all sm:text-left"
                         style={{
                             background: data.cartaoManual ? "color-mix(in srgb, var(--accent) 13%, transparent)" : "rgba(255, 255, 255, 0.04)",
                             borderColor: data.cartaoManual ? "color-mix(in srgb, var(--secondary) 35%, transparent)" : "rgba(255, 255, 255, 0.1)",
@@ -239,13 +239,13 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
                                 key={item.id}
                                 type="button"
                                 onClick={() => onChange({ ...data, cartaoId: item.id, cartaoManual: false })}
-                                className="rounded-lg border px-3 py-2 text-left text-sm transition-all"
+                                className="rounded-lg border px-3 py-2 text-center text-sm transition-all sm:text-left"
                                 style={{
                                     background: selected ? "color-mix(in srgb, var(--accent) 13%, transparent)" : "rgba(255, 255, 255, 0.04)",
                                     borderColor: selected ? "color-mix(in srgb, var(--secondary) 35%, transparent)" : "rgba(255, 255, 255, 0.1)",
                                 }}
                             >
-                                <span className="flex items-center gap-2">
+                                <span className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
                                     <span
                                         className="rounded px-2 py-1 text-[10px] font-bold text-white"
                                         style={{ background: flagStyle[item.bandeira] || flagStyle.Elo }}
@@ -254,7 +254,7 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
                                     </span>
                                     <span className="text-foreground">{item.nome}</span>
                                 </span>
-                                <span className="mt-1 block text-xs text-muted">
+                                <span className="mt-1 block text-center text-xs text-muted sm:text-left">
                                     {item.banco}{item.ultimos_digitos ? ` • final ${item.ultimos_digitos}` : ""}
                                 </span>
                             </button>
@@ -298,7 +298,7 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
                                 className="w-full rounded-lg border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-red-500/50"
                                 style={{ background: "rgba(255, 255, 255, 0.05)" }}
                             />
-                            <div className="mt-2 flex flex-wrap gap-2">
+                            <div className="mt-2 flex flex-wrap justify-center gap-2 sm:justify-start">
                                 {suggestedBanks.map((bank) => (
                                     <button
                                         key={bank}
