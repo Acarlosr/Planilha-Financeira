@@ -88,6 +88,7 @@ interface ExpenseItem {
     value: number;
     date: string;
     category: string;
+    cardLabel?: string | null;
 }
 
 function DespesasContent() {
@@ -190,6 +191,7 @@ function DespesasContent() {
             value: Number(expense.value),
             date: expense.date,
             category: expense.category,
+            cardLabel: expense.cartao_manual ?? null,
         }));
         setLocalExpenses(prev => [...formattedExpenses, ...prev]);
     };
@@ -326,6 +328,7 @@ function DespesasContent() {
                                         <th>Data</th>
                                         <th>Descrição</th>
                                         <th>Categoria</th>
+                                        <th>Cartão</th>
                                         <th style={{ textAlign: "right" }}>Valor</th>
                                     </tr>
                                 </thead>
@@ -335,6 +338,7 @@ function DespesasContent() {
                                             <td>{item.date}</td>
                                             <td>{item.description}</td>
                                             <td>{getCategoryById(item.category)?.label ?? "Despesa"}</td>
+                                            <td>{item.cardLabel ?? "-"}</td>
                                             <td style={{ textAlign: "right", color: "#dc2626", fontWeight: 700 }}>
                                                 - {item.value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
                                             </td>
@@ -343,7 +347,7 @@ function DespesasContent() {
                                 </tbody>
                                 <tfoot>
                                     <tr>
-                                        <td colSpan={3} style={{ textAlign: "right", fontWeight: 700 }}>Total de despesas</td>
+                                        <td colSpan={4} style={{ textAlign: "right", fontWeight: 700 }}>Total de despesas</td>
                                         <td style={{ textAlign: "right", color: "#dc2626", fontWeight: 700 }}>
                                             {totalDespesas.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
                                         </td>
@@ -425,6 +429,12 @@ function DespesasContent() {
                                                 <span className="text-xs text-muted">{item.date}</span>
                                                 <span className="text-xs text-muted">•</span>
                                                 <span className="text-xs text-muted">{cat?.label}</span>
+                                                {item.cardLabel && (
+                                                    <>
+                                                        <span className="text-xs text-muted">•</span>
+                                                        <span className="text-xs text-muted">Cartão: {item.cardLabel}</span>
+                                                    </>
+                                                )}
                                             </div>
                                         </div>
                                     </div>

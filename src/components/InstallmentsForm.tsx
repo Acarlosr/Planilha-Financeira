@@ -11,6 +11,7 @@ const flagLabel: Record<string, string> = {
     Mastercard: "MC",
     Amex: "AMEX",
     Elo: "ELO",
+    Outros: "OUTROS",
 };
 
 const flagStyle: Record<string, string> = {
@@ -18,13 +19,20 @@ const flagStyle: Record<string, string> = {
     Mastercard: "linear-gradient(135deg, #ef4444 0%, #f59e0b 100%)",
     Amex: "linear-gradient(135deg, #0098F0 0%, #54E0FF 100%)",
     Elo: "linear-gradient(135deg, #111827 0%, #64748b 100%)",
+    Outros: "linear-gradient(135deg, #374151 0%, #9ca3af 100%)",
 };
+
+const manualBrands = ["Mastercard", "Visa", "Amex", "Outros"];
+const suggestedBanks = ["Nubank", "C6", "Inter", "Bradesco", "Itaú", "Santander"];
 
 export interface InstallmentsData {
     parcelada: boolean;
     numeroParcelas: number;
     dataPrimeiraParcela: string; // YYYY-MM-DD
     cartaoId: string | null;
+    cartaoManual: boolean;
+    cartaoBandeira: string;
+    cartaoNome: string;
 }
 
 interface InstallmentsFormProps {
@@ -34,6 +42,8 @@ interface InstallmentsFormProps {
 }
 
 export default function InstallmentsForm({ data, onChange, cartoes }: InstallmentsFormProps) {
+    const noCardSelected = !data.cartaoId && !data.cartaoManual;
+
     const handleToggle = () => {
         onChange({
             ...data,
@@ -129,15 +139,27 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
                 <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                     <button
                         type="button"
-                        onClick={() => onChange({ ...data, cartaoId: null })}
+                        onClick={() => onChange({ ...data, cartaoId: null, cartaoManual: false })}
                         className="rounded-lg border px-3 py-2 text-left text-sm transition-all"
                         style={{
-                            background: !data.cartaoId ? "color-mix(in srgb, var(--accent) 13%, transparent)" : "rgba(255, 255, 255, 0.04)",
-                            borderColor: !data.cartaoId ? "color-mix(in srgb, var(--secondary) 35%, transparent)" : "rgba(255, 255, 255, 0.1)",
-                            color: !data.cartaoId ? "var(--foreground)" : "var(--text-secondary)",
+                            background: noCardSelected ? "color-mix(in srgb, var(--accent) 13%, transparent)" : "rgba(255, 255, 255, 0.04)",
+                            borderColor: noCardSelected ? "color-mix(in srgb, var(--secondary) 35%, transparent)" : "rgba(255, 255, 255, 0.1)",
+                            color: noCardSelected ? "var(--foreground)" : "var(--text-secondary)",
                         }}
                     >
                         Sem cartão
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => onChange({ ...data, cartaoId: null, cartaoManual: true })}
+                        className="rounded-lg border px-3 py-2 text-left text-sm transition-all"
+                        style={{
+                            background: data.cartaoManual ? "color-mix(in srgb, var(--accent) 13%, transparent)" : "rgba(255, 255, 255, 0.04)",
+                            borderColor: data.cartaoManual ? "color-mix(in srgb, var(--secondary) 35%, transparent)" : "rgba(255, 255, 255, 0.1)",
+                            color: data.cartaoManual ? "var(--foreground)" : "var(--text-secondary)",
+                        }}
+                    >
+                        Informar cartão
                     </button>
                     {cartoes.map((item) => {
                         const selected = data.cartaoId === item.id;
@@ -145,7 +167,7 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
                             <button
                                 key={item.id}
                                 type="button"
-                                onClick={() => onChange({ ...data, cartaoId: item.id })}
+                                onClick={() => onChange({ ...data, cartaoId: item.id, cartaoManual: false })}
                                 className="rounded-lg border px-3 py-2 text-left text-sm transition-all"
                                 style={{
                                     background: selected ? "color-mix(in srgb, var(--accent) 13%, transparent)" : "rgba(255, 255, 255, 0.04)",
@@ -168,9 +190,62 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
                         );
                     })}
                 </div>
-                {cartoes.length === 0 && (
+
+                {data.cartaoManual && (
+                    <div className="mt-3 space-y-3 rounded-lg border border-white/10 p-3" style={{ background: "rgba(255, 255, 255, 0.03)" }}>
+                        <div>
+                            <label className="mb-2 block text-xs font-medium text-muted">Bandeira do cartão</label>
+                            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                                {manualBrands.map((brand) => {
+                                    const selected = data.cartaoBandeira === brand;
+                                    return (
+                                        <button
+                                            key={brand}
+                                            type="button"
+                                            onClick={() => onChange({ ...data, cartaoBandeira: brand })}
+                                            className="rounded-lg border px-2 py-2 text-xs font-bold text-white transition-all"
+                                            style={{
+                                                background: flagStyle[brand],
+                                                borderColor: selected ? "var(--accent)" : "rgba(255, 255, 255, 0.12)",
+                                                boxShadow: selected ? "0 0 0 2px color-mix(in srgb, var(--accent) 35%, transparent)" : "none",
+                                            }}
+                                        >
+                                            {flagLabel[brand]}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="mb-1 block text-xs font-medium text-muted">Nome do cartão ou banco</label>
+                            <input
+                                type="text"
+                                value={data.cartaoNome}
+                                onChange={(e) => onChange({ ...data, cartaoNome: e.target.value })}
+                                placeholder="Ex: Nubank, C6, Inter, Itaú..."
+                                className="w-full rounded-lg border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-red-500/50"
+                                style={{ background: "rgba(255, 255, 255, 0.05)" }}
+                            />
+                            <div className="mt-2 flex flex-wrap gap-2">
+                                {suggestedBanks.map((bank) => (
+                                    <button
+                                        key={bank}
+                                        type="button"
+                                        onClick={() => onChange({ ...data, cartaoNome: bank })}
+                                        className="rounded-full border border-white/10 px-2.5 py-1 text-xs text-muted transition hover:text-white"
+                                    >
+                                        {bank}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {cartoes.length === 0 && !data.cartaoManual && (
                     <p className="mt-2 text-xs text-muted">
-                        Nenhum cartão cadastrado ainda. Você pode salvar a despesa sem cartão.
+                        Nenhum cartão cadastrado ainda. Você pode informar a bandeira e o banco nesta despesa.
                     </p>
                 )}
             </div>

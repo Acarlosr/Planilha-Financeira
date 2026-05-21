@@ -36,6 +36,9 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
         numeroParcelas: 2,
         dataPrimeiraParcela: new Date().toISOString().split('T')[0],
         cartaoId: null,
+        cartaoManual: false,
+        cartaoBandeira: "Mastercard",
+        cartaoNome: "",
     });
 
     // Resetar form ao abrir
@@ -50,6 +53,9 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                 numeroParcelas: 2,
                 dataPrimeiraParcela: new Date().toISOString().split('T')[0],
                 cartaoId: null,
+                cartaoManual: false,
+                cartaoBandeira: "Mastercard",
+                cartaoNome: "",
             });
         }
     }, [isOpen, categorias, initialCategoryId]);
@@ -72,6 +78,37 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
 
             const valorTotal = parseFloat(amount.replace(/\./g, '').replace(',', '.'));
             if (isNaN(valorTotal)) throw new Error("Valor inválido");
+
+            let cartaoId = installmentsData.cartaoId || null;
+            const cartaoManualNome = installmentsData.cartaoNome.trim();
+            const bandeiraCartao = (installmentsData.cartaoBandeira === "Outros"
+                ? "Elo"
+                : installmentsData.cartaoBandeira) as "Visa" | "Mastercard" | "Amex" | "Elo";
+
+            if (!onSaveLocal && installmentsData.cartaoManual && cartaoManualNome) {
+                const { data: cartaoCriado, error: cartaoError } = await supabase
+                    .from("cartoes")
+                    .insert({
+                        user_id: userId,
+                        nome: `${cartaoManualNome} ${installmentsData.cartaoBandeira}`,
+                        banco: cartaoManualNome,
+                        bandeira: bandeiraCartao,
+                        ultimos_digitos: "",
+                        cor: "gray",
+                        limite: 0,
+                        dia_fechamento: 1,
+                        dia_vencimento: 10,
+                    })
+                    .select("id")
+                    .single();
+
+                if (cartaoError) throw cartaoError;
+                cartaoId = cartaoCriado.id;
+            }
+
+            const cartaoManualResumo = installmentsData.cartaoManual && cartaoManualNome
+                ? `${cartaoManualNome} ${installmentsData.cartaoBandeira}`
+                : null;
 
             const novasDespesas = [];
 
@@ -103,7 +140,8 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                         date: format(dataParcela, 'dd/MM/yyyy'), // Formato frontend
                         category: categoryId, // Compatibilidade com frontend
                         categoria_id: categoryId,
-                        cartao_id: installmentsData.cartaoId || null,
+                        cartao_id: cartaoId,
+                        cartao_manual: cartaoManualResumo,
                         parcelada: true,
                         parcela_atual: i + 1,
                         parcela_total: installmentsData.numeroParcelas,
@@ -123,7 +161,8 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                     date: format(new Date(date), 'dd/MM/yyyy'),
                     category: categoryId,
                     categoria_id: categoryId,
-                    cartao_id: installmentsData.cartaoId || null,
+                    cartao_id: cartaoId,
+                    cartao_manual: cartaoManualResumo,
                     parcelada: false,
                 });
             }
