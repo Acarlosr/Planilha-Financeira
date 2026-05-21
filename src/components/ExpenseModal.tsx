@@ -44,6 +44,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
     const [installmentsData, setInstallmentsData] = useState<InstallmentsData>({
         parcelada: false,
         tipoRepeticao: "recorrente",
+        baseValorParcelado: "total",
         numeroParcelas: 2,
         dataPrimeiraParcela: new Date().toISOString().split('T')[0],
         cartaoId: null,
@@ -68,6 +69,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
             setInstallmentsData({
                 parcelada: false,
                 tipoRepeticao: "recorrente",
+                baseValorParcelado: "total",
                 numeroParcelas: 2,
                 dataPrimeiraParcela: initialDate,
                 cartaoId: null,
@@ -132,11 +134,14 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
 
             if (installmentsData.parcelada) {
                 const isInstallmentPurchase = installmentsData.tipoRepeticao === "parcelada";
+                const usesInstallmentValue = isInstallmentPurchase && installmentsData.baseValorParcelado === "parcela";
                 const valorParcela = isInstallmentPurchase
-                    ? parseFloat((valorTotal / installmentsData.numeroParcelas).toFixed(2))
+                    ? usesInstallmentValue
+                        ? valorTotal
+                        : parseFloat((valorTotal / installmentsData.numeroParcelas).toFixed(2))
                     : valorTotal;
                 const totalCalculado = valorParcela * installmentsData.numeroParcelas;
-                const diferenca = isInstallmentPurchase ? parseFloat((valorTotal - totalCalculado).toFixed(2)) : 0;
+                const diferenca = isInstallmentPurchase && !usesInstallmentValue ? parseFloat((valorTotal - totalCalculado).toFixed(2)) : 0;
                 const grupoId = uuidv4();
 
                 for (let i = 0; i < installmentsData.numeroParcelas; i++) {
@@ -162,6 +167,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                         cartao_id: cartaoId,
                         cartao_manual: cartaoManualResumo,
                         tipo_repeticao: installmentsData.tipoRepeticao,
+                        base_valor_parcelado: installmentsData.baseValorParcelado,
                         parcelada: true,
                         parcela_atual: i + 1,
                         parcela_total: installmentsData.numeroParcelas,

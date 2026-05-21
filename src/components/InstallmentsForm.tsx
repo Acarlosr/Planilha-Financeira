@@ -28,6 +28,7 @@ const suggestedBanks = ["Nubank", "C6", "Inter", "Bradesco", "Itaú", "Santander
 export interface InstallmentsData {
     parcelada: boolean;
     tipoRepeticao: "recorrente" | "parcelada";
+    baseValorParcelado: "total" | "parcela";
     numeroParcelas: number;
     dataPrimeiraParcela: string; // YYYY-MM-DD
     cartaoId: string | null;
@@ -110,9 +111,43 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
                             }}
                         >
                             <span className="block text-sm font-medium text-foreground">Compra parcelada</span>
-                            <span className="block text-xs text-muted">Divide o valor total pelas parcelas</span>
+                            <span className="block text-xs text-muted">Valor total ou valor de cada parcela</span>
                         </button>
                     </div>
+
+                    {isInstallmentPurchase && (
+                        <div className="col-span-2 space-y-2">
+                            <label className="block text-xs font-medium text-muted">
+                                O valor informado é:
+                            </label>
+                            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                                <button
+                                    type="button"
+                                    onClick={() => onChange({ ...data, baseValorParcelado: "total" })}
+                                    className="rounded-lg border px-3 py-2 text-left transition-all"
+                                    style={{
+                                        background: data.baseValorParcelado === "total" ? "color-mix(in srgb, var(--accent) 13%, transparent)" : "rgba(255, 255, 255, 0.04)",
+                                        borderColor: data.baseValorParcelado === "total" ? "color-mix(in srgb, var(--secondary) 35%, transparent)" : "rgba(255, 255, 255, 0.1)",
+                                    }}
+                                >
+                                    <span className="block text-sm font-medium text-foreground">Valor total da compra</span>
+                                    <span className="block text-xs text-muted">Ex: R$ 1.100,00 em 10x vira R$ 110,00/mês</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => onChange({ ...data, baseValorParcelado: "parcela" })}
+                                    className="rounded-lg border px-3 py-2 text-left transition-all"
+                                    style={{
+                                        background: data.baseValorParcelado === "parcela" ? "color-mix(in srgb, var(--accent) 13%, transparent)" : "rgba(255, 255, 255, 0.04)",
+                                        borderColor: data.baseValorParcelado === "parcela" ? "color-mix(in srgb, var(--secondary) 35%, transparent)" : "rgba(255, 255, 255, 0.1)",
+                                    }}
+                                >
+                                    <span className="block text-sm font-medium text-foreground">Valor de cada parcela</span>
+                                    <span className="block text-xs text-muted">Ex: R$ 110,00 em 10x lança R$ 110,00/mês</span>
+                                </button>
+                            </div>
+                        </div>
+                    )}
 
                     {/* Número de Meses */}
                     <div>
@@ -158,7 +193,9 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
                         </div>
                         <div className="mt-2 text-muted">
                             {isInstallmentPurchase
-                                ? "Ex: uma compra de R$ 1.100,00 em 10x vira 10 despesas de R$ 110,00."
+                                ? data.baseValorParcelado === "total"
+                                    ? "O sistema vai dividir o valor informado pela quantidade de parcelas."
+                                    : "O sistema vai repetir o valor informado em cada parcela."
                                 : "Ex: Netflix de R$ 20,99 por 8 meses vira R$ 20,99 em cada mês."}
                         </div>
                     </div>
