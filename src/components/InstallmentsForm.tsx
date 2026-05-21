@@ -27,6 +27,7 @@ const suggestedBanks = ["Nubank", "C6", "Inter", "Bradesco", "Itaú", "Santander
 
 export interface InstallmentsData {
     parcelada: boolean;
+    tipoRepeticao: "recorrente" | "parcelada";
     numeroParcelas: number;
     dataPrimeiraParcela: string; // YYYY-MM-DD
     cartaoId: string | null;
@@ -43,6 +44,7 @@ interface InstallmentsFormProps {
 
 export default function InstallmentsForm({ data, onChange, cartoes }: InstallmentsFormProps) {
     const noCardSelected = !data.cartaoId && !data.cartaoManual;
+    const isInstallmentPurchase = data.tipoRepeticao === "parcelada";
 
     const handleToggle = () => {
         onChange({
@@ -61,8 +63,8 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
                         <Divide size={18} />
                     </div>
                     <div>
-                        <p className="font-medium text-white">Cobrança mensal?</p>
-                        <p className="text-xs text-muted">Repetir o mesmo valor nos próximos meses</p>
+                        <p className="font-medium text-white">Repetir despesa?</p>
+                        <p className="text-xs text-muted">Assinatura mensal ou compra parcelada no cartão</p>
                     </div>
                 </div>
                 <button
@@ -85,10 +87,37 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
             {/* Campos de Parcelamento (Show/Hide) */}
             {data.parcelada && (
                 <div className="grid grid-cols-2 gap-4 pt-2 animate-in slide-in-from-top-2 duration-200">
+                    <div className="col-span-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                        <button
+                            type="button"
+                            onClick={() => onChange({ ...data, tipoRepeticao: "recorrente" })}
+                            className="rounded-lg border px-3 py-2 text-left transition-all"
+                            style={{
+                                background: data.tipoRepeticao === "recorrente" ? "color-mix(in srgb, var(--accent) 13%, transparent)" : "rgba(255, 255, 255, 0.04)",
+                                borderColor: data.tipoRepeticao === "recorrente" ? "color-mix(in srgb, var(--secondary) 35%, transparent)" : "rgba(255, 255, 255, 0.1)",
+                            }}
+                        >
+                            <span className="block text-sm font-medium text-foreground">Assinatura mensal</span>
+                            <span className="block text-xs text-muted">Repete o valor cheio todo mês</span>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => onChange({ ...data, tipoRepeticao: "parcelada" })}
+                            className="rounded-lg border px-3 py-2 text-left transition-all"
+                            style={{
+                                background: data.tipoRepeticao === "parcelada" ? "color-mix(in srgb, var(--accent) 13%, transparent)" : "rgba(255, 255, 255, 0.04)",
+                                borderColor: data.tipoRepeticao === "parcelada" ? "color-mix(in srgb, var(--secondary) 35%, transparent)" : "rgba(255, 255, 255, 0.1)",
+                            }}
+                        >
+                            <span className="block text-sm font-medium text-foreground">Compra parcelada</span>
+                            <span className="block text-xs text-muted">Divide o valor total pelas parcelas</span>
+                        </button>
+                    </div>
+
                     {/* Número de Meses */}
                     <div>
                         <label className="block text-xs font-medium text-muted mb-1">
-                            Qtd. meses
+                            {isInstallmentPurchase ? "Qtd. parcelas" : "Qtd. meses"}
                         </label>
                         <select
                             value={data.numeroParcelas}
@@ -107,7 +136,7 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
                     {/* Data 1º Débito */}
                     <div>
                         <label className="block text-xs font-medium text-muted mb-1">
-                            Data 1º débito
+                            {isInstallmentPurchase ? "Data 1ª parcela" : "Data 1º débito"}
                         </label>
                         <input
                             type="date"
@@ -123,9 +152,14 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
                     <div className="col-span-2 rounded-lg p-3 text-xs text-red-200 border border-red-500/20 bg-red-500/5">
                         <p className="font-medium mb-1 text-red-400">Projeção:</p>
                         <div className="flex justify-between opacity-80">
-                            <span>1º: {data.dataPrimeiraParcela ? format(parseISO(data.dataPrimeiraParcela), 'dd/MM/yyyy') : '--'}</span>
+                            <span>{isInstallmentPurchase ? "1ª" : "1º"}: {data.dataPrimeiraParcela ? format(parseISO(data.dataPrimeiraParcela), 'dd/MM/yyyy') : '--'}</span>
                             <span>➜</span>
-                            <span>Último: {data.dataPrimeiraParcela ? format(addMonths(parseISO(data.dataPrimeiraParcela), data.numeroParcelas - 1), 'dd/MM/yyyy') : '--'}</span>
+                            <span>{isInstallmentPurchase ? "Última" : "Último"}: {data.dataPrimeiraParcela ? format(addMonths(parseISO(data.dataPrimeiraParcela), data.numeroParcelas - 1), 'dd/MM/yyyy') : '--'}</span>
+                        </div>
+                        <div className="mt-2 text-muted">
+                            {isInstallmentPurchase
+                                ? "Ex: uma compra de R$ 1.100,00 em 10x vira 10 despesas de R$ 110,00."
+                                : "Ex: Netflix de R$ 20,99 por 8 meses vira R$ 20,99 em cada mês."}
                         </div>
                     </div>
                 </div>

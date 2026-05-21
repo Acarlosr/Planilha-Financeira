@@ -43,6 +43,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
     // Dados de parcelamento
     const [installmentsData, setInstallmentsData] = useState<InstallmentsData>({
         parcelada: false,
+        tipoRepeticao: "recorrente",
         numeroParcelas: 2,
         dataPrimeiraParcela: new Date().toISOString().split('T')[0],
         cartaoId: null,
@@ -66,6 +67,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
             setCategoryId(initialExpense?.category || initialCategoryId || (categorias.length > 0 ? categorias[0].id : ""));
             setInstallmentsData({
                 parcelada: false,
+                tipoRepeticao: "recorrente",
                 numeroParcelas: 2,
                 dataPrimeiraParcela: initialDate,
                 cartaoId: null,
@@ -129,25 +131,37 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
             const novasDespesas = [];
 
             if (installmentsData.parcelada) {
-                // Cobrança mensal recorrente: cada mês recebe o valor cheio informado.
+                const isInstallmentPurchase = installmentsData.tipoRepeticao === "parcelada";
+                const valorParcela = isInstallmentPurchase
+                    ? parseFloat((valorTotal / installmentsData.numeroParcelas).toFixed(2))
+                    : valorTotal;
+                const totalCalculado = valorParcela * installmentsData.numeroParcelas;
+                const diferenca = isInstallmentPurchase ? parseFloat((valorTotal - totalCalculado).toFixed(2)) : 0;
                 const grupoId = uuidv4();
 
                 for (let i = 0; i < installmentsData.numeroParcelas; i++) {
                     const dataParcela = addMonths(parseISO(installmentsData.dataPrimeiraParcela), i);
+                    const valorFinal = isInstallmentPurchase && i === installmentsData.numeroParcelas - 1
+                        ? parseFloat((valorParcela + diferenca).toFixed(2))
+                        : valorParcela;
+                    const descricaoFinal = isInstallmentPurchase
+                        ? `${description} (${i + 1}/${installmentsData.numeroParcelas})`
+                        : description;
 
                     novasDespesas.push({
                         id: Math.random(), // ID temporário para local
                         user_id: userId,
-                        descricao: description,
-                        description: description, // Compatibilidade com frontend
-                        valor: valorTotal,
-                        value: valorTotal, // Compatibilidade com frontend
+                        descricao: descricaoFinal,
+                        description: descricaoFinal, // Compatibilidade com frontend
+                        valor: valorFinal,
+                        value: valorFinal, // Compatibilidade com frontend
                         data: format(dataParcela, 'yyyy-MM-dd'), // Formato banco import
                         date: format(dataParcela, 'dd/MM/yyyy'), // Formato frontend
                         category: categoryId, // Compatibilidade com frontend
                         categoria_id: categoryId,
                         cartao_id: cartaoId,
                         cartao_manual: cartaoManualResumo,
+                        tipo_repeticao: installmentsData.tipoRepeticao,
                         parcelada: true,
                         parcela_atual: i + 1,
                         parcela_total: installmentsData.numeroParcelas,
@@ -169,6 +183,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                     categoria_id: categoryId,
                     cartao_id: cartaoId,
                     cartao_manual: cartaoManualResumo,
+                    tipo_repeticao: "unica",
                     parcelada: false,
                 });
             }

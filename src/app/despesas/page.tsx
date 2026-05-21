@@ -90,6 +90,7 @@ interface ExpenseItem {
     isoDate: string;
     category: string;
     cardLabel?: string | null;
+    repeatType?: "unica" | "recorrente" | "parcelada";
 }
 
 const LOCAL_EXPENSES_STORAGE_KEY = "financaspro-local-expenses";
@@ -105,16 +106,18 @@ const displayDateToIso = (date: string) => {
 const normalizeLocalExpenses = (rawExpenses: Partial<ExpenseItem>[]) => {
     const expenses = rawExpenses.map((expense) => ({
         id: expense.id ?? `local-${Date.now()}-${Math.random()}`,
-        description: stripRecurrenceSuffix(expense.description ?? "Despesa"),
+        description: expense.repeatType ? (expense.description ?? "Despesa") : stripRecurrenceSuffix(expense.description ?? "Despesa"),
         value: Number(expense.value ?? 0),
         date: expense.date ?? "01/01/2026",
         isoDate: expense.isoDate ?? displayDateToIso(expense.date ?? ""),
         category: expense.category ?? "",
         cardLabel: expense.cardLabel ?? null,
+        repeatType: expense.repeatType ?? "unica",
     }));
 
     const groupedTotals = new Map<string, { sum: number; count: number; expected: number }>();
     rawExpenses.forEach((expense) => {
+        if (expense.repeatType) return;
         const match = expense.description?.match(/\((\d+)\/(\d+)\)$/);
         if (!match) return;
         const key = `${stripRecurrenceSuffix(expense.description ?? "")}|${expense.category}|${expense.cardLabel ?? ""}|${match[2]}`;
@@ -126,6 +129,7 @@ const normalizeLocalExpenses = (rawExpenses: Partial<ExpenseItem>[]) => {
 
     return expenses.map((expense, index) => {
         const original = rawExpenses[index];
+        if (original.repeatType) return expense;
         const match = original.description?.match(/\((\d+)\/(\d+)\)$/);
         if (!match) return expense;
         const key = `${stripRecurrenceSuffix(original.description ?? "")}|${original.category}|${original.cardLabel ?? ""}|${match[2]}`;
@@ -274,6 +278,7 @@ function DespesasContent() {
             isoDate: expense.data,
             category: expense.category,
             cardLabel: expense.cartao_manual ?? null,
+            repeatType: expense.tipo_repeticao ?? "unica",
         }));
         setLocalExpenses(prev => {
             const currentExpenses = editingExpense ? prev.filter(item => item.id !== editingExpense.id) : prev;
@@ -519,6 +524,18 @@ function DespesasContent() {
                                                     <>
                                                         <span className="text-xs text-muted">•</span>
                                                         <span className="text-xs text-muted">Cartão: {item.cardLabel}</span>
+                                                    </>
+                                                )}
+                                                {item.repeatType === "parcelada" && (
+                                                    <>
+                                                        <span className="text-xs text-muted">•</span>
+                                                        <span className="text-xs text-muted">Parcela</span>
+                                                    </>
+                                                )}
+                                                {item.repeatType === "recorrente" && (
+                                                    <>
+                                                        <span className="text-xs text-muted">•</span>
+                                                        <span className="text-xs text-muted">Assinatura</span>
                                                     </>
                                                 )}
                                             </div>
