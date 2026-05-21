@@ -1,6 +1,6 @@
 "use client";
 
-import { format, addMonths } from "date-fns";
+import { format, addMonths, parseISO } from "date-fns";
 import { Divide } from "lucide-react";
 import { Database } from "@/types/database.types";
 
@@ -61,8 +61,8 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
                         <Divide size={18} />
                     </div>
                     <div>
-                        <p className="font-medium text-white">Compra Parcelada?</p>
-                        <p className="text-xs text-muted">Repetir despesa nos próximos meses</p>
+                        <p className="font-medium text-white">Cobrança mensal?</p>
+                        <p className="text-xs text-muted">Repetir o mesmo valor nos próximos meses</p>
                     </div>
                 </div>
                 <button
@@ -85,10 +85,10 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
             {/* Campos de Parcelamento (Show/Hide) */}
             {data.parcelada && (
                 <div className="grid grid-cols-2 gap-4 pt-2 animate-in slide-in-from-top-2 duration-200">
-                    {/* Número de Parcelas */}
+                    {/* Número de Meses */}
                     <div>
                         <label className="block text-xs font-medium text-muted mb-1">
-                            Qtd. Parcelas
+                            Qtd. meses
                         </label>
                         <select
                             value={data.numeroParcelas}
@@ -104,10 +104,10 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
                         </select>
                     </div>
 
-                    {/* Data 1ª Parcela */}
+                    {/* Data 1º Débito */}
                     <div>
                         <label className="block text-xs font-medium text-muted mb-1">
-                            Data 1ª Parcela
+                            Data 1º débito
                         </label>
                         <input
                             type="date"
@@ -123,9 +123,9 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
                     <div className="col-span-2 rounded-lg p-3 text-xs text-red-200 border border-red-500/20 bg-red-500/5">
                         <p className="font-medium mb-1 text-red-400">Projeção:</p>
                         <div className="flex justify-between opacity-80">
-                            <span>1ª: {data.dataPrimeiraParcela ? format(new Date(data.dataPrimeiraParcela), 'dd/MM/yyyy') : '--'}</span>
+                            <span>1º: {data.dataPrimeiraParcela ? format(parseISO(data.dataPrimeiraParcela), 'dd/MM/yyyy') : '--'}</span>
                             <span>➜</span>
-                            <span>Última: {data.dataPrimeiraParcela ? format(addMonths(new Date(data.dataPrimeiraParcela), data.numeroParcelas - 1), 'dd/MM/yyyy') : '--'}</span>
+                            <span>Último: {data.dataPrimeiraParcela ? format(addMonths(parseISO(data.dataPrimeiraParcela), data.numeroParcelas - 1), 'dd/MM/yyyy') : '--'}</span>
                         </div>
                     </div>
                 </div>

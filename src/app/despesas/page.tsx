@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import MonthYearPicker from "@/components/MonthYearPicker";
@@ -87,9 +87,62 @@ interface ExpenseItem {
     description: string;
     value: number;
     date: string;
+    isoDate: string;
     category: string;
     cardLabel?: string | null;
 }
+
+const LOCAL_EXPENSES_STORAGE_KEY = "financaspro-local-expenses";
+
+const stripRecurrenceSuffix = (description: string) => description.replace(/\s\(\d+\/\d+\)$/, "");
+
+const displayDateToIso = (date: string) => {
+    if (/^\d{4}-\d{2}-\d{2}$/.test(date)) return date;
+    const [day, month, year] = date.split("/");
+    return year && month && day ? `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}` : new Date().toISOString().split("T")[0];
+};
+
+const normalizeLocalExpenses = (rawExpenses: Partial<ExpenseItem>[]) => {
+    const expenses = rawExpenses.map((expense) => ({
+        id: expense.id ?? `local-${Date.now()}-${Math.random()}`,
+        description: stripRecurrenceSuffix(expense.description ?? "Despesa"),
+        value: Number(expense.value ?? 0),
+        date: expense.date ?? "01/01/2026",
+        isoDate: expense.isoDate ?? displayDateToIso(expense.date ?? ""),
+        category: expense.category ?? "",
+        cardLabel: expense.cardLabel ?? null,
+    }));
+
+    const groupedTotals = new Map<string, { sum: number; count: number; expected: number }>();
+    rawExpenses.forEach((expense) => {
+        const match = expense.description?.match(/\((\d+)\/(\d+)\)$/);
+        if (!match) return;
+        const key = `${stripRecurrenceSuffix(expense.description ?? "")}|${expense.category}|${expense.cardLabel ?? ""}|${match[2]}`;
+        const current = groupedTotals.get(key) ?? { sum: 0, count: 0, expected: Number(match[2]) };
+        current.sum += Number(expense.value ?? 0);
+        current.count += 1;
+        groupedTotals.set(key, current);
+    });
+
+    return expenses.map((expense, index) => {
+        const original = rawExpenses[index];
+        const match = original.description?.match(/\((\d+)\/(\d+)\)$/);
+        if (!match) return expense;
+        const key = `${stripRecurrenceSuffix(original.description ?? "")}|${original.category}|${original.cardLabel ?? ""}|${match[2]}`;
+        const grouped = groupedTotals.get(key);
+        if (!grouped || grouped.count !== grouped.expected) return expense;
+        return {
+            ...expense,
+            value: Number(grouped.sum.toFixed(2)),
+        };
+    });
+};
+
+const isExpenseInPeriod = (expense: ExpenseItem, month: number, year: number, scope: "monthly" | "annual") => {
+    const [expenseYear, expenseMonth] = expense.isoDate.split("-").map(Number);
+    if (scope === "annual") return expenseYear === year;
+    return expenseYear === year && expenseMonth === month;
+};
 
 function DespesasContent() {
     const router = useRouter();
@@ -104,12 +157,26 @@ function DespesasContent() {
 
     const [activeCategory, setActiveCategory] = useState<string | null>(null);
     const [selectedCategoryForModal, setSelectedCategoryForModal] = useState<string | null>(null);
-    const [localExpenses, setLocalExpenses] = useState<ExpenseItem[]>([]);
+    const [localExpenses, setLocalExpenses] = useState<ExpenseItem[]>(() => {
+        if (typeof window === "undefined") return [];
+        try {
+            const stored = window.localStorage.getItem(LOCAL_EXPENSES_STORAGE_KEY);
+            return stored ? normalizeLocalExpenses(JSON.parse(stored)) : [];
+        } catch {
+            return [];
+        }
+    });
+    const [editingExpense, setEditingExpense] = useState<ExpenseItem | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { despesas, loading: loadingDespesas, error, refetch } = useDespesas(currentMonth, currentYear, statementScope);
     const { cartoes } = useCartoes();
     const { categorias, loading: loadingCategorias } = useCategorias();
     const databaseUnavailable = Boolean(error?.includes("Could not find the table") || error?.includes("schema cache"));
+
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        window.localStorage.setItem(LOCAL_EXPENSES_STORAGE_KEY, JSON.stringify(localExpenses));
+    }, [localExpenses]);
 
     const handleDateChange = (newDate: { month: number; year: number }) => {
         const params = new URLSearchParams(searchParams);
@@ -145,10 +212,12 @@ function DespesasContent() {
             description: item.descricao,
             value: Number(item.valor),
             date: `${day}/${month}/${year}`,
+            isoDate: item.data,
             category: item.categoria_id,
         };
     });
-    const filteredExpenses = databaseUnavailable ? localExpenses : databaseExpenses;
+    const localExpensesForPeriod = localExpenses.filter((item) => isExpenseInPeriod(item, currentMonth, currentYear, statementScope));
+    const filteredExpenses = databaseUnavailable ? localExpensesForPeriod : databaseExpenses;
 
     const getItemsByCategory = (categoryId: string) => {
         return filteredExpenses.filter((item) => item.category === categoryId);
@@ -180,8 +249,20 @@ function DespesasContent() {
     const loading = !databaseUnavailable && (loadingDespesas || loadingCategorias);
 
     const openExpenseModal = (categoryId?: string) => {
+        setEditingExpense(null);
         setSelectedCategoryForModal(categoryId ?? activeCategory);
         setIsModalOpen(true);
+    };
+
+    const openEditExpense = (expense: ExpenseItem) => {
+        setEditingExpense(expense);
+        setSelectedCategoryForModal(expense.category);
+        setIsModalOpen(true);
+    };
+
+    const closeExpenseModal = () => {
+        setIsModalOpen(false);
+        setEditingExpense(null);
     };
 
     const handleSaveLocalExpenses = (newExpenses: any[]) => {
@@ -190,10 +271,15 @@ function DespesasContent() {
             description: expense.description,
             value: Number(expense.value),
             date: expense.date,
+            isoDate: expense.data,
             category: expense.category,
             cardLabel: expense.cartao_manual ?? null,
         }));
-        setLocalExpenses(prev => [...formattedExpenses, ...prev]);
+        setLocalExpenses(prev => {
+            const currentExpenses = editingExpense ? prev.filter(item => item.id !== editingExpense.id) : prev;
+            return [...formattedExpenses, ...currentExpenses];
+        });
+        setEditingExpense(null);
     };
 
     return (
@@ -443,7 +529,17 @@ function DespesasContent() {
                                             - R$ {item.value.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                                         </span>
                                         <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <button className="p-2 hover:bg-white/10 rounded-lg transition-colors">
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    if (databaseUnavailable || item.id.startsWith("local-")) {
+                                                        openEditExpense(item);
+                                                        return;
+                                                    }
+                                                    alert("Edição direta das despesas salvas no banco será habilitada na próxima etapa.");
+                                                }}
+                                                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                                            >
                                                 <Edit size={16} className="text-muted" />
                                             </button>
                                             <button
@@ -481,12 +577,13 @@ function DespesasContent() {
 
             <ExpenseModal
                 isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
+                onClose={closeExpenseModal}
                 onSave={refetch}
                 onSaveLocal={databaseUnavailable ? handleSaveLocalExpenses : undefined}
                 cartoes={cartoes}
                 categorias={categorySource as any}
                 initialCategoryId={selectedCategoryForModal}
+                initialExpense={editingExpense}
             />
         </div>
     );

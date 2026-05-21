@@ -5,7 +5,7 @@ import { X, Calendar, Tag, AlignLeft } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import InstallmentsForm, { InstallmentsData } from "./InstallmentsForm";
 import { Database } from "@/types/database.types";
-import { addMonths, format } from "date-fns";
+import { addMonths, format, parseISO } from "date-fns";
 import { v4 as uuidv4 } from 'uuid';
 
 type Cartao = Database["public"]["Tables"]["cartoes"]["Row"];
@@ -19,10 +19,20 @@ interface ExpenseModalProps {
     categorias: Categoria[];
     onSaveLocal?: (expenses: any[]) => void;
     initialCategoryId?: string | null;
+    initialExpense?: {
+        id: string;
+        description: string;
+        value: number;
+        date: string;
+        isoDate?: string;
+        category: string;
+        cardLabel?: string | null;
+    } | null;
 }
 
-export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categorias, onSaveLocal, initialCategoryId }: ExpenseModalProps) {
+export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categorias, onSaveLocal, initialCategoryId, initialExpense }: ExpenseModalProps) {
     const [loading, setLoading] = useState(false);
+    const isEditing = Boolean(initialExpense);
 
     // Dados básicos
     const [description, setDescription] = useState("");
@@ -44,21 +54,27 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
     // Resetar form ao abrir
     useEffect(() => {
         if (isOpen) {
-            setDescription("");
-            setAmount("");
-            setDate(new Date().toISOString().split('T')[0]);
-            setCategoryId(initialCategoryId || (categorias.length > 0 ? categorias[0].id : ""));
+            const today = new Date().toISOString().split('T')[0];
+            const cardLabel = initialExpense?.cardLabel?.trim() ?? "";
+            const knownBrand = ["Mastercard", "Visa", "Amex", "Outros"].find((brand) => cardLabel.endsWith(` ${brand}`));
+            const cardName = knownBrand ? cardLabel.replace(` ${knownBrand}`, "") : cardLabel;
+            const initialDate = initialExpense?.isoDate || today;
+
+            setDescription(initialExpense?.description.replace(/\s\(\d+\/\d+\)$/, "") ?? "");
+            setAmount(initialExpense ? initialExpense.value.toLocaleString("pt-BR", { minimumFractionDigits: 2 }) : "");
+            setDate(initialDate);
+            setCategoryId(initialExpense?.category || initialCategoryId || (categorias.length > 0 ? categorias[0].id : ""));
             setInstallmentsData({
                 parcelada: false,
                 numeroParcelas: 2,
-                dataPrimeiraParcela: new Date().toISOString().split('T')[0],
+                dataPrimeiraParcela: initialDate,
                 cartaoId: null,
-                cartaoManual: false,
-                cartaoBandeira: "Mastercard",
-                cartaoNome: "",
+                cartaoManual: Boolean(cardLabel),
+                cartaoBandeira: knownBrand || "Mastercard",
+                cartaoNome: cardName,
             });
         }
-    }, [isOpen, categorias, initialCategoryId]);
+    }, [isOpen, categorias, initialCategoryId, initialExpense]);
 
     if (!isOpen) return null;
 
@@ -113,29 +129,19 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
             const novasDespesas = [];
 
             if (installmentsData.parcelada) {
-                // Lógica de Parcelas
-                const valorParcela = parseFloat((valorTotal / installmentsData.numeroParcelas).toFixed(2));
+                // Cobrança mensal recorrente: cada mês recebe o valor cheio informado.
                 const grupoId = uuidv4();
 
-                // Ajuste de centavos na última parcela
-                const totalCalculado = valorParcela * installmentsData.numeroParcelas;
-                const diferenca = parseFloat((valorTotal - totalCalculado).toFixed(2));
-
                 for (let i = 0; i < installmentsData.numeroParcelas; i++) {
-                    const dataParcela = addMonths(new Date(installmentsData.dataPrimeiraParcela), i);
-
-                    // Adiciona diferença na última parcela
-                    const valorFinal = (i === installmentsData.numeroParcelas - 1)
-                        ? parseFloat((valorParcela + diferenca).toFixed(2))
-                        : valorParcela;
+                    const dataParcela = addMonths(parseISO(installmentsData.dataPrimeiraParcela), i);
 
                     novasDespesas.push({
                         id: Math.random(), // ID temporário para local
                         user_id: userId,
-                        descricao: `${description} (${i + 1}/${installmentsData.numeroParcelas})`,
-                        description: `${description} (${i + 1}/${installmentsData.numeroParcelas})`, // Compatibilidade com frontend
-                        valor: valorFinal,
-                        value: valorFinal, // Compatibilidade com frontend
+                        descricao: description,
+                        description: description, // Compatibilidade com frontend
+                        valor: valorTotal,
+                        value: valorTotal, // Compatibilidade com frontend
                         data: format(dataParcela, 'yyyy-MM-dd'), // Formato banco import
                         date: format(dataParcela, 'dd/MM/yyyy'), // Formato frontend
                         category: categoryId, // Compatibilidade com frontend
@@ -158,7 +164,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                     valor: valorTotal,
                     value: valorTotal,
                     data: date,
-                    date: format(new Date(date), 'dd/MM/yyyy'),
+                    date: format(parseISO(date), 'dd/MM/yyyy'),
                     category: categoryId,
                     categoria_id: categoryId,
                     cartao_id: cartaoId,
@@ -210,7 +216,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-bold text-foreground">Nova Despesa</h2>
+                    <h2 className="text-xl font-bold text-foreground">{isEditing ? "Editar Despesa" : "Nova Despesa"}</h2>
                     <button onClick={onClose} className="p-2 text-muted hover:text-white hover:bg-white/10 rounded-lg transition-colors">
                         <X size={20} />
                     </button>
@@ -327,7 +333,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                                     <span>Salvando...</span>
                                 </>
                             ) : (
-                                <span>Salvar Despesa</span>
+                                <span>{isEditing ? "Salvar Alterações" : "Salvar Despesa"}</span>
                             )}
                         </button>
                     </div>
