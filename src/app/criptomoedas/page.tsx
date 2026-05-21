@@ -32,32 +32,30 @@ function CriptoContent() {
 
     const [coins, setCoins] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [marketError, setMarketError] = useState<string | null>(null);
+    const [lastMarketUpdate, setLastMarketUpdate] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchCoins = async () => {
             setLoading(true);
-            setCoins([]); // Clear old data immediately when currency changes
+            setMarketError(null);
             try {
-                const response = await fetch(
-                    `https://api.coingecko.com/api/v3/coins/markets?vs_currency=${currency}&order=market_cap_desc&per_page=10&page=1&sparkline=false`
-                );
+                const response = await fetch(`/api/crypto/markets?currency=${currency}`);
                 if (!response.ok) {
-                    throw new Error('API rate limit or error');
+                    throw new Error('CoinGecko indisponível no momento');
                 }
                 const data = await response.json();
-                setCoins(data);
+                setCoins(data.coins ?? []);
+                setLastMarketUpdate(data.updatedAt ?? new Date().toISOString());
             } catch (error) {
                 console.error("Error fetching crypto data:", error);
-                // If API fails, keep loading state for a moment then show empty
-                setTimeout(() => setLoading(false), 500);
-                return;
+                setMarketError(error instanceof Error ? error.message : "Erro ao carregar mercado cripto");
             } finally {
                 setLoading(false);
             }
         };
 
         fetchCoins();
-        // Refresh every 60 seconds
         const interval = setInterval(fetchCoins, 60000);
         return () => clearInterval(interval);
     }, [currency]);
@@ -148,7 +146,7 @@ function CriptoContent() {
                     >
                         <div className="flex items-center gap-2">
                             <LineChart size={18} />
-                            Mercado (Top 10)
+                            Mercado (Top 20)
                         </div>
                         {activeTab === "market" && (
                             <div className="absolute bottom-0 left-0 w-full h-0.5 bg-amber-400 rounded-t-full" />
@@ -180,6 +178,24 @@ function CriptoContent() {
                 <div className="glass-card p-6 min-h-[400px]">
                     {activeTab === "market" ? (
                         <>
+                            <div className="mb-5 flex flex-col gap-2 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between" style={{ borderColor: "var(--card-border)", background: "var(--card-bg)" }}>
+                                <div>
+                                    <p className="text-sm font-semibold text-foreground">Top 20 por valor de mercado</p>
+                                    <p className="text-sm text-muted">
+                                        Dados da CoinGecko atualizados automaticamente a cada 60 segundos.
+                                    </p>
+                                </div>
+                                <div className="text-sm font-medium" style={{ color: "var(--accent)" }}>
+                                    {lastMarketUpdate
+                                        ? `Atualizado ${new Date(lastMarketUpdate).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`
+                                        : "Aguardando dados"}
+                                </div>
+                            </div>
+                            {marketError && (
+                                <div className="mb-5 rounded-lg border p-4 text-sm" style={{ borderColor: "color-mix(in srgb, var(--danger) 22%, transparent)", background: "color-mix(in srgb, var(--danger) 8%, transparent)", color: "var(--danger)" }}>
+                                    {marketError}
+                                </div>
+                            )}
                             {loading ? (
                                 <div className="text-center py-12 text-muted">
                                     Carregando cotações...
@@ -191,7 +207,9 @@ function CriptoContent() {
                                             <tr className="text-left text-sm text-muted border-b border-white/10">
                                                 <th className="pb-4 font-medium pl-4">Moeda</th>
                                                 <th className="pb-4 font-medium">Preço Atual</th>
+                                                <th className="pb-4 font-medium">1h</th>
                                                 <th className="pb-4 font-medium">Variação 24h</th>
+                                                <th className="pb-4 font-medium">7d</th>
                                                 <th className="pb-4 font-medium">Capitalização</th>
                                             </tr>
                                         </thead>
@@ -211,12 +229,30 @@ function CriptoContent() {
                                                         {formatCurrency(coin.current_price)}
                                                     </td>
                                                     <td className="py-4">
+                                                        <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${coin.price_change_percentage_1h_in_currency >= 0
+                                                            ? "bg-emerald-500/20 text-emerald-400"
+                                                            : "bg-red-500/20 text-red-400"
+                                                            }`}>
+                                                            {coin.price_change_percentage_1h_in_currency > 0 ? "+" : ""}
+                                                            {coin.price_change_percentage_1h_in_currency?.toFixed(2) ?? "0.00"}%
+                                                        </span>
+                                                    </td>
+                                                    <td className="py-4">
                                                         <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${coin.price_change_percentage_24h >= 0
                                                             ? "bg-emerald-500/20 text-emerald-400"
                                                             : "bg-red-500/20 text-red-400"
                                                             }`}>
                                                             {coin.price_change_percentage_24h > 0 ? "+" : ""}
                                                             {coin.price_change_percentage_24h?.toFixed(2)}%
+                                                        </span>
+                                                    </td>
+                                                    <td className="py-4">
+                                                        <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${coin.price_change_percentage_7d_in_currency >= 0
+                                                            ? "bg-emerald-500/20 text-emerald-400"
+                                                            : "bg-red-500/20 text-red-400"
+                                                            }`}>
+                                                            {coin.price_change_percentage_7d_in_currency > 0 ? "+" : ""}
+                                                            {coin.price_change_percentage_7d_in_currency?.toFixed(2) ?? "0.00"}%
                                                         </span>
                                                     </td>
                                                     <td className="py-4 text-muted">
