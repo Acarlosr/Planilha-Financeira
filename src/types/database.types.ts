@@ -271,6 +271,9 @@ export interface Database {
                     bandeira: 'Visa' | 'Mastercard' | 'Amex' | 'Elo'
                     ultimos_digitos: string | null
                     cor: string
+                    limite: number | null
+                    dia_fechamento: number | null
+                    dia_vencimento: number | null
                     created_at: string
                     updated_at: string
                 }
@@ -282,6 +285,9 @@ export interface Database {
                     bandeira: 'Visa' | 'Mastercard' | 'Amex' | 'Elo'
                     ultimos_digitos?: string | null
                     cor: string
+                    limite?: number | null
+                    dia_fechamento?: number | null
+                    dia_vencimento?: number | null
                     created_at?: string
                     updated_at?: string
                 }
@@ -293,6 +299,9 @@ export interface Database {
                     bandeira?: 'Visa' | 'Mastercard' | 'Amex' | 'Elo'
                     ultimos_digitos?: string | null
                     cor?: string
+                    limite?: number | null
+                    dia_fechamento?: number | null
+                    dia_vencimento?: number | null
                     created_at?: string
                     updated_at?: string
                 }

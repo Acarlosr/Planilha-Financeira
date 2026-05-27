@@ -15,9 +15,16 @@ CREATE TABLE IF NOT EXISTS cartoes (
     bandeira TEXT NOT NULL CHECK (bandeira IN ('Visa', 'Mastercard', 'Amex', 'Elo')),
     ultimos_digitos TEXT,
     cor TEXT NOT NULL,
+    limite DECIMAL(10, 2) DEFAULT 0,
+    dia_fechamento INTEGER DEFAULT 1,
+    dia_vencimento INTEGER DEFAULT 10,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+ALTER TABLE cartoes ADD COLUMN IF NOT EXISTS limite DECIMAL(10, 2) DEFAULT 0;
+ALTER TABLE cartoes ADD COLUMN IF NOT EXISTS dia_fechamento INTEGER DEFAULT 1;
+ALTER TABLE cartoes ADD COLUMN IF NOT EXISTS dia_vencimento INTEGER DEFAULT 10;
 
 -- =============================================
 -- ADICIONAR CAMPOS DE PARCELAMENTO EM DESPESAS

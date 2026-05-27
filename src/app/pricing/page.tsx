@@ -50,7 +50,7 @@ export default function PricingPage() {
             '3_cards': 'Até 3 cards no dashboard',
             'unlimited_cards': 'Cards ilimitados no dashboard',
             'advanced_reports': 'Relatórios avançados',
-            'export_data': 'Exportação PDF/Excel',
+            'export_data': 'Exportação PDF em beta',
             '24_months_history': 'Histórico de 24 meses',
             'unlimited_history': 'Histórico ilimitado',
             'custom_categories': 'Categorias personalizadas',
@@ -80,7 +80,7 @@ export default function PricingPage() {
                         Escolha o plano ideal para você
                     </h1>
                     <p className="text-muted text-lg">
-                        Comece grátis e faça upgrade quando precisar de mais recursos
+                        O produto está em beta. A cobrança real será liberada depois da integração com gateway.
                     </p>
                 </div>
 
@@ -235,7 +235,7 @@ export default function PricingPage() {
                                             border: "1px solid rgba(255, 255, 255, 0.2)"
                                         }}
                                     >
-                                        {plan.slug === 'free' ? 'Começar Grátis' : 'Assinar Agora'}
+                                        {plan.slug === 'free' ? 'Começar Grátis' : 'Entrar na Lista'}
                                     </Link>
                                 )}
                             </div>
@@ -245,8 +245,8 @@ export default function PricingPage() {
 
                 {/* FAQ or Additional Info */}
                 <div className="text-center text-muted text-sm">
-                    <p>Todos os planos incluem 7 dias de trial gratuito</p>
-                    <p className="mt-2">Cancele a qualquer momento, sem taxas</p>
+                    <p>Beta sem cobrança ativa nesta versão.</p>
+                    <p className="mt-2">SaaS financeiro tradicional, sem wallet ou utilidade on-chain.</p>
                 </div>
             </div>
         </div>

@@ -4,7 +4,7 @@ import { useCallback, useEffect, Suspense, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
-import { ArrowLeft, Crown, Zap, CreditCard, Lock, CheckCircle, Loader2 } from "lucide-react";
+import { ArrowLeft, Crown, Zap, CreditCard, Lock, CheckCircle, Loader2, Mail } from "lucide-react";
 import { SubscriptionPlan } from "@/types/saas";
 
 function CheckoutContent() {
@@ -15,7 +15,6 @@ function CheckoutContent() {
     const [plan, setPlan] = useState<SubscriptionPlan | null>(null);
     const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
     const [loading, setLoading] = useState(true);
-    const [processing, setProcessing] = useState(false);
     const [user, setUser] = useState<any>(null);
 
     const checkUser = useCallback(async () => {
@@ -53,29 +52,7 @@ function CheckoutContent() {
         checkUser();
     }, [checkUser, loadPlan]);
 
-    const handleSubscribe = async () => {
-        if (!plan || !user) return;
-
-        setProcessing(true);
-
-        const { error } = await supabase
-            .from("user_profiles")
-            .update({
-                subscription_plan_id: plan.id,
-                subscription_status: "active",
-                subscription_started_at: new Date().toISOString(),
-            })
-            .eq("id", user.id);
-
-        if (error) {
-            alert("Não foi possível ativar o plano. Verifique sua sessão e tente novamente.");
-            setProcessing(false);
-            return;
-        }
-
-        setProcessing(false);
-        router.push("/settings/subscription?updated=1");
-    };
+    const contactHref = `mailto:contato@saldoclaro.xyz?subject=${encodeURIComponent(`Interesse no plano ${plan?.name ?? ""}`)}&body=${encodeURIComponent(`Olá, quero entrar na lista do plano ${plan?.name ?? ""}.\n\nConta: ${user?.email ?? ""}`)}`;
 
     const formatPrice = (price: number) => {
         if (price === 0) return "Grátis";
@@ -203,21 +180,21 @@ function CheckoutContent() {
                         </div>
                     </div>
 
-                        {/* Beta Activation */}
+                    {/* Payment Status */}
                     <div
                         className="rounded-2xl p-8 border border-white/10"
                         style={{ background: "rgba(255, 255, 255, 0.03)" }}
                     >
                         <div className="flex items-center gap-2 mb-6">
                             <CreditCard size={20} className="text-[#7CFF6B]" />
-                            <h2 className="text-xl font-bold text-foreground">Ativação Beta</h2>
+                            <h2 className="text-xl font-bold text-foreground">Pagamento em preparação</h2>
                         </div>
 
                         {/* Security Badge */}
                         <div className="flex items-center gap-2 mb-6 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
                             <Lock size={16} className="text-emerald-400" />
                             <span className="text-sm text-emerald-400">
-                                Ambiente beta: ativação imediata do plano selecionado
+                                Nenhuma cobrança será feita nesta tela enquanto o gateway não estiver conectado.
                             </span>
                         </div>
 
@@ -226,32 +203,27 @@ function CheckoutContent() {
                                 <CreditCard size={32} className="text-amber-400" />
                             </div>
                             <h3 className="text-lg font-semibold text-foreground mb-2">
-                                Gateway em preparação
+                                Gateway ainda não conectado
                             </h3>
                             <p className="text-muted text-sm mb-6">
-                                Por enquanto, esta tela ativa o plano para teste. O próximo passo de produção é conectar Stripe, Mercado Pago ou PagSeguro por webhook.
+                                O FinançasPro está em beta como SaaS financeiro. Para vender assinatura de verdade, esta etapa precisa criar uma sessão no provedor de pagamento e confirmar o plano por webhook.
                             </p>
                         </div>
 
-                        {/* Subscribe Button */}
-                        <button
-                            onClick={handleSubscribe}
-                            disabled={processing}
-                            className="w-full py-4 rounded-xl text-black font-semibold transition-all hover:brightness-110 disabled:opacity-50"
+                        <a
+                            href={contactHref}
+                            className="flex w-full items-center justify-center gap-2 rounded-xl py-4 text-black font-semibold transition-all hover:brightness-110"
                             style={{
                                 background: "linear-gradient(135deg, #7CFF6B 0%, #6FEB5A 100%)",
                                 boxShadow: "0 4px 20px rgba(124, 255, 107, 0.4)",
                             }}
                         >
-                            {processing ? (
-                                <Loader2 className="w-5 h-5 animate-spin mx-auto" />
-                            ) : (
-                                `Ativar ${plan.name} - ${formatPrice(currentPrice || 0)}/${billingCycle === "monthly" ? "mês" : "ano"}`
-                            )}
-                        </button>
+                            <Mail size={18} />
+                            Entrar na lista do {plan.name}
+                        </a>
 
                         <p className="text-center text-muted text-xs mt-4">
-                            Ao assinar, você concorda com nossos Termos de Serviço e Política de Privacidade.
+                            Fluxo de cobrança recomendado: Stripe, Mercado Pago ou PagSeguro com webhook no Supabase.
                         </p>
                     </div>
                 </div>

@@ -74,7 +74,7 @@ export default function Sidebar() {
                     backdropFilter: "blur(12px)",
                 }}
             >
-                <Link href="/landing" className="flex items-center gap-3">
+                <Link href="/" className="flex items-center gap-3">
                     <div
                         className="w-10 h-10 rounded-xl flex items-center justify-center"
                         style={{
@@ -116,7 +116,7 @@ export default function Sidebar() {
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b" style={{ borderColor: "var(--card-border)" }}>
                 {!collapsed && (
-                    <Link href="/landing" className="flex items-center gap-3">
+                    <Link href="/" className="flex items-center gap-3">
                         <div
                             className="w-10 h-10 rounded-xl flex items-center justify-center"
                             style={{
@@ -131,7 +131,7 @@ export default function Sidebar() {
                 )}
                 {collapsed && (
                     <Link
-                        href="/landing"
+                        href="/"
                         className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto"
                         style={{
                             background: "var(--accent)",

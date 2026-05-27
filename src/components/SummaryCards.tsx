@@ -1,7 +1,6 @@
 "use client";
 
 import { TrendingUp, TrendingDown, Wallet, LineChart } from "lucide-react";
-import { poupancaData, aplicacaoData } from "@/constants/financialData";
 import { useDashboardOverview } from "@/hooks/useDashboardOverview";
 
 interface CardData {
@@ -13,12 +12,6 @@ interface CardData {
     iconBg: string;
     progressColor: string;
 }
-
-// Calculate totals from shared data
-const totalPoupanca = poupancaData.metas.reduce((sum, m) => sum + m.valorAtual, 0);
-const totalAplicacao = aplicacaoData.tipos.reduce((sum, t) => sum + t.saldo, 0);
-const totalCripto = 0;
-const totalInvestimentos = totalPoupanca + totalAplicacao + totalCripto;
 
 const formatCurrency = (value: number) => value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -59,7 +52,7 @@ const getShadowColor = (type: CardData["changeType"]) => {
 };
 
 export default function SummaryCards() {
-    const { currentIncome, currentExpenses, previousIncome, previousExpenses, loading } = useDashboardOverview();
+    const { currentIncome, currentExpenses, previousIncome, previousExpenses, totalInvestments, loading } = useDashboardOverview();
     const saldo = currentIncome - currentExpenses;
     const previousSaldo = previousIncome - previousExpenses;
     const cards: CardData[] = [
@@ -92,8 +85,8 @@ export default function SummaryCards() {
         },
         {
             title: "Total Investido",
-            value: totalInvestimentos.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
-            change: "0%",
+            value: loading ? "Carregando..." : formatCurrency(totalInvestments),
+            change: "Dados reais",
             changeType: "investment",
             icon: <LineChart size={24} className="text-white" />,
             iconBg: "linear-gradient(135deg, #f59e0b 0%, #ffbf47 100%)",

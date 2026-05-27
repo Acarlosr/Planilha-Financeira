@@ -1,6 +1,6 @@
-# 💰 FinançasPro - Dashboard Financeiro SaaS
+# FinançasPro - Dashboard Financeiro SaaS
 
-Sistema completo de gerenciamento financeiro pessoal com arquitetura SaaS, múltiplos planos de assinatura e dashboard personalizável.
+Sistema de gerenciamento financeiro pessoal em beta, com dashboard, autenticação, controle de receitas/despesas, investimentos, metas e radar financeiro.
 
 ![Next.js](https://img.shields.io/badge/Next.js-16.1-black)
 ![React](https://img.shields.io/badge/React-19.2-blue)
@@ -11,25 +11,23 @@ Sistema completo de gerenciamento financeiro pessoal com arquitetura SaaS, múlt
 
 ## 🚀 Funcionalidades
 
-### 💼 Gestão Financeira
+### Gestão Financeira
 - ✅ Controle de receitas e despesas
 - ✅ Gerenciamento de investimentos
 - ✅ Metas de poupança
 - ✅ Portfolio de criptomoedas
 - ✅ Cartões de crédito e parcelas
-- ✅ Gráficos e relatórios
-- ✅ Exportação PDF/Excel
+- ✅ Gráficos principais
+- ✅ Exportação PDF em beta
 
-### 🎯 SaaS Features
-- ✅ **3 Planos de Assinatura** (Free, Pro, Enterprise)
-- ✅ **Sistema de Roles** (Admin/User)
-- ✅ **Dashboard Personalizável** (drag & drop em desenvolvimento)
-- ✅ **Feature Gating** por plano
-- ✅ **Trial de 7 dias** incluído
-- ✅ **Quotas de uso** por plano
-- ✅ **Área administrativa** para métricas
+### SaaS Features
+- ✅ Autenticação com Supabase
+- ✅ Perfil de usuário e planos no banco
+- ✅ Feature gating inicial por plano
+- ⚠️ Checkout em preparação, sem cobrança real nesta versão
+- ⚠️ Área administrativa, quotas e plano Enterprise ainda são base técnica, não produto final
 
-### 🎨 UI/UX
+### UI/UX
 - ✅ Design moderno dark theme
 - ✅ Animações suaves
 - ✅ Tema Neon Green (#7CFF6B)
@@ -40,17 +38,14 @@ Sistema completo de gerenciamento financeiro pessoal com arquitetura SaaS, múlt
 
 ## 📦 Planos de Assinatura
 
-| Recurso | Free | Pro | Enterprise |
-|---------|------|-----|------------|
-| **Preço** | Grátis | R$ 10,99/mês | R$ 99,90/mês |
-| **Transações** | 10/mês | Ilimitadas | Ilimitadas |
-| **Cards Dashboard** | 3 | 10 | Ilimitados |
-| **Relatórios** | ❌ | ✅ | ✅ |
-| **Export PDF/Excel** | ❌ | ✅ | ✅ |
-| **Histórico** | 6 meses | 24 meses | Ilimitado |
-| **API Access** | ❌ | ❌ | ✅ |
-| **Suporte** | Email | Prioritário | Dedicado |
-| **Multi-user** | ❌ | ❌ | ✅ |
+| Recurso | Beta atual | Pro planejado |
+|---------|------------|---------------|
+| **Preço** | Sem cobrança ativa | A definir |
+| **Transações** | Controle básico | Limites e histórico ampliados |
+| **Dashboard** | Cards principais | Personalização avançada |
+| **Relatórios** | Gráficos principais | Relatórios avançados |
+| **Exportação** | PDF em beta | PDF/Excel aprimorado |
+| **Pagamento** | Não conectado | Gateway + webhook |
 
 ---
 
@@ -72,7 +67,7 @@ Sistema completo de gerenciamento financeiro pessoal com arquitetura SaaS, múlt
 
 ### Autenticação
 - **Supabase Auth** - Sistema de autenticação
-- **OAuth Providers** - Google, GitHub, Microsoft
+- **OAuth Providers** - Google e outros provedores configuráveis no Supabase
 - **Email OTP** - Magic links
 - **Role-based Access** - Admin/User
 

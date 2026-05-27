@@ -23,6 +23,7 @@ interface DashboardOverview {
     currentExpenses: number;
     previousIncome: number;
     previousExpenses: number;
+    totalInvestments: number;
     recentTransactions: RecentTransaction[];
     monthlyCashFlow: MonthlyCashFlow[];
     loading: boolean;
@@ -51,6 +52,7 @@ export function useDashboardOverview(): DashboardOverview {
     const [currentExpenses, setCurrentExpenses] = useState(0);
     const [previousIncome, setPreviousIncome] = useState(0);
     const [previousExpenses, setPreviousExpenses] = useState(0);
+    const [totalInvestments, setTotalInvestments] = useState(0);
     const [recentTransactions, setRecentTransactions] = useState<RecentTransaction[]>([]);
     const [monthlyCashFlow, setMonthlyCashFlow] = useState<MonthlyCashFlow[]>([]);
     const [loading, setLoading] = useState(true);
@@ -67,6 +69,7 @@ export function useDashboardOverview(): DashboardOverview {
                 setCurrentExpenses(0);
                 setPreviousIncome(0);
                 setPreviousExpenses(0);
+                setTotalInvestments(0);
                 setRecentTransactions([]);
                 setMonthlyCashFlow([]);
                 return;
@@ -78,7 +81,7 @@ export function useDashboardOverview(): DashboardOverview {
             const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
             const historyStart = sixMonthsAgo.toISOString().slice(0, 10);
 
-            const [receitasResult, despesasResult] = await Promise.all([
+            const [receitasResult, despesasResult, aplicacoesResult, metasPoupancaResult] = await Promise.all([
                 supabase
                     .from("receitas")
                     .select("id, descricao, valor, data, categoria_id")
@@ -91,13 +94,25 @@ export function useDashboardOverview(): DashboardOverview {
                     .eq("user_id", user.id)
                     .gte("data", historyStart)
                     .order("data", { ascending: false }),
+                supabase
+                    .from("aplicacoes")
+                    .select("valor, tipo_transacao")
+                    .eq("user_id", user.id),
+                supabase
+                    .from("metas_poupanca")
+                    .select("valor_atual")
+                    .eq("user_id", user.id),
             ]);
 
             if (receitasResult.error) throw receitasResult.error;
             if (despesasResult.error) throw despesasResult.error;
+            if (aplicacoesResult.error) throw aplicacoesResult.error;
+            if (metasPoupancaResult.error) throw metasPoupancaResult.error;
 
             const receitas = receitasResult.data ?? [];
             const despesas = despesasResult.data ?? [];
+            const aplicacoes = aplicacoesResult.data ?? [];
+            const metasPoupanca = metasPoupancaResult.data ?? [];
 
             const sumBetween = (
                 rows: Array<{ valor: number; data: string }>,
@@ -110,6 +125,12 @@ export function useDashboardOverview(): DashboardOverview {
             setCurrentExpenses(sumBetween(despesas, currentRange));
             setPreviousIncome(sumBetween(receitas, previousRange));
             setPreviousExpenses(sumBetween(despesas, previousRange));
+            setTotalInvestments(
+                aplicacoes.reduce((sum, item) => {
+                    const value = Number(item.valor);
+                    return item.tipo_transacao === "resgate" ? sum - value : sum + value;
+                }, 0) + metasPoupanca.reduce((sum, item) => sum + Number(item.valor_atual), 0)
+            );
 
             const months = Array.from({ length: 6 }, (_, index) => {
                 const date = new Date(now.getFullYear(), now.getMonth() - 5 + index, 1);
@@ -161,6 +182,7 @@ export function useDashboardOverview(): DashboardOverview {
         currentExpenses,
         previousIncome,
         previousExpenses,
+        totalInvestments,
         recentTransactions,
         monthlyCashFlow,
         loading,
@@ -171,6 +193,7 @@ export function useDashboardOverview(): DashboardOverview {
         currentExpenses,
         previousIncome,
         previousExpenses,
+        totalInvestments,
         recentTransactions,
         monthlyCashFlow,
         loading,

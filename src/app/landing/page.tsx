@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 import { useTheme } from "@/contexts/ThemeContext";
 import {
     TrendingUp,
@@ -61,6 +63,21 @@ const benefits = [
 
 export default function LandingPage() {
     const { theme, toggleTheme } = useTheme();
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+    useEffect(() => {
+        const loadUser = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            setIsAuthenticated(Boolean(user));
+        };
+
+        loadUser();
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setIsAuthenticated(Boolean(session?.user));
+        });
+
+        return () => subscription.unsubscribe();
+    }, []);
 
     return (
         <div className="min-h-screen relative overflow-hidden">
@@ -117,22 +134,37 @@ export default function LandingPage() {
                                 <Moon size={20} />
                             )}
                         </button>
-                        <Link
-                            href="/login"
-                            className="px-4 py-2 text-muted hover:text-foreground transition-colors font-medium"
-                        >
-                            Entrar
-                        </Link>
-                        <Link
-                            href="/cadastro"
-                            className="px-5 py-2.5 rounded-xl text-foreground font-semibold transition-all hover:brightness-110"
-                            style={{
-                                background: "linear-gradient(135deg, #FFD700 0%, #FFC700 100%)",
-                                boxShadow: "0 4px 15px rgba(30, 64, 175, 0.4)"
-                            }}
-                        >
-                            Começar Grátis
-                        </Link>
+                        {isAuthenticated ? (
+                            <Link
+                                href="/"
+                                className="px-5 py-2.5 rounded-xl text-foreground font-semibold transition-all hover:brightness-110"
+                                style={{
+                                    background: "linear-gradient(135deg, #FFD700 0%, #FFC700 100%)",
+                                    boxShadow: "0 4px 15px rgba(30, 64, 175, 0.4)"
+                                }}
+                            >
+                                Ir para dashboard
+                            </Link>
+                        ) : (
+                            <>
+                                <Link
+                                    href="/login"
+                                    className="px-4 py-2 text-muted hover:text-foreground transition-colors font-medium"
+                                >
+                                    Entrar
+                                </Link>
+                                <Link
+                                    href="/cadastro"
+                                    className="px-5 py-2.5 rounded-xl text-foreground font-semibold transition-all hover:brightness-110"
+                                    style={{
+                                        background: "linear-gradient(135deg, #FFD700 0%, #FFC700 100%)",
+                                        boxShadow: "0 4px 15px rgba(30, 64, 175, 0.4)"
+                                    }}
+                                >
+                                    Começar Grátis
+                                </Link>
+                            </>
+                        )}
                     </div>
                 </div>
             </header>
@@ -160,14 +192,14 @@ export default function LandingPage() {
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                         <Link
-                            href="/cadastro"
+                            href={isAuthenticated ? "/" : "/cadastro"}
                             className="flex items-center gap-2 px-8 py-4 rounded-xl text-foreground font-semibold text-lg transition-all hover:brightness-110 hover:scale-105"
                             style={{
                                 background: "linear-gradient(135deg, #FFD700 0%, #FFC700 100%)",
                                 boxShadow: "0 4px 20px rgba(30, 64, 175, 0.5)"
                             }}
                         >
-                            Criar Conta Grátis
+                            {isAuthenticated ? "Ir para Dashboard" : "Criar Conta Grátis"}
                             <ArrowRight className="w-5 h-5" />
                         </Link>
                         <Link
@@ -238,14 +270,14 @@ export default function LandingPage() {
                                     com recursos poderosos e interface intuitiva.
                                 </p>
                                 <Link
-                                    href="/cadastro"
+                            href={isAuthenticated ? "/" : "/cadastro"}
                                     className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-foreground font-semibold transition-all hover:brightness-110"
                                     style={{
                                         background: "linear-gradient(135deg, #FFD700 0%, #FFC700 100%)",
                                         boxShadow: "0 4px 15px rgba(30, 64, 175, 0.4)"
                                     }}
                                 >
-                                    Começar Agora
+                                    {isAuthenticated ? "Ir para Dashboard" : "Começar Agora"}
                                     <ArrowRight className="w-5 h-5" />
                                 </Link>
                             </div>
@@ -270,18 +302,17 @@ export default function LandingPage() {
                     <div className="text-center mb-12">
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 mb-6">
                             <Zap className="w-4 h-4 text-emerald-400" />
-                            <span className="text-sm text-emerald-300 font-medium">Experimente grátis por 15 dias</span>
+                            <span className="text-sm text-emerald-300 font-medium">Beta aberto sem cobrança</span>
                         </div>
                         <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                            Planos simples e acessíveis
+                            SaaS financeiro em beta
                         </h2>
                         <p className="text-muted text-lg">
-                            Comece gratuitamente e depois escolha o plano que melhor se adapta a você
+                            Use o dashboard agora. A cobrança será conectada quando o gateway estiver pronto.
                         </p>
                     </div>
 
                     <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-                        {/* Plano BRL */}
                         <div
                             className="rounded-2xl p-8 border border-white/10 text-center transition-all duration-300 hover:border-[#7CFF6B]/30"
                             style={{ background: "rgba(255, 255, 255, 0.03)" }}
@@ -289,96 +320,93 @@ export default function LandingPage() {
                             <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 mb-4">
                                 🇧🇷
                             </div>
-                            <h3 className="text-xl font-semibold text-foreground mb-2">Plano Brasil</h3>
+                            <h3 className="text-xl font-semibold text-foreground mb-2">Beta Financeiro</h3>
                             <div className="mb-4">
-                                <span className="text-4xl font-bold text-foreground">R$ 10,99</span>
-                                <span className="text-muted">/mês</span>
+                                <span className="text-4xl font-bold text-foreground">Grátis</span>
                             </div>
                             <p className="text-muted text-sm mb-6">
-                                Acesso completo a todas as funcionalidades
+                                Acesso para testar o controle financeiro principal
                             </p>
                             <ul className="text-left space-y-3 mb-8">
                                 <li className="flex items-center gap-2 text-muted text-sm">
                                     <Check className="w-4 h-4 text-emerald-400" />
-                                    15 dias grátis para testar
+                                    Receitas, despesas e dashboard
                                 </li>
                                 <li className="flex items-center gap-2 text-muted text-sm">
                                     <Check className="w-4 h-4 text-emerald-400" />
-                                    Controle ilimitado de transações
+                                    Metas de poupança e investimentos
                                 </li>
                                 <li className="flex items-center gap-2 text-muted text-sm">
                                     <Check className="w-4 h-4 text-emerald-400" />
-                                    Relatórios e gráficos avançados
+                                    Gráficos e radar financeiro beta
                                 </li>
                                 <li className="flex items-center gap-2 text-muted text-sm">
                                     <Check className="w-4 h-4 text-emerald-400" />
-                                    Suporte prioritário
+                                    Feedback direto para evolução do produto
                                 </li>
                             </ul>
                             <Link
-                                href="/cadastro"
+                                href={isAuthenticated ? "/" : "/cadastro"}
                                 className="block w-full py-3 rounded-xl text-foreground font-semibold transition-all hover:brightness-110"
                                 style={{
                                     background: "linear-gradient(135deg, #FFD700 0%, #FFC700 100%)",
                                     boxShadow: "0 4px 15px rgba(30, 64, 175, 0.4)"
                                 }}
                             >
-                                Começar Grátis
+                                {isAuthenticated ? "Ir para Dashboard" : "Começar Grátis"}
                             </Link>
                         </div>
 
-                        {/* Plano USD */}
                         <div
                             className="rounded-2xl p-8 border border-[#7CFF6B]/30 text-center relative transition-all duration-300 hover:border-cyan-400/50"
                             style={{ background: "rgba(56, 189, 248, 0.05)" }}
                         >
                             <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs font-semibold bg-[#7CFF6B] text-white">
-                                INTERNACIONAL
+                                EM PREPARAÇÃO
                             </div>
                             <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[#FFD700]/20 text-[#FFD700] mb-4 text-2xl">
                                 🌎
                             </div>
-                            <h3 className="text-xl font-semibold text-foreground mb-2">Plano Global</h3>
+                            <h3 className="text-xl font-semibold text-foreground mb-2">Plano Pro</h3>
                             <div className="mb-4">
-                                <span className="text-4xl font-bold text-foreground">$ 2</span>
-                                <span className="text-muted">/mês</span>
+                                <span className="text-4xl font-bold text-foreground">Em breve</span>
                             </div>
                             <p className="text-muted text-sm mb-6">
-                                Ideal para quem está fora do Brasil
+                                Cobrança será liberada quando o gateway estiver integrado
                             </p>
                             <ul className="text-left space-y-3 mb-8">
                                 <li className="flex items-center gap-2 text-muted text-sm">
                                     <Check className="w-4 h-4 text-[#7CFF6B]" />
-                                    15 dias grátis para testar
+                                    Exportação PDF aprimorada
                                 </li>
                                 <li className="flex items-center gap-2 text-muted text-sm">
                                     <Check className="w-4 h-4 text-[#7CFF6B]" />
-                                    Controle ilimitado de transações
+                                    Histórico maior e relatórios
                                 </li>
                                 <li className="flex items-center gap-2 text-muted text-sm">
                                     <Check className="w-4 h-4 text-[#7CFF6B]" />
-                                    Relatórios e gráficos avançados
+                                    Recursos premium sem ativação manual
                                 </li>
                                 <li className="flex items-center gap-2 text-muted text-sm">
                                     <Check className="w-4 h-4 text-[#7CFF6B]" />
-                                    Suporte prioritário
+                                    Pagamento com confirmação por webhook
                                 </li>
                             </ul>
                             <Link
-                                href="/cadastro"
+                                href="/pricing"
                                 className="block w-full py-3 rounded-xl text-foreground font-semibold transition-all hover:brightness-110"
                                 style={{
                                     background: "linear-gradient(135deg, #7CFF6B 0%, #6FEB5A 100%)",
                                     boxShadow: "0 4px 15px rgba(14, 165, 233, 0.4)"
                                 }}
                             >
-                                Começar Grátis
+                                Ver status dos planos
                             </Link>
                         </div>
                     </div>
 
                     <p className="text-center text-muted text-sm mt-8">
-                        Cancele a qualquer momento. Sem compromisso.
+                        SaaS financeiro tradicional. Sem wallet, token ou promessa on-chain.
                     </p>
                 </div>
             </section>
