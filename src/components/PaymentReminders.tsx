@@ -108,7 +108,7 @@ export default function PaymentReminders() {
             const today = toISODate(now);
             const nextFifteenDays = toISODate(new Date(now.getFullYear(), now.getMonth(), now.getDate() + 15));
 
-            const [receitasResult, despesasResult, cartoesResult] = await Promise.all([
+            const [receitasResult, despesasBaseResult, despesasDueResult, cartoesResult] = await Promise.all([
                 supabase
                     .from("receitas")
                     .select("valor")
@@ -117,11 +117,17 @@ export default function PaymentReminders() {
                     .lte("data", nextMonthEnd),
                 supabase
                     .from("despesas")
-                    .select("id, descricao, valor, data, cartao_id, boleto, data_vencimento")
+                    .select("id, descricao, valor, data, cartao_id")
                     .eq("user_id", user.id)
                     .gte("data", monthStart)
                     .lte("data", nextMonthEnd)
                     .order("data", { ascending: true }),
+                supabase
+                    .from("despesas")
+                    .select("id, boleto, data_vencimento")
+                    .eq("user_id", user.id)
+                    .gte("data", monthStart)
+                    .lte("data", nextMonthEnd),
                 supabase
                     .from("cartoes")
                     .select("id, nome, bandeira, dia_vencimento")
@@ -129,15 +135,25 @@ export default function PaymentReminders() {
             ]);
 
             if (receitasResult.error) throw receitasResult.error;
-            if (despesasResult.error) {
-                throw new Error("Atualize o schema de despesas para habilitar boleto e vencimento.");
-            }
+            if (despesasBaseResult.error) throw despesasBaseResult.error;
             if (cartoesResult.error) {
                 throw new Error("Atualize o schema de cartões para habilitar dia de vencimento.");
             }
 
             const income = (receitasResult.data ?? []).reduce((sum, item) => sum + Number(item.valor), 0);
-            const expenses = (despesasResult.data ?? []) as ExpenseRow[];
+            const dueById = new Map(
+                despesasDueResult.error
+                    ? []
+                    : (despesasDueResult.data ?? []).map((item) => [item.id, item])
+            );
+            const expenses = ((despesasBaseResult.data ?? []) as ExpenseRow[]).map((expense) => {
+                const dueInfo = dueById.get(expense.id) as Pick<ExpenseRow, "boleto" | "data_vencimento"> | undefined;
+                return {
+                    ...expense,
+                    boleto: dueInfo?.boleto ?? false,
+                    data_vencimento: dueInfo?.data_vencimento ?? null,
+                };
+            });
             const cards = (cartoesResult.data ?? []) as CardRow[];
 
             const cardReminders = cards
