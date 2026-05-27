@@ -9,7 +9,7 @@ import DataConnectionStatus from "@/components/DataConnectionStatus";
 import FinancialRadar from "@/components/FinancialRadar";
 import PaymentReminders from "@/components/PaymentReminders";
 import Link from "next/link";
-import { Bell, Search, Plus, TrendingDown, TrendingUp, WalletCards } from "lucide-react";
+import { Bell, Search, Plus, TrendingDown, TrendingUp } from "lucide-react";
 
 export default function Home() {
   return (
@@ -69,7 +69,7 @@ export default function Home() {
         {/* Trial Banner */}
         <TrialBanner />
 
-        <section className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <section className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <Link
             href="/receitas"
             className="group flex items-center justify-between rounded-lg border px-4 py-4 transition"
@@ -97,21 +97,6 @@ export default function Home() {
             <span className="flex items-center gap-3 font-medium">
               <TrendingDown size={18} />
               Nova despesa
-            </span>
-            <Plus size={18} className="transition group-hover:rotate-90" />
-          </Link>
-          <Link
-            href="/settings/subscription"
-            className="group flex items-center justify-between rounded-lg border px-4 py-4 transition"
-            style={{
-              background: "color-mix(in srgb, var(--accent) 10%, transparent)",
-              borderColor: "color-mix(in srgb, var(--accent) 20%, transparent)",
-              color: "var(--accent)",
-            }}
-          >
-            <span className="flex items-center gap-3 font-medium">
-              <WalletCards size={18} />
-              Plano e limites
             </span>
             <Plus size={18} className="transition group-hover:rotate-90" />
           </Link>

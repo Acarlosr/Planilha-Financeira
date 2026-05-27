@@ -35,6 +35,7 @@ export interface InstallmentsData {
     cartaoManual: boolean;
     cartaoBandeira: string;
     cartaoNome: string;
+    cartaoDiaVencimento: number;
 }
 
 interface InstallmentsFormProps {
@@ -262,6 +263,17 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
                     })}
                 </div>
 
+                {data.cartaoId && (
+                    <div className="mt-2 rounded-lg border border-white/10 px-3 py-2 text-xs text-muted" style={{ background: "rgba(255, 255, 255, 0.03)" }}>
+                        {(() => {
+                            const selectedCard = cartoes.find((item) => item.id === data.cartaoId);
+                            return selectedCard?.dia_vencimento
+                                ? `Fatura vence todo dia ${selectedCard.dia_vencimento}.`
+                                : "Cartão selecionado sem vencimento cadastrado.";
+                        })()}
+                    </div>
+                )}
+
                 {data.cartaoManual && (
                     <div className="mt-3 space-y-3 rounded-lg border border-white/10 p-3" style={{ background: "rgba(255, 255, 255, 0.03)" }}>
                         <div>
@@ -310,6 +322,25 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
                                     </button>
                                 ))}
                             </div>
+                        </div>
+
+                        <div>
+                            <label className="mb-1 block text-xs font-medium text-muted">Dia de vencimento da fatura</label>
+                            <input
+                                type="number"
+                                min="1"
+                                max="31"
+                                value={data.cartaoDiaVencimento}
+                                onChange={(e) => onChange({
+                                    ...data,
+                                    cartaoDiaVencimento: Math.min(Math.max(Number(e.target.value) || 10, 1), 31),
+                                })}
+                                className="w-full rounded-lg border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-red-500/50"
+                                style={{ background: "rgba(255, 255, 255, 0.05)" }}
+                            />
+                            <p className="mt-1 text-xs text-muted">
+                                Esse dia será usado nos lembretes de vencimento do dashboard.
+                            </p>
                         </div>
                     </div>
                 )}

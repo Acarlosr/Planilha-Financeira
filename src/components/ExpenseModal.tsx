@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, Calendar, Tag, AlignLeft } from "lucide-react";
+import { X, Calendar, Tag, AlignLeft, FileText } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import InstallmentsForm, { InstallmentsData } from "./InstallmentsForm";
 import { Database } from "@/types/database.types";
@@ -38,6 +38,8 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
     const [description, setDescription] = useState("");
     const [amount, setAmount] = useState("");
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+    const [isBoleto, setIsBoleto] = useState(false);
+    const [dueDate, setDueDate] = useState(new Date().toISOString().split('T')[0]);
     const [categoryId, setCategoryId] = useState("");
 
     // Dados de parcelamento
@@ -51,6 +53,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
         cartaoManual: false,
         cartaoBandeira: "Mastercard",
         cartaoNome: "",
+        cartaoDiaVencimento: 10,
     });
 
     // Resetar form ao abrir
@@ -65,6 +68,8 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
             setDescription(initialExpense?.description.replace(/\s\(\d+\/\d+\)$/, "") ?? "");
             setAmount(initialExpense ? initialExpense.value.toLocaleString("pt-BR", { minimumFractionDigits: 2 }) : "");
             setDate(initialDate);
+            setIsBoleto(false);
+            setDueDate(initialDate);
             setCategoryId(initialExpense?.category || initialCategoryId || (categorias.length > 0 ? categorias[0].id : ""));
             setInstallmentsData({
                 parcelada: false,
@@ -76,6 +81,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                 cartaoManual: Boolean(cardLabel),
                 cartaoBandeira: knownBrand || "Mastercard",
                 cartaoNome: cardName,
+                cartaoDiaVencimento: 10,
             });
         }
     }, [isOpen, categorias, initialCategoryId, initialExpense]);
@@ -117,7 +123,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                         cor: "gray",
                         limite: 0,
                         dia_fechamento: 1,
-                        dia_vencimento: 10,
+                        dia_vencimento: installmentsData.cartaoDiaVencimento,
                     })
                     .select("id")
                     .single();
@@ -168,6 +174,8 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                         cartao_manual: cartaoManualResumo,
                         tipo_repeticao: installmentsData.tipoRepeticao,
                         base_valor_parcelado: installmentsData.baseValorParcelado,
+                        boleto: isBoleto && !cartaoId,
+                        data_vencimento: isBoleto && !cartaoId ? dueDate : format(dataParcela, 'yyyy-MM-dd'),
                         parcelada: true,
                         parcela_atual: i + 1,
                         parcela_total: installmentsData.numeroParcelas,
@@ -190,6 +198,8 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                     cartao_id: cartaoId,
                     cartao_manual: cartaoManualResumo,
                     tipo_repeticao: "unica",
+                    boleto: isBoleto && !cartaoId,
+                    data_vencimento: isBoleto && !cartaoId ? dueDate : date,
                     parcelada: false,
                 });
             }
@@ -206,6 +216,8 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                     data: d.data,
                     categoria_id: d.categoria_id,
                     cartao_id: d.cartao_id,
+                    boleto: d.boleto,
+                    data_vencimento: d.data_vencimento,
                     parcelada: d.parcelada,
                     parcela_atual: d.parcela_atual,
                     parcela_total: d.parcela_total,
@@ -292,6 +304,44 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                                     style={{ background: "rgba(255, 255, 255, 0.05)" }}
                                 />
                             </div>
+                        </div>
+
+                        <div className="col-span-1 md:col-span-2 rounded-xl border border-white/10 p-3" style={{ background: "rgba(255, 255, 255, 0.03)" }}>
+                            <div className="flex items-center justify-between gap-3">
+                                <div className="flex items-center gap-3">
+                                    <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${isBoleto ? "bg-red-500/20 text-red-400" : "bg-white/10 text-muted"}`}>
+                                        <FileText size={18} />
+                                    </div>
+                                    <div>
+                                        <p className="font-medium text-white">É boleto ou conta com vencimento?</p>
+                                        <p className="text-xs text-muted">Use para aparecer nos lembretes do dashboard.</p>
+                                    </div>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => setIsBoleto((value) => !value)}
+                                    className={`relative h-6 w-12 rounded-full transition-colors ${isBoleto ? "bg-red-500" : "bg-white/10"}`}
+                                >
+                                    <span className={`mt-0.5 ml-0.5 inline-block h-5 w-5 rounded-full bg-white shadow transition ${isBoleto ? "translate-x-6" : "translate-x-0"}`} />
+                                </button>
+                            </div>
+
+                            {isBoleto && (
+                                <div className="mt-3">
+                                    <label className="block text-sm font-medium text-muted mb-1">Data de vencimento</label>
+                                    <div className="relative">
+                                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
+                                        <input
+                                            type="date"
+                                            required={isBoleto}
+                                            value={dueDate}
+                                            onChange={(e) => setDueDate(e.target.value)}
+                                            className="w-full pl-10 pr-4 py-2.5 rounded-xl text-white outline-none transition-all border border-white/10 focus:border-red-500/50"
+                                            style={{ background: "rgba(255, 255, 255, 0.05)" }}
+                                        />
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         <div className="col-span-1 md:col-span-2">

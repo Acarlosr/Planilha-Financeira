@@ -32,6 +32,8 @@ ALTER TABLE cartoes ADD COLUMN IF NOT EXISTS dia_vencimento INTEGER DEFAULT 10;
 
 -- Adicionar campo de cartão
 ALTER TABLE despesas ADD COLUMN IF NOT EXISTS cartao_id UUID REFERENCES cartoes(id) ON DELETE SET NULL;
+ALTER TABLE despesas ADD COLUMN IF NOT EXISTS boleto BOOLEAN DEFAULT FALSE;
+ALTER TABLE despesas ADD COLUMN IF NOT EXISTS data_vencimento DATE;
 
 -- Adicionar campos de parcelamento
 ALTER TABLE despesas ADD COLUMN IF NOT EXISTS parcelada BOOLEAN DEFAULT FALSE;
@@ -45,6 +47,7 @@ ALTER TABLE despesas ADD COLUMN IF NOT EXISTS parcela_grupo_id UUID;
 
 CREATE INDEX IF NOT EXISTS idx_cartoes_user_id ON cartoes(user_id);
 CREATE INDEX IF NOT EXISTS idx_despesas_cartao_id ON despesas(cartao_id);
+CREATE INDEX IF NOT EXISTS idx_despesas_data_vencimento ON despesas(data_vencimento);
 CREATE INDEX IF NOT EXISTS idx_despesas_parcela_grupo ON despesas(parcela_grupo_id);
 
 -- =============================================

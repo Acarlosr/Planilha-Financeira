@@ -24,6 +24,8 @@ interface ExpenseRow {
     valor: number;
     data: string;
     cartao_id: string | null;
+    boleto?: boolean | null;
+    data_vencimento?: string | null;
 }
 
 interface CardRow {
@@ -115,7 +117,7 @@ export default function PaymentReminders() {
                     .lte("data", nextMonthEnd),
                 supabase
                     .from("despesas")
-                    .select("id, descricao, valor, data, cartao_id")
+                    .select("id, descricao, valor, data, cartao_id, boleto, data_vencimento")
                     .eq("user_id", user.id)
                     .gte("data", monthStart)
                     .lte("data", nextMonthEnd)
@@ -127,8 +129,12 @@ export default function PaymentReminders() {
             ]);
 
             if (receitasResult.error) throw receitasResult.error;
-            if (despesasResult.error) throw despesasResult.error;
-            if (cartoesResult.error) throw cartoesResult.error;
+            if (despesasResult.error) {
+                throw new Error("Atualize o schema de despesas para habilitar boleto e vencimento.");
+            }
+            if (cartoesResult.error) {
+                throw new Error("Atualize o schema de cartões para habilitar dia de vencimento.");
+            }
 
             const income = (receitasResult.data ?? []).reduce((sum, item) => sum + Number(item.valor), 0);
             const expenses = (despesasResult.data ?? []) as ExpenseRow[];
@@ -158,18 +164,22 @@ export default function PaymentReminders() {
                 .filter(Boolean) as Reminder[];
 
             const boletoReminders = expenses
-                .filter((expense) => !expense.cartao_id && expense.data >= today && expense.data <= nextFifteenDays)
+                .filter((expense) => {
+                    const dueDate = expense.data_vencimento ?? expense.data;
+                    return Boolean(expense.boleto) && !expense.cartao_id && dueDate >= today && dueDate <= nextFifteenDays;
+                })
                 .map((expense) => {
+                    const dueDate = expense.data_vencimento ?? expense.data;
                     const balanceAfter = income - Number(expense.valor);
                     return {
                         id: `expense-${expense.id}`,
                         type: "boleto" as const,
                         title: expense.descricao,
                         detail: "Conta ou boleto cadastrado",
-                        dueDate: expense.data,
+                        dueDate,
                         amount: Number(expense.valor),
                         balanceAfter,
-                        status: getStatus(balanceAfter, expense.data),
+                        status: getStatus(balanceAfter, dueDate),
                     };
                 });
 

@@ -119,6 +119,8 @@ export interface Database {
                     data: string
                     categoria_id: string
                     cartao_id: string | null
+                    boleto: boolean | null
+                    data_vencimento: string | null
                     parcelada: boolean
                     parcela_atual: number | null
                     parcela_total: number | null
@@ -134,6 +136,8 @@ export interface Database {
                     data: string
                     categoria_id: string
                     cartao_id?: string | null
+                    boleto?: boolean | null
+                    data_vencimento?: string | null
                     parcelada?: boolean
                     parcela_atual?: number | null
                     parcela_total?: number | null
@@ -149,6 +153,8 @@ export interface Database {
                     data?: string
                     categoria_id?: string
                     cartao_id?: string | null
+                    boleto?: boolean | null
+                    data_vencimento?: string | null
                     parcelada?: boolean
                     parcela_atual?: number | null
                     parcela_total?: number | null
