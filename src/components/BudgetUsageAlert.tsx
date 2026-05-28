@@ -4,10 +4,37 @@ import { useCallback, useEffect, useState } from "react";
 import { AlertTriangle, CheckCircle2, Gauge, TrendingDown } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
+type MonthlyRow = {
+    valor: number | string | null;
+    data: string | null;
+};
+
 const formatCurrency = (value: number) => value.toLocaleString("pt-BR", {
     style: "currency",
     currency: "BRL",
 });
+
+const getMonthBounds = () => {
+    const now = new Date();
+    const start = new Date(now.getFullYear(), now.getMonth(), 1);
+    const end = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    return {
+        startDate: `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, "0")}-01`,
+        endDate: `${end.getFullYear()}-${String(end.getMonth() + 1).padStart(2, "0")}-01`,
+    };
+};
+
+const sumRowsInMonth = (rows: MonthlyRow[], startDate: string, endDate: string) => rows
+    .filter((item) => item.data && item.data >= startDate && item.data < endDate)
+    .reduce((sum, item) => sum + Number(item.valor ?? 0), 0);
+
+const getErrorMessage = (err: unknown) => {
+    if (err instanceof Error) return err.message;
+    if (typeof err === "object" && err && "message" in err) {
+        return String((err as { message?: unknown }).message);
+    }
+    return "Erro ao carregar uso da receita";
+};
 
 const getTone = (usage: number) => {
     if (usage >= 100) {
@@ -60,33 +87,28 @@ export default function BudgetUsageAlert() {
                 return;
             }
 
-            const now = new Date();
-            const startDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`;
-            const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-            const endDate = `${nextMonth.getFullYear()}-${String(nextMonth.getMonth() + 1).padStart(2, "0")}-01`;
+            const { startDate, endDate } = getMonthBounds();
 
             const [receitasResult, despesasResult] = await Promise.all([
                 supabase
                     .from("receitas")
                     .select("valor, data")
                     .eq("user_id", session.user.id)
-                    .gte("data", startDate)
-                    .lt("data", endDate),
+                    .order("data", { ascending: false }),
                 supabase
                     .from("despesas")
                     .select("valor, data")
                     .eq("user_id", session.user.id)
-                    .gte("data", startDate)
-                    .lt("data", endDate),
+                    .order("data", { ascending: false }),
             ]);
 
-            if (receitasResult.error) throw receitasResult.error;
-            if (despesasResult.error) throw despesasResult.error;
+            if (receitasResult.error) throw new Error(`Receitas: ${receitasResult.error.message}`);
+            if (despesasResult.error) throw new Error(`Despesas: ${despesasResult.error.message}`);
 
-            setCurrentIncome((receitasResult.data ?? []).reduce((sum, item) => sum + Number(item.valor), 0));
-            setCurrentExpenses((despesasResult.data ?? []).reduce((sum, item) => sum + Number(item.valor), 0));
+            setCurrentIncome(sumRowsInMonth((receitasResult.data ?? []) as MonthlyRow[], startDate, endDate));
+            setCurrentExpenses(sumRowsInMonth((despesasResult.data ?? []) as MonthlyRow[], startDate, endDate));
         } catch (err) {
-            setError(err instanceof Error ? err.message : "Erro ao carregar uso da receita");
+            setError(getErrorMessage(err));
             setCurrentIncome(0);
             setCurrentExpenses(0);
         } finally {
