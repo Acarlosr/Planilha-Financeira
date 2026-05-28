@@ -1,7 +1,8 @@
 "use client";
 
+import { useCallback, useEffect, useState } from "react";
 import { AlertTriangle, CheckCircle2, Gauge, TrendingDown } from "lucide-react";
-import { useDashboardOverview } from "@/hooks/useDashboardOverview";
+import { supabase } from "@/lib/supabase";
 
 const formatCurrency = (value: number) => value.toLocaleString("pt-BR", {
     style: "currency",
@@ -42,7 +43,67 @@ const getTone = (usage: number) => {
 };
 
 export default function BudgetUsageAlert() {
-    const { currentIncome, currentExpenses, loading } = useDashboardOverview();
+    const [currentIncome, setCurrentIncome] = useState(0);
+    const [currentExpenses, setCurrentExpenses] = useState(0);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    const loadBudgetUsage = useCallback(async () => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session?.user) {
+                setCurrentIncome(0);
+                setCurrentExpenses(0);
+                return;
+            }
+
+            const now = new Date();
+            const startDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`;
+            const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+            const endDate = `${nextMonth.getFullYear()}-${String(nextMonth.getMonth() + 1).padStart(2, "0")}-01`;
+
+            const [receitasResult, despesasResult] = await Promise.all([
+                supabase
+                    .from("receitas")
+                    .select("valor, data")
+                    .eq("user_id", session.user.id)
+                    .gte("data", startDate)
+                    .lt("data", endDate),
+                supabase
+                    .from("despesas")
+                    .select("valor, data")
+                    .eq("user_id", session.user.id)
+                    .gte("data", startDate)
+                    .lt("data", endDate),
+            ]);
+
+            if (receitasResult.error) throw receitasResult.error;
+            if (despesasResult.error) throw despesasResult.error;
+
+            setCurrentIncome((receitasResult.data ?? []).reduce((sum, item) => sum + Number(item.valor), 0));
+            setCurrentExpenses((despesasResult.data ?? []).reduce((sum, item) => sum + Number(item.valor), 0));
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Erro ao carregar uso da receita");
+            setCurrentIncome(0);
+            setCurrentExpenses(0);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        loadBudgetUsage();
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
+            loadBudgetUsage();
+        });
+
+        return () => subscription.unsubscribe();
+    }, [loadBudgetUsage]);
+
     const usage = currentIncome > 0 ? (currentExpenses / currentIncome) * 100 : 0;
     const cappedUsage = Math.min(Math.max(usage, 0), 100);
     const balance = currentIncome - currentExpenses;
@@ -69,7 +130,7 @@ export default function BudgetUsageAlert() {
                                 {tone.label}
                             </span>
                         </div>
-                        <p className="mt-1 text-sm text-muted">{loading ? "Calculando receita e despesas..." : message}</p>
+                        <p className="mt-1 text-sm text-muted">{loading ? "Calculando receita e despesas..." : error ?? message}</p>
                     </div>
                 </div>
 
