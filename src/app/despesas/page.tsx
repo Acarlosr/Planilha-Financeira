@@ -235,10 +235,9 @@ function DespesasContent() {
 
     const totalDespesas = filteredExpenses.reduce((sum, item) => sum + item.value, 0);
 
-    const categorySource = [
-        ...commonExpenseCategories,
-        ...categorias.filter((cat) => !commonExpenseCategories.some((common) => common.id === cat.id || common.nome === cat.nome)),
-    ];
+    const categorySource = !databaseUnavailable && categorias.length > 0
+        ? categorias
+        : commonExpenseCategories;
 
     const categoriasDespesa = categorySource.map((cat) => ({
         id: cat.id,
