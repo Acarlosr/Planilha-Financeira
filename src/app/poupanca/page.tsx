@@ -50,10 +50,13 @@ function PoupancaContent() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [transacoesData, setTransacoesData] = useState(transacoes);
 
-    const totalPoupanca = evolucaoData[evolucaoData.length - 1].valor;
+    const totalPoupanca = evolucaoData[evolucaoData.length - 1]?.valor ?? 0;
     const totalMetas = metas.reduce((sum, meta) => sum + meta.valorMeta, 0);
     const totalEconomizado = metas.reduce((sum, meta) => sum + meta.valorAtual, 0);
-    const progressoGeral = ((totalEconomizado / totalMetas) * 100).toFixed(1);
+    const progressoGeral = totalMetas > 0 ? ((totalEconomizado / totalMetas) * 100).toFixed(1) : "0.0";
+    const crescimentoTrintaDias = evolucaoData.length >= 2
+        ? totalPoupanca - evolucaoData[evolucaoData.length - 2].valor
+        : 0;
 
     const getTransacoesFiltradas = () => {
         if (!activeMeta) return transacoesData;
@@ -164,7 +167,7 @@ function PoupancaContent() {
                                 <p className="text-muted text-sm font-medium">Crescimento (30d)</p>
                             </div>
                             <h2 className="text-3xl font-bold text-[#FFD700]">
-                                + R$ 650,00
+                                {crescimentoTrintaDias >= 0 ? "+" : "-"} R$ {Math.abs(crescimentoTrintaDias).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                             </h2>
                         </div>
                     </div>
@@ -172,6 +175,11 @@ function PoupancaContent() {
 
                 {/* Metas */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                    {metas.length === 0 && (
+                        <div className="md:col-span-3 glass-card p-6 text-sm text-muted">
+                            Nenhuma meta de poupança cadastrada. Os valores ficam zerados até você registrar depósitos ou metas reais.
+                        </div>
+                    )}
                     {metas.map((meta) => {
                         const progresso = calcularProgresso(meta.valorAtual, meta.valorMeta);
                         const isActive = activeMeta === meta.id;

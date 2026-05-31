@@ -81,7 +81,7 @@ export function useDashboardOverview(): DashboardOverview {
             const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
             const historyStart = sixMonthsAgo.toISOString().slice(0, 10);
 
-            const [receitasResult, despesasResult, aplicacoesResult, metasPoupancaResult] = await Promise.all([
+            const [receitasResult, despesasResult, aplicacoesResult] = await Promise.all([
                 supabase
                     .from("receitas")
                     .select("id, descricao, valor, data, categoria_id")
@@ -98,21 +98,17 @@ export function useDashboardOverview(): DashboardOverview {
                     .from("aplicacoes")
                     .select("valor, tipo_transacao")
                     .eq("user_id", user.id),
-                supabase
-                    .from("metas_poupanca")
-                    .select("valor_atual")
-                    .eq("user_id", user.id),
             ]);
 
-            if (receitasResult.error) throw receitasResult.error;
-            if (despesasResult.error) throw despesasResult.error;
-            if (aplicacoesResult.error) throw aplicacoesResult.error;
-            if (metasPoupancaResult.error) throw metasPoupancaResult.error;
+            const warnings = [
+                receitasResult.error ? `Receitas: ${receitasResult.error.message}` : null,
+                despesasResult.error ? `Despesas: ${despesasResult.error.message}` : null,
+                aplicacoesResult.error ? `Aplicações: ${aplicacoesResult.error.message}` : null,
+            ].filter(Boolean);
 
-            const receitas = receitasResult.data ?? [];
-            const despesas = despesasResult.data ?? [];
-            const aplicacoes = aplicacoesResult.data ?? [];
-            const metasPoupanca = metasPoupancaResult.data ?? [];
+            const receitas = receitasResult.error ? [] : receitasResult.data ?? [];
+            const despesas = despesasResult.error ? [] : despesasResult.data ?? [];
+            const aplicacoes = aplicacoesResult.error ? [] : aplicacoesResult.data ?? [];
 
             const sumBetween = (
                 rows: Array<{ valor: number; data: string }>,
@@ -129,8 +125,9 @@ export function useDashboardOverview(): DashboardOverview {
                 aplicacoes.reduce((sum, item) => {
                     const value = Number(item.valor);
                     return item.tipo_transacao === "resgate" ? sum - value : sum + value;
-                }, 0) + metasPoupanca.reduce((sum, item) => sum + Number(item.valor_atual), 0)
+                }, 0)
             );
+            setError(warnings.length > 0 ? warnings.join(" | ") : null);
 
             const months = Array.from({ length: 6 }, (_, index) => {
                 const date = new Date(now.getFullYear(), now.getMonth() - 5 + index, 1);
@@ -168,6 +165,13 @@ export function useDashboardOverview(): DashboardOverview {
         } catch (err) {
             const message = err instanceof Error ? err.message : "Erro ao carregar dashboard";
             setError(message);
+            setCurrentIncome(0);
+            setCurrentExpenses(0);
+            setPreviousIncome(0);
+            setPreviousExpenses(0);
+            setTotalInvestments(0);
+            setRecentTransactions([]);
+            setMonthlyCashFlow([]);
         } finally {
             setLoading(false);
         }

@@ -28,14 +28,6 @@ const sumRowsInMonth = (rows: MonthlyRow[], startDate: string, endDate: string) 
     .filter((item) => item.data && item.data >= startDate && item.data < endDate)
     .reduce((sum, item) => sum + Number(item.valor ?? 0), 0);
 
-const getErrorMessage = (err: unknown) => {
-    if (err instanceof Error) return err.message;
-    if (typeof err === "object" && err && "message" in err) {
-        return String((err as { message?: unknown }).message);
-    }
-    return "Erro ao carregar uso da receita";
-};
-
 const getTone = (usage: number) => {
     if (usage >= 100) {
         return {
@@ -73,12 +65,10 @@ export default function BudgetUsageAlert() {
     const [currentIncome, setCurrentIncome] = useState(0);
     const [currentExpenses, setCurrentExpenses] = useState(0);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
 
     const loadBudgetUsage = useCallback(async () => {
         try {
             setLoading(true);
-            setError(null);
 
             const { data: { session } } = await supabase.auth.getSession();
             if (!session?.user) {
@@ -102,13 +92,12 @@ export default function BudgetUsageAlert() {
                     .order("data", { ascending: false }),
             ]);
 
-            if (receitasResult.error) throw new Error(`Receitas: ${receitasResult.error.message}`);
-            if (despesasResult.error) throw new Error(`Despesas: ${despesasResult.error.message}`);
+            const receitas = receitasResult.error ? [] : (receitasResult.data ?? []) as MonthlyRow[];
+            const despesas = despesasResult.error ? [] : (despesasResult.data ?? []) as MonthlyRow[];
 
-            setCurrentIncome(sumRowsInMonth((receitasResult.data ?? []) as MonthlyRow[], startDate, endDate));
-            setCurrentExpenses(sumRowsInMonth((despesasResult.data ?? []) as MonthlyRow[], startDate, endDate));
-        } catch (err) {
-            setError(getErrorMessage(err));
+            setCurrentIncome(sumRowsInMonth(receitas, startDate, endDate));
+            setCurrentExpenses(sumRowsInMonth(despesas, startDate, endDate));
+        } catch {
             setCurrentIncome(0);
             setCurrentExpenses(0);
         } finally {
@@ -152,7 +141,7 @@ export default function BudgetUsageAlert() {
                                 {tone.label}
                             </span>
                         </div>
-                        <p className="mt-1 text-sm text-muted">{loading ? "Calculando receita e despesas..." : error ?? message}</p>
+                        <p className="mt-1 text-sm text-muted">{loading ? "Calculando receita e despesas..." : message}</p>
                     </div>
                 </div>
 
