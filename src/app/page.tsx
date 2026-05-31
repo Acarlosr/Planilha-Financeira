@@ -9,8 +9,10 @@ import DataConnectionStatus from "@/components/DataConnectionStatus";
 import FinancialRadar from "@/components/FinancialRadar";
 import PaymentReminders from "@/components/PaymentReminders";
 import BudgetUsageAlert from "@/components/BudgetUsageAlert";
+import MarketInsightRail from "@/components/MarketInsightRail";
+import DashboardPulse from "@/components/DashboardPulse";
 import Link from "next/link";
-import { Bell, Search, Plus, TrendingDown, TrendingUp } from "lucide-react";
+import { Bell, Search, Plus, TrendingDown, TrendingUp, Zap } from "lucide-react";
 
 export default function Home() {
   return (
@@ -21,9 +23,15 @@ export default function Home() {
       {/* Main Content */}
       <main className="md:ml-64 p-4 pt-24 md:p-8 transition-all duration-300">
         {/* Header */}
-        <header className="flex flex-col gap-5 mb-8 lg:flex-row lg:items-center lg:justify-between">
+        <header className="relative mb-8 overflow-hidden rounded-xl border p-5 lg:p-6" style={{ background: "linear-gradient(135deg, color-mix(in srgb, var(--card-bg-solid) 68%, transparent), color-mix(in srgb, var(--secondary) 7%, transparent))", borderColor: "var(--card-border)", boxShadow: "var(--shadow-glass)" }}>
+          <DashboardPulse />
+          <div className="relative z-10 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground">Dashboard financeiro</h1>
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold" style={{ borderColor: "color-mix(in srgb, var(--secondary) 32%, transparent)", color: "var(--secondary)", background: "color-mix(in srgb, var(--secondary) 8%, transparent)" }}>
+              <Zap size={14} />
+              Market dashboard beta
+            </div>
+            <h1 className="text-2xl md:text-4xl font-bold text-foreground">Dashboard financeiro</h1>
             <p className="text-muted mt-1 max-w-2xl">
               Acompanhe saldo, entradas, saídas e movimentações recentes com dados sincronizados da sua conta.
             </p>
@@ -65,66 +73,70 @@ export default function Home() {
             {/* User Profile with Dropdown */}
             <UserMenu />
           </div>
+          </div>
         </header>
 
         {/* Trial Banner */}
         <TrialBanner />
 
-        <section className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <Link
-            href="/receitas"
-            className="group flex items-center justify-between rounded-lg border px-4 py-4 transition"
-            style={{
-              background: "color-mix(in srgb, var(--success) 10%, transparent)",
-              borderColor: "color-mix(in srgb, var(--success) 20%, transparent)",
-              color: "var(--success)",
-            }}
-          >
-            <span className="flex items-center gap-3 font-medium">
-              <TrendingUp size={18} />
-              Nova receita
-            </span>
-            <Plus size={18} className="transition group-hover:rotate-90" />
-          </Link>
-          <Link
-            href="/despesas"
-            className="group flex items-center justify-between rounded-lg border px-4 py-4 transition"
-            style={{
-              background: "color-mix(in srgb, var(--danger) 10%, transparent)",
-              borderColor: "color-mix(in srgb, var(--danger) 20%, transparent)",
-              color: "var(--danger)",
-            }}
-          >
-            <span className="flex items-center gap-3 font-medium">
-              <TrendingDown size={18} />
-              Nova despesa
-            </span>
-            <Plus size={18} className="transition group-hover:rotate-90" />
-          </Link>
-        </section>
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
+          <div className="min-w-0">
+            <section className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <Link
+                href="/receitas"
+                className="group flex items-center justify-between rounded-lg border px-4 py-4 transition"
+                style={{
+                  background: "linear-gradient(135deg, color-mix(in srgb, var(--success) 14%, transparent), color-mix(in srgb, var(--secondary) 9%, transparent))",
+                  borderColor: "color-mix(in srgb, var(--success) 24%, transparent)",
+                  color: "var(--success)",
+                }}
+              >
+                <span className="flex items-center gap-3 font-medium">
+                  <TrendingUp size={18} />
+                  Nova receita
+                </span>
+                <Plus size={18} className="transition group-hover:rotate-90" />
+              </Link>
+              <Link
+                href="/despesas"
+                className="group flex items-center justify-between rounded-lg border px-4 py-4 transition"
+                style={{
+                  background: "linear-gradient(135deg, color-mix(in srgb, var(--danger) 12%, transparent), color-mix(in srgb, var(--accent) 7%, transparent))",
+                  borderColor: "color-mix(in srgb, var(--danger) 24%, transparent)",
+                  color: "var(--danger)",
+                }}
+              >
+                <span className="flex items-center gap-3 font-medium">
+                  <TrendingDown size={18} />
+                  Nova despesa
+                </span>
+                <Plus size={18} className="transition group-hover:rotate-90" />
+              </Link>
+            </section>
 
-        <BudgetUsageAlert />
+            <section className="mb-8">
+              <SummaryCards />
+            </section>
 
-        <PaymentReminders />
+            <BudgetUsageAlert />
 
-        <FinancialRadar />
+            <div className="grid gap-6 2xl:grid-cols-[minmax(0,1fr)_430px]">
+              <CashFlowChart />
+              <PaymentReminders />
+            </div>
 
-        <DataConnectionStatus />
+            <FinancialRadar />
 
-        {/* Summary Cards */}
-        <section className="mb-8">
-          <SummaryCards />
-        </section>
+            <DataConnectionStatus />
 
-        {/* Cash Flow Chart */}
-        <section className="mb-8">
-          <CashFlowChart />
-        </section>
+            {/* Transactions Table */}
+            <section className="mb-8">
+              <TransactionsTable />
+            </section>
+          </div>
 
-        {/* Transactions Table */}
-        <section className="mb-8">
-          <TransactionsTable />
-        </section>
+          <MarketInsightRail />
+        </div>
 
         {/* Footer */}
         <footer className="text-center py-6 text-muted text-sm">

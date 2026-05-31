@@ -17,6 +17,7 @@ import {
     Moon,
     Menu,
     X,
+    Sparkles,
 } from "lucide-react";
 
 interface NavItem {
@@ -50,8 +51,8 @@ export default function Sidebar() {
             {/* Beta Banner */}
             <div className="fixed top-0 left-0 w-full z-[100] text-center flex items-center justify-center gap-2 h-8 text-xs font-medium backdrop-blur-md border-b"
                 style={{
-                    background: "color-mix(in srgb, var(--accent) 9%, transparent)",
-                    borderColor: "color-mix(in srgb, var(--accent) 18%, transparent)",
+                    background: "linear-gradient(90deg, rgba(7, 11, 21, 0.7), color-mix(in srgb, var(--accent) 11%, transparent), rgba(7, 11, 21, 0.7))",
+                    borderColor: "color-mix(in srgb, var(--accent) 20%, transparent)",
                     color: "var(--accent)",
                 }}
             >
@@ -78,11 +79,11 @@ export default function Sidebar() {
                     <div
                         className="w-10 h-10 rounded-xl flex items-center justify-center"
                         style={{
-                            background: "var(--accent)",
+                            background: "linear-gradient(135deg, var(--accent), var(--secondary))",
                             boxShadow: "0 10px 24px color-mix(in srgb, var(--accent) 22%, transparent)",
                         }}
                     >
-                        <TrendingUp className="text-white" size={20} />
+                        <Sparkles className="text-black" size={20} />
                     </div>
                     <span className="font-semibold text-foreground text-lg">FinançasPro</span>
                 </Link>
@@ -107,10 +108,10 @@ export default function Sidebar() {
                     ${collapsed ? "w-64 md:w-20" : "w-64"} 
                     ${mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
                 style={{
-                    background: "var(--background-light)",
+                    background: "linear-gradient(180deg, rgba(13, 19, 32, 0.94), rgba(9, 15, 27, 0.84))",
                     borderColor: "var(--card-border)",
                     backdropFilter: "blur(20px)",
-                    boxShadow: "4px 0 20px rgba(0, 0, 0, 0.1)",
+                    boxShadow: "14px 0 48px rgba(0, 0, 0, 0.24)",
                 }}
             >
             {/* Header */}
@@ -120,11 +121,11 @@ export default function Sidebar() {
                         <div
                             className="w-10 h-10 rounded-xl flex items-center justify-center"
                             style={{
-                                background: "var(--accent)",
-                                boxShadow: "0 10px 24px color-mix(in srgb, var(--accent) 22%, transparent)",
+                                background: "linear-gradient(135deg, var(--accent), var(--secondary))",
+                                boxShadow: "0 10px 24px color-mix(in srgb, var(--secondary) 24%, transparent)",
                             }}
                         >
-                            <TrendingUp className="text-white" size={20} />
+                            <Sparkles className="text-black" size={20} />
                         </div>
                         <span className="font-semibold text-foreground text-lg">FinançasPro</span>
                     </Link>
@@ -134,11 +135,11 @@ export default function Sidebar() {
                         href="/"
                         className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto"
                         style={{
-                            background: "var(--accent)",
-                            boxShadow: "0 10px 24px color-mix(in srgb, var(--accent) 22%, transparent)",
+                            background: "linear-gradient(135deg, var(--accent), var(--secondary))",
+                            boxShadow: "0 10px 24px color-mix(in srgb, var(--secondary) 24%, transparent)",
                         }}
                     >
-                        <TrendingUp className="text-white" size={20} />
+                        <Sparkles className="text-black" size={20} />
                     </Link>
                 )}
             </div>
@@ -155,9 +156,10 @@ export default function Sidebar() {
                         style={
                             isActive(item.href)
                                 ? {
-                                    background: "color-mix(in srgb, var(--accent) 13%, transparent)",
-                                    border: "1px solid color-mix(in srgb, var(--accent) 22%, transparent)",
+                                    background: "linear-gradient(135deg, color-mix(in srgb, var(--secondary) 17%, transparent), color-mix(in srgb, var(--accent) 10%, transparent))",
+                                    border: "1px solid color-mix(in srgb, var(--secondary) 30%, transparent)",
                                     color: "var(--foreground)",
+                                    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06), 0 12px 28px rgba(24,242,230,0.08)",
                                 }
                                 : {
                                     color: "var(--text-secondary)",

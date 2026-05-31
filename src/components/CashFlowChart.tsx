@@ -53,7 +53,7 @@ export default function CashFlowChart() {
     const data = monthlyCashFlow.length > 0 ? monthlyCashFlow : [{ month: "Atual", entradas: 0, saidas: 0 }];
 
     return (
-        <div className="glass-card p-6">
+        <div className="glass-card market-card p-6">
             <div className="flex items-center justify-between mb-6">
                 <div>
                     <h2 className="text-xl font-bold text-foreground">Fluxo de Caixa</h2>
@@ -61,11 +61,11 @@ export default function CashFlowChart() {
                 </div>
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full" style={{ background: "var(--success)" }} />
+                        <div className="w-3 h-3 rounded-full shadow-[0_0_14px_currentColor]" style={{ background: "var(--success)", color: "var(--success)" }} />
                         <span className="text-sm text-muted">Entradas</span>
                     </div>
                     <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full" style={{ background: "var(--danger)" }} />
+                        <div className="w-3 h-3 rounded-full shadow-[0_0_14px_currentColor]" style={{ background: "var(--danger)", color: "var(--danger)" }} />
                         <span className="text-sm text-muted">Saídas</span>
                     </div>
                 </div>
@@ -84,17 +84,17 @@ export default function CashFlowChart() {
                     >
                         <defs>
                             <linearGradient id="colorEntradas" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#22c55e" stopOpacity={0.22} />
-                                <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
+                                <stop offset="5%" stopColor="#15e3a0" stopOpacity={0.28} />
+                                <stop offset="95%" stopColor="#18f2e6" stopOpacity={0.02} />
                             </linearGradient>
                             <linearGradient id="colorSaidas" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#d94d4d" stopOpacity={0.2} />
-                                <stop offset="95%" stopColor="#d94d4d" stopOpacity={0} />
+                                <stop offset="5%" stopColor="#ff4f7b" stopOpacity={0.24} />
+                                <stop offset="95%" stopColor="#ff4f7b" stopOpacity={0.02} />
                             </linearGradient>
                         </defs>
                         <CartesianGrid
                             strokeDasharray="3 3"
-                            stroke="color-mix(in srgb, var(--foreground) 10%, transparent)"
+                            stroke="color-mix(in srgb, var(--secondary) 13%, transparent)"
                             vertical={false}
                         />
                         <XAxis
@@ -115,7 +115,7 @@ export default function CashFlowChart() {
                         <Area
                             type="monotone"
                             dataKey="entradas"
-                            stroke="#22c55e"
+                            stroke="#15e3a0"
                             strokeWidth={3}
                             fillOpacity={1}
                             fill="url(#colorEntradas)"
@@ -123,7 +123,7 @@ export default function CashFlowChart() {
                         <Area
                             type="monotone"
                             dataKey="saidas"
-                            stroke="#d94d4d"
+                            stroke="#ff4f7b"
                             strokeWidth={3}
                             fillOpacity={1}
                             fill="url(#colorSaidas)"

@@ -82,7 +82,7 @@ export default function FinancialRadar() {
     const insights = payload?.insights ?? [];
 
     return (
-        <section className="mb-8 glass-card overflow-hidden">
+        <section className="mb-8 glass-card market-card overflow-hidden">
             <div className="flex flex-col gap-4 border-b p-5 md:flex-row md:items-center md:justify-between" style={{ borderColor: "var(--card-border)" }}>
                 <div className="flex items-start gap-3">
                     <div
@@ -148,7 +148,7 @@ export default function FinancialRadar() {
                                 <article
                                     key={insight.id}
                                     className="rounded-lg border p-4"
-                                    style={{ borderColor: "var(--card-border)", background: "var(--card-bg-solid)" }}
+                                    style={{ borderColor: "var(--card-border)", background: "linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.025))" }}
                                 >
                                     <div className="mb-3 flex items-center justify-between gap-3">
                                         <span
@@ -164,6 +164,9 @@ export default function FinancialRadar() {
                                     </div>
                                     <h3 className="text-sm font-bold text-foreground">{insight.title}</h3>
                                     <p className="mt-2 text-sm text-muted">{insight.summary}</p>
+                                    <svg className="sparkline mt-3 h-10 w-full" viewBox="0 0 150 40" fill="none" aria-hidden="true" style={{ color: tone.color }}>
+                                        <path d={insight.tone === "negative" ? "M2 9 C18 14, 32 8, 46 17 S73 31, 90 24 S120 27, 148 33" : "M2 31 C18 24, 32 28, 47 19 S76 11, 93 17 S121 8, 148 12"} stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+                                    </svg>
                                     <p className="mt-3 text-xs leading-relaxed text-muted">{insight.detail}</p>
                                 </article>
                             );

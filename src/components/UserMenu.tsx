@@ -71,9 +71,9 @@ export default function UserMenu() {
                 </Link>
                 <Link
                     href="/cadastro"
-                    className="px-4 py-2 text-white font-medium rounded-lg transition-all hover:brightness-105"
+                    className="px-4 py-2 text-black font-semibold rounded-lg transition-all hover:brightness-105"
                     style={{
-                        background: "var(--accent)",
+                        background: "linear-gradient(135deg, var(--accent), var(--secondary))",
                         boxShadow: "0 10px 24px color-mix(in srgb, var(--accent) 22%, transparent)",
                     }}
                 >
@@ -97,10 +97,10 @@ export default function UserMenu() {
                 <div
                     className="w-9 h-9 rounded-lg flex items-center justify-center"
                     style={{
-                        background: "var(--accent)",
+                        background: "linear-gradient(135deg, var(--accent), var(--secondary))",
                     }}
                 >
-                    <User size={18} className="text-white" />
+                    <User size={18} className="text-black" />
                 </div>
                 <div className="hidden md:block">
                     <p className="text-sm font-medium text-foreground">{userName}</p>

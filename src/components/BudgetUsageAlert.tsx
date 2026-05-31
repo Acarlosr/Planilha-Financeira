@@ -138,16 +138,16 @@ export default function BudgetUsageAlert() {
             : `Você atingiu ${usage.toFixed(1).replace(".", ",")}% da receita do mês.`;
 
     return (
-        <section className="mb-8 rounded-lg border p-5" style={{ background: tone.bg, borderColor: tone.border }}>
+        <section className="glass-card market-card mb-8 p-5" style={{ borderColor: tone.border }}>
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div className="flex items-start gap-3">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg" style={{ background: "var(--card-bg-solid)", color: tone.color }}>
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg" style={{ background: tone.bg, color: tone.color, boxShadow: `0 0 24px ${tone.color}` }}>
                         <Gauge size={22} />
                     </div>
                     <div>
                         <div className="flex flex-wrap items-center gap-2">
                             <h2 className="text-lg font-bold text-foreground">Uso da receita do mês</h2>
-                            <span className="flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold" style={{ color: tone.color, background: "var(--card-bg-solid)" }}>
+                            <span className="flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold" style={{ color: tone.color, background: tone.bg }}>
                                 {tone.icon}
                                 {tone.label}
                             </span>
@@ -182,12 +182,13 @@ export default function BudgetUsageAlert() {
                         {currentIncome > 0 ? `${usage.toFixed(1).replace(".", ",")}%` : "0%"}
                     </span>
                 </div>
-                <div className="h-3 overflow-hidden rounded-full" style={{ background: "color-mix(in srgb, var(--foreground) 10%, transparent)" }}>
+                <div className="h-4 overflow-hidden rounded-full border" style={{ background: "color-mix(in srgb, var(--foreground) 8%, transparent)", borderColor: "var(--card-border)" }}>
                     <div
                         className="h-full rounded-full transition-all duration-700"
                         style={{
                             width: `${loading ? 0 : cappedUsage}%`,
                             background: tone.bar,
+                            boxShadow: `0 0 20px ${tone.color}`,
                         }}
                     />
                 </div>
