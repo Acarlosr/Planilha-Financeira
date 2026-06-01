@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { X, Plus } from "lucide-react";
 
 interface SavingsModalProps {
@@ -12,7 +12,7 @@ interface SavingsModalProps {
         date: string;
         type: string;
         meta: string;
-    }) => void;
+    }) => void | Promise<void>;
     metas: { id: string; nome: string; icone: string }[];
 }
 
@@ -24,16 +24,21 @@ export default function SavingsModal({ isOpen, onClose, onSave, metas }: Savings
     const [type, setType] = useState<"deposito" | "retirada">("deposito");
     const [loading, setLoading] = useState(false);
 
+    useEffect(() => {
+        if (!meta && metas[0]?.id) {
+            setMeta(metas[0].id);
+        }
+    }, [meta, metas]);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
 
         try {
-            const formattedDate = new Date(date).toLocaleDateString('pt-BR');
-            onSave({
+            await onSave({
                 description,
                 value: parseFloat(value.replace(',', '.')),
-                date: formattedDate,
+                date,
                 type,
                 meta,
             });
@@ -125,29 +130,30 @@ export default function SavingsModal({ isOpen, onClose, onSave, metas }: Savings
                         </button>
                     </div>
 
-                    {/* Meta Selection */}
-                    <div>
-                        <label className="block text-sm font-medium text-muted mb-2">
-                            Meta
-                        </label>
-                        <div className="grid grid-cols-3 gap-2">
-                            {metas.map((m) => (
-                                <button
-                                    key={m.id}
-                                    type="button"
-                                    onClick={() => setMeta(m.id)}
-                                    className={`p-3 rounded-xl border text-center transition-all ${meta === m.id
-                                            ? "border-amber-500 bg-amber-500/20 text-white"
-                                            : "border-white/10 text-gray-400 hover:border-white/30"
-                                        }`}
-                                    style={{ background: meta === m.id ? undefined : "rgba(255, 255, 255, 0.03)" }}
-                                >
-                                    <span className="text-xl block mb-1">{m.icone}</span>
-                                    <span className="text-xs">{m.nome.split(' ')[0]}</span>
-                                </button>
-                            ))}
+                    {metas.length > 0 && (
+                        <div>
+                            <label className="block text-sm font-medium text-muted mb-2">
+                                Meta
+                            </label>
+                            <div className="grid grid-cols-3 gap-2">
+                                {metas.map((m) => (
+                                    <button
+                                        key={m.id}
+                                        type="button"
+                                        onClick={() => setMeta(m.id)}
+                                        className={`p-3 rounded-xl border text-center transition-all ${meta === m.id
+                                                ? "border-amber-500 bg-amber-500/20 text-white"
+                                                : "border-white/10 text-gray-400 hover:border-white/30"
+                                            }`}
+                                        style={{ background: meta === m.id ? undefined : "rgba(255, 255, 255, 0.03)" }}
+                                    >
+                                        <span className="text-xl block mb-1">{m.icone}</span>
+                                        <span className="text-xs">{m.nome.split(' ')[0]}</span>
+                                    </button>
+                                ))}
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* Description */}
                     <div>

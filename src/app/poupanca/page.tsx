@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useCallback, useEffect, useMemo, useState, Suspense } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import MonthYearPicker from "@/components/MonthYearPicker";
 import SavingsModal from "@/components/SavingsModal";
 import PrintExportButtons from "@/components/PrintExportButtons";
+import { supabase } from "@/lib/supabase";
 import {
     Plus,
     Target,
@@ -26,10 +27,43 @@ import {
     ResponsiveContainer,
 } from "recharts";
 
-import { poupancaData } from "@/constants/financialData";
+import { poupancaData, type MetaPoupanca, type Transacao } from "@/constants/financialData";
 
-// Dados do gráfico de evolução e metas vindos da constant
-const { evolucao: evolucaoData, metas, transacoes } = poupancaData;
+const { evolucao: emptySavingsEvolution } = poupancaData;
+
+type SavingsTransaction = Transacao & {
+    isoDate: string;
+};
+
+const monthLabels = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+
+const formatDisplayDate = (value: string) => {
+    const [year, month, day] = value.split("-");
+    return year && month && day ? `${day}/${month}/${year}` : value;
+};
+
+const buildSavingsEvolution = (transactions: SavingsTransaction[]) => {
+    const now = new Date();
+    let runningBalance = 0;
+
+    return Array.from({ length: 7 }, (_, index) => {
+        const date = new Date(now.getFullYear(), now.getMonth() - 6 + index, 1);
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+
+        runningBalance += transactions
+            .filter((item) => {
+                const [itemYear, itemMonth] = item.isoDate.split("-").map(Number);
+                return itemYear === year && itemMonth === month;
+            })
+            .reduce((sum, item) => sum + (item.tipo === "deposito" ? item.valor : -item.valor), 0);
+
+        return {
+            mes: monthLabels[date.getMonth()],
+            valor: Math.max(runningBalance, 0),
+        };
+    });
+};
 
 function PoupancaContent() {
     const router = useRouter();
@@ -48,39 +82,136 @@ function PoupancaContent() {
 
     const [activeMeta, setActiveMeta] = useState<string | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [transacoesData, setTransacoesData] = useState(transacoes);
+    const [metas, setMetas] = useState<MetaPoupanca[]>([]);
+    const [transacoesData, setTransacoesData] = useState<SavingsTransaction[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    const totalPoupanca = evolucaoData[evolucaoData.length - 1]?.valor ?? 0;
+    const loadSavings = useCallback(async () => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+                setMetas([]);
+                setTransacoesData([]);
+                return;
+            }
+
+            const [metasResult, poupancaResult] = await Promise.all([
+                supabase
+                    .from("metas_poupanca")
+                    .select("id, nome, valor_meta, valor_atual, icone, cor")
+                    .eq("user_id", user.id)
+                    .order("created_at", { ascending: true }),
+                supabase
+                    .from("poupanca")
+                    .select("id, descricao, valor, data, tipo_transacao, meta_id")
+                    .eq("user_id", user.id)
+                    .order("data", { ascending: false }),
+            ]);
+
+            if (metasResult.error) throw metasResult.error;
+            if (poupancaResult.error) throw poupancaResult.error;
+
+            setMetas((metasResult.data ?? []).map((meta) => ({
+                id: meta.id,
+                nome: meta.nome,
+                valorMeta: Number(meta.valor_meta),
+                valorAtual: Number(meta.valor_atual),
+                cor: meta.cor,
+                icone: meta.icone,
+            })));
+
+            setTransacoesData((poupancaResult.data ?? []).map((item) => ({
+                id: item.id,
+                descricao: item.descricao,
+                valor: Number(item.valor),
+                data: formatDisplayDate(item.data),
+                isoDate: item.data,
+                tipo: item.tipo_transacao,
+                meta: item.meta_id ?? "",
+            })));
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Erro ao carregar poupança");
+            setMetas([]);
+            setTransacoesData([]);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        loadSavings();
+    }, [loadSavings]);
+
+    const totalPoupanca = transacoesData.reduce((sum, item) => sum + (item.tipo === "deposito" ? item.valor : -item.valor), 0);
     const totalMetas = metas.reduce((sum, meta) => sum + meta.valorMeta, 0);
     const totalEconomizado = metas.reduce((sum, meta) => sum + meta.valorAtual, 0);
     const progressoGeral = totalMetas > 0 ? ((totalEconomizado / totalMetas) * 100).toFixed(1) : "0.0";
-    const crescimentoTrintaDias = evolucaoData.length >= 2
-        ? totalPoupanca - evolucaoData[evolucaoData.length - 2].valor
-        : 0;
+    const evolucaoData = useMemo(
+        () => transacoesData.length > 0 ? buildSavingsEvolution(transacoesData) : emptySavingsEvolution,
+        [transacoesData]
+    );
+    const crescimentoTrintaDias = useMemo(() => {
+        const now = new Date();
+        const thirtyDaysAgo = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30);
+        return transacoesData
+            .filter((item) => new Date(`${item.isoDate}T00:00:00`) >= thirtyDaysAgo)
+            .reduce((sum, item) => sum + (item.tipo === "deposito" ? item.valor : -item.valor), 0);
+    }, [transacoesData]);
 
     const getTransacoesFiltradas = () => {
         if (!activeMeta) return transacoesData;
         return transacoesData.filter((t) => t.meta === activeMeta);
     };
 
-    const handleSaveSaving = (saving: any) => {
-        const newTransaction = {
-            id: Date.now(),
+    const handleSaveSaving = async (saving: any) => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+            alert("Faça login novamente para registrar poupança.");
+            throw new Error("Usuário não autenticado");
+        }
+
+        const { error: insertError } = await supabase.from("poupanca").insert({
+            user_id: user.id,
             descricao: saving.description,
             valor: saving.value,
             data: saving.date,
-            tipo: saving.type,
-            meta: saving.meta,
-        };
-        setTransacoesData(prev => [newTransaction, ...prev]);
+            tipo_transacao: saving.type,
+            meta_id: saving.meta || null,
+        });
+
+        if (insertError) {
+            alert(`Erro ao salvar aporte: ${insertError.message}`);
+            throw insertError;
+        }
+
+        if (saving.meta) {
+            const selectedMeta = metas.find((meta) => meta.id === saving.meta);
+            if (selectedMeta) {
+                await supabase
+                    .from("metas_poupanca")
+                    .update({
+                        valor_atual: saving.type === "deposito"
+                            ? selectedMeta.valorAtual + saving.value
+                            : Math.max(selectedMeta.valorAtual - saving.value, 0),
+                    })
+                    .eq("id", saving.meta)
+                    .eq("user_id", user.id);
+            }
+        }
+
+        await loadSavings();
     };
 
-    const handleDeleteTransaction = (id: number) => {
+    const handleDeleteTransaction = (id: number | string) => {
         setTransacoesData(prev => prev.filter(t => t.id !== id));
     };
 
     const calcularProgresso = (atual: number, meta: number) => {
-        return ((atual / meta) * 100).toFixed(1);
+        return meta > 0 ? ((atual / meta) * 100).toFixed(1) : "0.0";
     };
 
     return (
@@ -94,7 +225,7 @@ function PoupancaContent() {
                         <div>
                             <h1 className="text-3xl font-bold text-foreground">Poupança</h1>
                             <p className="text-muted mt-1">
-                                Acompanhe suas economias e metas financeiras
+                                {loading ? "Carregando suas economias..." : "Acompanhe suas economias e metas financeiras"}
                             </p>
                         </div>
                         <div className="flex items-center gap-3">
@@ -123,6 +254,12 @@ function PoupancaContent() {
                             onChange={handleDateChange}
                         />
                     </div>
+
+                    {error && (
+                        <div className="mt-4 rounded-xl border p-4 text-sm text-red-300" style={{ borderColor: "rgba(248, 113, 113, 0.24)", background: "rgba(239, 68, 68, 0.08)" }}>
+                            Não foi possível carregar a poupança: {error}
+                        </div>
+                    )}
 
                     {/* Summary Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
@@ -358,9 +495,9 @@ function PoupancaContent() {
                         })}
                     </div>
 
-                    {activeMeta && getTransacoesFiltradas().length === 0 && (
+                    {getTransacoesFiltradas().length === 0 && (
                         <div className="text-center py-12">
-                            <p className="text-muted">Nenhuma transação nesta meta</p>
+                            <p className="text-muted">{activeMeta ? "Nenhuma transação nesta meta" : "Nenhuma movimentação de poupança registrada"}</p>
                         </div>
                     )}
                 </div>
