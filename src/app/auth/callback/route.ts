@@ -36,7 +36,13 @@ export async function GET(request: NextRequest) {
             }
         );
 
-        await supabase.auth.exchangeCodeForSession(code);
+        const { error } = await supabase.auth.exchangeCodeForSession(code);
+
+        if (error) {
+            const loginUrl = new URL('/login', origin);
+            loginUrl.searchParams.set('error', error.message);
+            return NextResponse.redirect(loginUrl);
+        }
 
         return response;
     }
