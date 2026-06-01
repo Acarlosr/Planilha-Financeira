@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, Suspense } from "react";
-import Link from "next/link";
+import { useCallback, useEffect, useMemo, useState, Suspense } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { supabase } from "@/lib/supabase";
+import { Database } from "@/types/database.types";
 import Sidebar from "@/components/Sidebar";
 import MonthYearPicker from "@/components/MonthYearPicker";
 import InvestmentModal from "@/components/InvestmentModal";
@@ -30,6 +31,13 @@ import { aplicacaoData } from "@/constants/financialData";
 
 // Dados vindos da constant
 const { rentabilidade: rentabilidadeData, tipos: tiposInvestimento, transacoes } = aplicacaoData;
+type TipoInvestimento = Database["public"]["Tables"]["tipos_investimento"]["Row"];
+type Aplicacao = Database["public"]["Tables"]["aplicacoes"]["Row"];
+
+const formatDisplayDate = (value: string) => {
+    const [year, month, day] = value.split("-");
+    return year && month && day ? `${day}/${month}/${year}` : value;
+};
 
 function AplicacaoContent() {
     const router = useRouter();
@@ -49,13 +57,76 @@ function AplicacaoContent() {
     const [activeFilter, setActiveFilter] = useState<string | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [transacoesData, setTransacoesData] = useState(transacoes);
+    const [tiposDb, setTiposDb] = useState<TipoInvestimento[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    const loadInvestments = useCallback(async () => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+                setTiposDb([]);
+                setTransacoesData([]);
+                return;
+            }
+
+            const [tiposResult, aplicacoesResult] = await Promise.all([
+                supabase
+                    .from("tipos_investimento")
+                    .select("*")
+                    .order("created_at", { ascending: true }),
+                supabase
+                    .from("aplicacoes")
+                    .select("*")
+                    .eq("user_id", user.id)
+                    .order("data", { ascending: false }),
+            ]);
+
+            if (tiposResult.error) throw tiposResult.error;
+            if (aplicacoesResult.error) throw aplicacoesResult.error;
+
+            setTiposDb(tiposResult.data ?? []);
+            setTransacoesData((aplicacoesResult.data ?? []).map((item: Aplicacao) => ({
+                id: item.id,
+                descricao: item.descricao,
+                valor: Number(item.valor),
+                data: formatDisplayDate(item.data),
+                tipo: item.tipo_transacao,
+                investimento: item.tipo_investimento_id,
+            })));
+        } catch (err) {
+            const message = err instanceof Error ? err.message : "Erro ao carregar aplicações";
+            setError(message);
+            setTiposDb([]);
+            setTransacoesData([]);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        loadInvestments();
+    }, [loadInvestments]);
 
     const getSaldoPorInvestimento = (investmentId: string) => {
         return transacoesData
             .filter((t) => t.investimento === investmentId)
             .reduce((sum, item) => sum + (item.tipo === "aporte" ? item.valor : -item.valor), 0);
     };
-    const tiposComSaldo = tiposInvestimento.map((inv) => ({
+    const tiposSource = tiposDb.length > 0
+        ? tiposDb.map((item) => ({
+            id: item.id,
+            nome: item.nome,
+            saldo: 0,
+            rentabilidade: 0,
+            cor: item.cor,
+            icone: item.icone,
+        }))
+        : tiposInvestimento;
+    const tiposComSaldo = tiposSource.map((inv) => ({
         ...inv,
         saldo: getSaldoPorInvestimento(inv.id),
     }));
@@ -68,16 +139,38 @@ function AplicacaoContent() {
         return transacoesData.filter((t) => t.investimento === activeFilter);
     };
 
-    const handleSaveInvestment = (investment: any) => {
-        const newTransaction = {
-            id: Date.now(),
+    const investmentTypesForModal = useMemo(
+        () => tiposDb.map((item) => ({ id: item.id, nome: item.nome, icone: item.icone })),
+        [tiposDb]
+    );
+
+    const handleSaveInvestment = async (investment: any) => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+            alert("Faça login novamente para registrar aplicações.");
+            throw new Error("Usuário não autenticado");
+        }
+
+        if (!tiposDb.some((item) => item.id === investment.investmentType)) {
+            alert("Tipo de investimento inválido. Rode o script de reparo/seed no Supabase e recarregue a página.");
+            throw new Error("Tipo de investimento inválido");
+        }
+
+        const { error: insertError } = await supabase.from("aplicacoes").insert({
+            user_id: user.id,
             descricao: investment.description,
             valor: investment.value,
             data: investment.date,
-            tipo: investment.type,
-            investimento: investment.investmentType,
-        };
-        setTransacoesData(prev => [newTransaction, ...prev]);
+            tipo_investimento_id: investment.investmentType,
+            tipo_transacao: investment.type,
+        });
+
+        if (insertError) {
+            alert(`Erro ao salvar aplicação: ${insertError.message}`);
+            throw insertError;
+        }
+
+        await loadInvestments();
     };
 
     return (
@@ -91,7 +184,7 @@ function AplicacaoContent() {
                         <div>
                             <h1 className="text-3xl font-bold text-foreground">Aplicações</h1>
                             <p className="text-muted mt-1">
-                                Acompanhe seus investimentos e rentabilidade
+                                {loading ? "Carregando seus investimentos..." : "Acompanhe seus investimentos e rentabilidade"}
                             </p>
                         </div>
                         <div className="flex items-center gap-3">
@@ -120,6 +213,12 @@ function AplicacaoContent() {
                             onChange={handleDateChange}
                         />
                     </div>
+
+                    {error && (
+                        <div className="mt-4 rounded-xl border p-4 text-sm text-red-300" style={{ borderColor: "rgba(248, 113, 113, 0.24)", background: "rgba(239, 68, 68, 0.08)" }}>
+                            Não foi possível carregar aplicações: {error}
+                        </div>
+                    )}
 
                     {/* Summary Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
@@ -175,31 +274,37 @@ function AplicacaoContent() {
                     {tiposComSaldo.map((inv) => {
                         const isActive = activeFilter === inv.id;
                         return (
-                            <Link href={`/aplicacao/${inv.id}`} key={inv.id}>
-                                <div
-                                    className={`glass-card p-5 cursor-pointer transition-all duration-300 hover:ring-2 hover:ring-[#7CFF6B] hover:shadow-[0_0_15px_rgba(124,255,107,0.3)] hover:scale-105 ${isActive ? "ring-2 ring-blue-400 ring-offset-2 scale-105" : ""
-                                        }`}
-                                >
-                                    <div className="flex items-start justify-between mb-3">
-                                        <div
-                                            className={`w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br ${inv.cor} text-2xl`}
-                                            style={{ boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)" }}
-                                        >
-                                            {inv.icone}
-                                        </div>
-                                        <div className="flex items-center gap-1 text-emerald-400">
-                                            <ArrowUpRight size={16} />
-                                            <span className="text-sm font-bold">{inv.rentabilidade}%</span>
-                                        </div>
+                            <button
+                                type="button"
+                                key={inv.id}
+                                onClick={() => setActiveFilter(isActive ? null : inv.id)}
+                                className={`glass-card p-5 cursor-pointer text-left transition-all duration-300 hover:ring-2 hover:ring-[#7CFF6B] hover:shadow-[0_0_15px_rgba(124,255,107,0.3)] hover:scale-105 ${isActive ? "ring-2 ring-blue-400 ring-offset-2 scale-105" : ""
+                                    }`}
+                            >
+                                <div className="flex items-start justify-between mb-3">
+                                    <div
+                                        className={`w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br ${inv.cor} text-2xl`}
+                                        style={{ boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)" }}
+                                    >
+                                        {inv.icone}
                                     </div>
-                                    <h3 className="text-muted text-sm font-medium mb-1">{inv.nome}</h3>
-                                    <p className="text-2xl font-bold text-foreground">
-                                        R$ {inv.saldo.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                                    </p>
+                                    <div className="flex items-center gap-1 text-emerald-400">
+                                        <ArrowUpRight size={16} />
+                                        <span className="text-sm font-bold">{inv.rentabilidade}%</span>
+                                    </div>
                                 </div>
-                            </Link>
+                                <h3 className="text-muted text-sm font-medium mb-1">{inv.nome}</h3>
+                                <p className="text-2xl font-bold text-foreground">
+                                    R$ {inv.saldo.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                                </p>
+                            </button>
                         );
                     })}
+                    {tiposDb.length === 0 && !loading && (
+                        <div className="md:col-span-2 lg:col-span-4 glass-card p-6 text-sm text-muted">
+                            Nenhum tipo de investimento cadastrado no Supabase. Rode o script de reparo/seed para habilitar novos aportes.
+                        </div>
+                    )}
                 </div>
 
                 {/* Chart */}
@@ -316,6 +421,7 @@ function AplicacaoContent() {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onSave={handleSaveInvestment}
+                investmentTypes={investmentTypesForModal}
             />
         </div>
     );

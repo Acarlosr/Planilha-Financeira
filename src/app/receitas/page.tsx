@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { Database } from "@/types/database.types";
 import Sidebar from "@/components/Sidebar";
 import MonthYearPicker from "@/components/MonthYearPicker";
 import PrintExportButtons from "@/components/PrintExportButtons";
@@ -14,7 +15,7 @@ import {
 } from "lucide-react";
 
 // Categorias de Receita conforme especificado
-const categoriasReceita = [
+const fallbackCategoriasReceita = [
     { id: "salario", label: "Salário Mensal", icone: "💼", cor: "from-emerald-500 to-emerald-400" },
     { id: "decimo", label: "13º Salário / Bônus", icone: "🎁", cor: "from-amber-500 to-amber-400" },
     { id: "freela", label: "Freelance / Extra", icone: "⚡", cor: "from-purple-500 to-purple-400" },
@@ -37,6 +38,7 @@ interface IncomeItem {
 }
 
 const initialIncomeData: IncomeItem[] = [];
+type CategoriaReceita = Database["public"]["Tables"]["categorias_receita"]["Row"];
 
 function ReceitasContent() {
     const router = useRouter();
@@ -48,6 +50,8 @@ function ReceitasContent() {
     const [incomeData, setIncomeData] = useState<IncomeItem[]>(initialIncomeData);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoadingData, setIsLoadingData] = useState(true);
+    const [categoriasReceitaDb, setCategoriasReceitaDb] = useState<CategoriaReceita[]>([]);
+    const [categoriasReady, setCategoriasReady] = useState(false);
 
     const currentMonth = searchParams.get("month") ? parseInt(searchParams.get("month")!) : new Date().getMonth() + 1;
     const currentYear = searchParams.get("year") ? parseInt(searchParams.get("year")!) : new Date().getFullYear();
@@ -67,6 +71,21 @@ function ReceitasContent() {
         params.set("scope", scope);
         router.push(`${pathname}?${params.toString()}`);
     };
+
+    const loadCategorias = useCallback(async () => {
+        const { data, error } = await supabase
+            .from("categorias_receita")
+            .select("*")
+            .order("created_at", { ascending: true });
+
+        if (error) {
+            console.error("Erro ao carregar categorias de receita:", error);
+            setCategoriasReceitaDb([]);
+        } else {
+            setCategoriasReceitaDb(data ?? []);
+        }
+        setCategoriasReady(true);
+    }, []);
 
     const loadData = useCallback(async (userId: string) => {
         setIsLoadingData(true);
@@ -111,7 +130,10 @@ function ReceitasContent() {
 
     useEffect(() => {
         const init = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
+            const [{ data: { session } }] = await Promise.all([
+                supabase.auth.getSession(),
+                loadCategorias(),
+            ]);
             if (!session) {
                 setIsLoadingData(false);
                 return;
@@ -120,17 +142,22 @@ function ReceitasContent() {
             await loadData(session.user.id);
         };
         init();
-    }, [currentMonth, currentYear, loadData]);
+    }, [currentMonth, currentYear, loadCategorias, loadData]);
 
     const handleSaveIncome = async (newIncome: { description: string; value: number; date: string; category: string }) => {
         if (!user) {
             alert("Sua sessão expirou. Faça login novamente.");
-            return;
+            throw new Error("Usuário não autenticado");
         }
 
-        // Converte DD/MM/YYYY para YYYY-MM-DD
-        const [day, month, year] = newIncome.date.split('/');
-        const pgDate = `${year}-${month}-${day}`;
+        if (!categoriasReceitaDb.some((categoria) => categoria.id === newIncome.category)) {
+            alert("Categoria de receita inválida. Rode o script de reparo/seed no Supabase e recarregue a página.");
+            throw new Error("Categoria de receita inválida");
+        }
+
+        const pgDate = newIncome.date.includes("-")
+            ? newIncome.date
+            : newIncome.date.split('/').reverse().join('-');
 
         const dbItem = {
             user_id: user.id,
@@ -141,11 +168,11 @@ function ReceitasContent() {
         };
 
         const { data, error } = await supabase.from('receitas').insert(dbItem).select().single();
-        
+
         if (error) {
             console.error(error);
-            alert("Erro ao salvar! Tem certeza que rodou o arquivo SQL no site do Supabase?");
-            return;
+            alert(`Erro ao salvar receita: ${error.message}`);
+            throw error;
         }
 
         const newItem: IncomeItem = {
@@ -180,6 +207,15 @@ function ReceitasContent() {
     };
 
     const totalReceitas = incomeData.reduce((sum, item) => sum + item.value, 0);
+
+    const categoriasReceita = categoriasReceitaDb.length > 0
+        ? categoriasReceitaDb.map((categoria) => ({
+            id: categoria.id,
+            label: categoria.nome,
+            icone: categoria.icone,
+            cor: categoria.cor,
+        }))
+        : fallbackCategoriasReceita;
 
     const getCategoryById = (id: string) => {
         return categoriasReceita.find((c) => c.id === id);
@@ -386,6 +422,7 @@ function ReceitasContent() {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onSave={handleSaveIncome}
+                categorias={categoriasReady && categoriasReceitaDb.length > 0 ? categoriasReceita : []}
             />
         </div>
     );

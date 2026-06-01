@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useEffect } from "react";
 import { X, Plus } from "lucide-react";
 
 interface InvestmentModalProps {
@@ -12,27 +13,33 @@ interface InvestmentModalProps {
         date: string;
         type: string;
         investmentType: string;
-    }) => void;
+    }) => void | Promise<void>;
+    investmentTypes: { id: string; nome: string; icone: string }[];
 }
 
-export default function InvestmentModal({ isOpen, onClose, onSave }: InvestmentModalProps) {
+export default function InvestmentModal({ isOpen, onClose, onSave, investmentTypes }: InvestmentModalProps) {
     const [description, setDescription] = useState("");
     const [value, setValue] = useState("");
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
     const [type, setType] = useState<"aporte" | "resgate">("aporte");
-    const [investmentType, setInvestmentType] = useState("tesouro");
+    const [investmentType, setInvestmentType] = useState(investmentTypes[0]?.id ?? "");
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        if (isOpen && investmentTypes.length > 0 && !investmentTypes.some((item) => item.id === investmentType)) {
+            setInvestmentType(investmentTypes[0].id);
+        }
+    }, [investmentType, investmentTypes, isOpen]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
 
         try {
-            const formattedDate = new Date(date).toLocaleDateString('pt-BR');
-            onSave({
+            await onSave({
                 description,
                 value: parseFloat(value.replace(',', '.')),
-                date: formattedDate,
+                date,
                 type,
                 investmentType,
             });
@@ -42,7 +49,7 @@ export default function InvestmentModal({ isOpen, onClose, onSave }: InvestmentM
             setValue("");
             setDate(new Date().toISOString().split('T')[0]);
             setType("aporte");
-            setInvestmentType("tesouro");
+            setInvestmentType(investmentTypes[0]?.id ?? "");
             onClose();
         } catch (error) {
             console.error("Error saving investment:", error);
@@ -135,11 +142,17 @@ export default function InvestmentModal({ isOpen, onClose, onSave }: InvestmentM
                             className="w-full px-4 py-3 rounded-xl text-white outline-none transition-all border border-white/10 focus:border-blue-500/50"
                             style={{ background: "rgba(255, 255, 255, 0.05)" }}
                         >
-                            <option value="tesouro" className="text-gray-900">Tesouro Direto</option>
-                            <option value="acoes" className="text-gray-900">Ações</option>
-                            <option value="fiis" className="text-gray-900">Fundos Imobiliários</option>
-                            <option value="cdb" className="text-gray-900">CDB/LCI/LCA</option>
+                            {investmentTypes.map((item) => (
+                                <option key={item.id} value={item.id} className="text-gray-900">
+                                    {item.icone} {item.nome}
+                                </option>
+                            ))}
                         </select>
+                        {investmentTypes.length === 0 && (
+                            <p className="mt-2 text-xs text-red-300">
+                                Cadastre os tipos de investimento no Supabase antes de salvar.
+                            </p>
+                        )}
                     </div>
 
                     {/* Description */}
@@ -192,7 +205,7 @@ export default function InvestmentModal({ isOpen, onClose, onSave }: InvestmentM
                     {/* Submit Button */}
                     <button
                         type="submit"
-                        disabled={loading || !description || !value}
+                        disabled={loading || !description || !value || !investmentType}
                         className="w-full py-3.5 rounded-xl text-foreground font-semibold transition-all hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed mt-6"
                         style={{
                             background: type === "aporte"
