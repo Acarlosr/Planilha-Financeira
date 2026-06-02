@@ -68,18 +68,17 @@ const colorMap: Record<string, string> = {
 
 const commonExpenseCategories = [
     { id: "650e8400-e29b-41d4-a716-446655440003", nome: "Transporte", icone: "Car", cor: "blue", tipo: "despesa", user_id: null, created_at: "" },
-    { id: "local-cartao-credito", nome: "Cartão de crédito", icone: "CreditCard", cor: "indigo", tipo: "despesa", user_id: null, created_at: "" },
-    { id: "local-streaming", nome: "Streaming", icone: "Tv", cor: "cyan", tipo: "despesa", user_id: null, created_at: "" },
-    { id: "local-internet", nome: "Internet", icone: "Wifi", cor: "teal", tipo: "despesa", user_id: null, created_at: "" },
-    { id: "local-tv-cabo", nome: "TV a cabo", icone: "Tv", cor: "blue", tipo: "despesa", user_id: null, created_at: "" },
-    { id: "650e8400-e29b-41d4-a716-446655440002", nome: "Delivery", icone: "Utensils", cor: "orange", tipo: "despesa", user_id: null, created_at: "" },
-    { id: "local-academia", nome: "Academia", icone: "Dumbbell", cor: "cyan", tipo: "despesa", user_id: null, created_at: "" },
-    { id: "local-agua", nome: "Água", icone: "Droplets", cor: "blue", tipo: "despesa", user_id: null, created_at: "" },
-    { id: "local-luz", nome: "Luz", icone: "Lightbulb", cor: "teal", tipo: "despesa", user_id: null, created_at: "" },
+    { id: "650e8400-e29b-41d4-a716-446655440009", nome: "Cartão de Crédito", icone: "CreditCard", cor: "indigo", tipo: "despesa", user_id: null, created_at: "" },
+    { id: "650e8400-e29b-41d4-a716-446655440010", nome: "Streaming", icone: "Tv", cor: "cyan", tipo: "despesa", user_id: null, created_at: "" },
+    { id: "650e8400-e29b-41d4-a716-446655440011", nome: "Internet/TV/Celular", icone: "Wifi", cor: "teal", tipo: "despesa", user_id: null, created_at: "" },
+    { id: "650e8400-e29b-41d4-a716-446655440012", nome: "Delivery", icone: "Utensils", cor: "orange", tipo: "despesa", user_id: null, created_at: "" },
+    { id: "650e8400-e29b-41d4-a716-446655440013", nome: "Academia", icone: "Dumbbell", cor: "cyan", tipo: "despesa", user_id: null, created_at: "" },
+    { id: "650e8400-e29b-41d4-a716-446655440014", nome: "Água", icone: "Droplets", cor: "blue", tipo: "despesa", user_id: null, created_at: "" },
+    { id: "650e8400-e29b-41d4-a716-446655440015", nome: "Luz", icone: "Lightbulb", cor: "teal", tipo: "despesa", user_id: null, created_at: "" },
     { id: "650e8400-e29b-41d4-a716-446655440004", nome: "Saúde", icone: "Heart", cor: "red", tipo: "despesa", user_id: null, created_at: "" },
     { id: "650e8400-e29b-41d4-a716-446655440005", nome: "Educação", icone: "GraduationCap", cor: "green", tipo: "despesa", user_id: null, created_at: "" },
-    { id: "local-viagens", nome: "Viagens", icone: "Plane", cor: "indigo", tipo: "despesa", user_id: null, created_at: "" },
-    { id: "650e8400-e29b-41d4-a716-446655440008", nome: "Outros", icone: "MoreHorizontal", cor: "gray", tipo: "despesa", user_id: null, created_at: "" },
+    { id: "650e8400-e29b-41d4-a716-446655440016", nome: "Viagens", icone: "Plane", cor: "indigo", tipo: "despesa", user_id: null, created_at: "" },
+    { id: "650e8400-e29b-41d4-a716-446655440017", nome: "Outros", icone: "MoreHorizontal", cor: "gray", tipo: "despesa", user_id: null, created_at: "" },
 ];
 
 interface ExpenseItem {

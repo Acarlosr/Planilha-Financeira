@@ -29,7 +29,16 @@ INSERT INTO categorias_despesa (id, nome, icone, cor) VALUES
 ('650e8400-e29b-41d4-a716-446655440005', 'Educação', 'GraduationCap', 'from-green-500 to-green-400'),
 ('650e8400-e29b-41d4-a716-446655440006', 'Lazer', 'Smartphone', 'from-pink-500 to-pink-400'),
 ('650e8400-e29b-41d4-a716-446655440007', 'Vestuário', 'Shirt', 'from-indigo-500 to-indigo-400'),
-('650e8400-e29b-41d4-a716-446655440008', 'Compras', 'ShoppingCart', 'from-teal-500 to-teal-400')
+('650e8400-e29b-41d4-a716-446655440008', 'Compras', 'ShoppingCart', 'from-teal-500 to-teal-400'),
+('650e8400-e29b-41d4-a716-446655440009', 'Cartão de Crédito', 'CreditCard', 'from-indigo-500 to-indigo-400'),
+('650e8400-e29b-41d4-a716-446655440010', 'Streaming', 'Tv', 'from-cyan-500 to-cyan-400'),
+('650e8400-e29b-41d4-a716-446655440011', 'Internet/TV/Celular', 'Wifi', 'from-teal-500 to-teal-400'),
+('650e8400-e29b-41d4-a716-446655440012', 'Delivery', 'Utensils', 'from-orange-500 to-orange-400'),
+('650e8400-e29b-41d4-a716-446655440013', 'Academia', 'Dumbbell', 'from-cyan-500 to-cyan-400'),
+('650e8400-e29b-41d4-a716-446655440014', 'Água', 'Droplets', 'from-blue-500 to-blue-400'),
+('650e8400-e29b-41d4-a716-446655440015', 'Luz', 'Lightbulb', 'from-teal-500 to-teal-400'),
+('650e8400-e29b-41d4-a716-446655440016', 'Viagens', 'Plane', 'from-indigo-500 to-indigo-400'),
+('650e8400-e29b-41d4-a716-446655440017', 'Outros', 'MoreHorizontal', 'from-slate-500 to-slate-400')
 ON CONFLICT (id) DO NOTHING;
 
 -- =============================================
