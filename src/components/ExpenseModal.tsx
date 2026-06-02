@@ -11,6 +11,14 @@ import { v4 as uuidv4 } from 'uuid';
 type Cartao = Database["public"]["Tables"]["cartoes"]["Row"];
 type Categoria = Database["public"]["Tables"]["categorias_despesa"]["Row"];
 
+const INTERNET_TV_CELULAR_CATEGORY_ID = "650e8400-e29b-41d4-a716-446655440011";
+
+const telecomServiceOptions = ["Internet", "Plano celular", "TV a cabo"];
+const telecomProviderOptions = ["Vivo", "Claro", "IPTV"];
+const telecomDetailPattern = /\s-\s(?:Internet|Plano celular|TV a cabo)\s(?:Vivo|Claro|IPTV)$/;
+
+const removeTelecomDetail = (value: string) => value.replace(telecomDetailPattern, "");
+
 interface ExpenseModalProps {
     isOpen: boolean;
     onClose: () => void;
@@ -41,6 +49,8 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
     const [isBoleto, setIsBoleto] = useState(false);
     const [dueDate, setDueDate] = useState(new Date().toISOString().split('T')[0]);
     const [categoryId, setCategoryId] = useState("");
+    const [telecomService, setTelecomService] = useState(telecomServiceOptions[0]);
+    const [telecomProvider, setTelecomProvider] = useState(telecomProviderOptions[0]);
 
     // Dados de parcelamento
     const [installmentsData, setInstallmentsData] = useState<InstallmentsData>({
@@ -64,13 +74,17 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
             const knownBrand = ["Mastercard", "Visa", "Amex", "Outros"].find((brand) => cardLabel.endsWith(` ${brand}`));
             const cardName = knownBrand ? cardLabel.replace(` ${knownBrand}`, "") : cardLabel;
             const initialDate = initialExpense?.isoDate || today;
+            const initialDescription = initialExpense?.description.replace(/\s\(\d+\/\d+\)$/, "") ?? "";
+            const detailMatch = initialDescription.match(telecomDetailPattern);
 
-            setDescription(initialExpense?.description.replace(/\s\(\d+\/\d+\)$/, "") ?? "");
+            setDescription(removeTelecomDetail(initialDescription));
             setAmount(initialExpense ? initialExpense.value.toLocaleString("pt-BR", { minimumFractionDigits: 2 }) : "");
             setDate(initialDate);
             setIsBoleto(false);
             setDueDate(initialDate);
             setCategoryId(initialExpense?.category || initialCategoryId || (categorias.length > 0 ? categorias[0].id : ""));
+            setTelecomService(detailMatch ? telecomServiceOptions.find((option) => detailMatch[0].includes(option)) ?? telecomServiceOptions[0] : telecomServiceOptions[0]);
+            setTelecomProvider(detailMatch ? telecomProviderOptions.find((option) => detailMatch[0].includes(option)) ?? telecomProviderOptions[0] : telecomProviderOptions[0]);
             setInstallmentsData({
                 parcelada: false,
                 tipoRepeticao: "recorrente",
@@ -104,6 +118,10 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
 
             const valorTotal = parseFloat(amount.replace(/\./g, '').replace(',', '.'));
             if (isNaN(valorTotal)) throw new Error("Valor inválido");
+            const descricaoBase = removeTelecomDetail(description.trim());
+            const descricaoFinalBase = categoryId === INTERNET_TV_CELULAR_CATEGORY_ID
+                ? `${descricaoBase} - ${telecomService} ${telecomProvider}`
+                : descricaoBase;
 
             let cartaoId = installmentsData.cartaoId || null;
             const cartaoManualNome = installmentsData.cartaoNome.trim();
@@ -156,8 +174,8 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                         ? parseFloat((valorParcela + diferenca).toFixed(2))
                         : valorParcela;
                     const descricaoFinal = isInstallmentPurchase
-                        ? `${description} (${i + 1}/${installmentsData.numeroParcelas})`
-                        : description;
+                        ? `${descricaoFinalBase} (${i + 1}/${installmentsData.numeroParcelas})`
+                        : descricaoFinalBase;
 
                     novasDespesas.push({
                         id: Math.random(), // ID temporário para local
@@ -187,8 +205,8 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                 novasDespesas.push({
                     id: Math.random(),
                     user_id: userId,
-                    descricao: description,
-                    description: description,
+                    descricao: descricaoFinalBase,
+                    description: descricaoFinalBase,
                     valor: valorTotal,
                     value: valorTotal,
                     data: date,
@@ -375,6 +393,73 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                                 A categoria selecionada será usada no card e no histórico.
                             </div>
                         </div>
+
+                        {categoryId === INTERNET_TV_CELULAR_CATEGORY_ID && (
+                            <div className="col-span-1 md:col-span-2 rounded-xl border border-white/10 p-3" style={{ background: "rgba(255, 255, 255, 0.03)" }}>
+                                <div className="mb-3">
+                                    <p className="font-medium text-white">Detalhes de Internet/TV/Celular</p>
+                                    <p className="text-xs text-muted">Escolha o tipo do serviço e a operadora/provedor.</p>
+                                </div>
+
+                                <div className="space-y-3">
+                                    <div>
+                                        <label className="block text-xs font-medium text-muted mb-2">Tipo do serviço</label>
+                                        <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                                            {telecomServiceOptions.map((option) => {
+                                                const selected = telecomService === option;
+                                                return (
+                                                    <button
+                                                        key={option}
+                                                        type="button"
+                                                        onClick={() => setTelecomService(option)}
+                                                        className="rounded-lg border px-3 py-2 text-sm transition-all"
+                                                        style={{
+                                                            background: selected
+                                                                ? "color-mix(in srgb, var(--accent) 16%, transparent)"
+                                                                : "rgba(255, 255, 255, 0.04)",
+                                                            borderColor: selected
+                                                                ? "color-mix(in srgb, var(--secondary) 42%, transparent)"
+                                                                : "rgba(255, 255, 255, 0.1)",
+                                                            color: selected ? "var(--foreground)" : "var(--text-secondary)",
+                                                        }}
+                                                    >
+                                                        {option}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-xs font-medium text-muted mb-2">Operadora ou provedor</label>
+                                        <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                                            {telecomProviderOptions.map((option) => {
+                                                const selected = telecomProvider === option;
+                                                return (
+                                                    <button
+                                                        key={option}
+                                                        type="button"
+                                                        onClick={() => setTelecomProvider(option)}
+                                                        className="rounded-lg border px-3 py-2 text-sm transition-all"
+                                                        style={{
+                                                            background: selected
+                                                                ? "color-mix(in srgb, var(--accent) 16%, transparent)"
+                                                                : "rgba(255, 255, 255, 0.04)",
+                                                            borderColor: selected
+                                                                ? "color-mix(in srgb, var(--secondary) 42%, transparent)"
+                                                                : "rgba(255, 255, 255, 0.1)",
+                                                            color: selected ? "var(--foreground)" : "var(--text-secondary)",
+                                                        }}
+                                                    >
+                                                        {option}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     <div className="border-t border-white/10 pt-4">
