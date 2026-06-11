@@ -143,6 +143,30 @@ BEGIN
 END $$;
 ```
 
+## Passo 8: Limpar cards legados do dashboard existente
+
+Se o projeto ja tinha preferencias salvas antes da reducao para os 6 cards atuais, execute tambem o arquivo `supabase/cleanup_dashboard_preferences.sql`.
+
+Esse script:
+- atualiza a funcao `initialize_dashboard_preferences` para usar apenas os cards atuais;
+- remove registros antigos de `dashboard_preferences` que nao existem mais no frontend.
+
+SQL de verificacao opcional:
+
+```sql
+SELECT DISTINCT card_id
+FROM dashboard_preferences
+ORDER BY card_id;
+```
+
+Resultado esperado:
+- `budget_vs_actual`
+- `bills_calendar`
+- `financial_radar`
+- `summary_cards`
+- `cash_flow_chart`
+- `transactions_table`
+
 ## Troubleshooting
 
 ### Erro: "auth.users does not exist"

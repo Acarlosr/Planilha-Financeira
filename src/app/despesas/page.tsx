@@ -67,10 +67,16 @@ const colorMap: Record<string, string> = {
 };
 
 const commonExpenseCategories = [
+    { id: "650e8400-e29b-41d4-a716-446655440001", nome: "Moradia", icone: "Home", cor: "blue", tipo: "despesa", user_id: null, created_at: "" },
+    { id: "650e8400-e29b-41d4-a716-446655440002", nome: "Alimentação", icone: "Utensils", cor: "orange", tipo: "despesa", user_id: null, created_at: "" },
     { id: "650e8400-e29b-41d4-a716-446655440003", nome: "Transporte", icone: "Car", cor: "blue", tipo: "despesa", user_id: null, created_at: "" },
+    { id: "650e8400-e29b-41d4-a716-446655440006", nome: "Lazer", icone: "Smartphone", cor: "pink", tipo: "despesa", user_id: null, created_at: "" },
+    { id: "650e8400-e29b-41d4-a716-446655440007", nome: "Vestuário", icone: "Shirt", cor: "indigo", tipo: "despesa", user_id: null, created_at: "" },
+    { id: "650e8400-e29b-41d4-a716-446655440008", nome: "Compras", icone: "ShoppingCart", cor: "teal", tipo: "despesa", user_id: null, created_at: "" },
     { id: "650e8400-e29b-41d4-a716-446655440009", nome: "Cartão de Crédito", icone: "CreditCard", cor: "indigo", tipo: "despesa", user_id: null, created_at: "" },
     { id: "650e8400-e29b-41d4-a716-446655440010", nome: "Streaming", icone: "Tv", cor: "cyan", tipo: "despesa", user_id: null, created_at: "" },
-    { id: "650e8400-e29b-41d4-a716-446655440011", nome: "Internet/TV/Celular", icone: "Wifi", cor: "teal", tipo: "despesa", user_id: null, created_at: "" },
+    { id: "650e8400-e29b-41d4-a716-446655440011", nome: "TV a Cabo/Internet", icone: "Wifi", cor: "teal", tipo: "despesa", user_id: null, created_at: "" },
+    { id: "650e8400-e29b-41d4-a716-446655440018", nome: "Celular", icone: "Smartphone", cor: "purple", tipo: "despesa", user_id: null, created_at: "" },
     { id: "650e8400-e29b-41d4-a716-446655440012", nome: "Delivery", icone: "Utensils", cor: "orange", tipo: "despesa", user_id: null, created_at: "" },
     { id: "650e8400-e29b-41d4-a716-446655440013", nome: "Academia", icone: "Dumbbell", cor: "cyan", tipo: "despesa", user_id: null, created_at: "" },
     { id: "650e8400-e29b-41d4-a716-446655440014", nome: "Água", icone: "Droplets", cor: "blue", tipo: "despesa", user_id: null, created_at: "" },
@@ -234,9 +240,12 @@ function DespesasContent() {
 
     const totalDespesas = filteredExpenses.reduce((sum, item) => sum + item.value, 0);
 
-    const categorySource = !databaseUnavailable && categorias.length > 0
-        ? categorias
-        : commonExpenseCategories;
+    // Prioriza as categorias do banco (os ids delas são os usados nas despesas).
+    // As estáticas entram apenas como complemento quando o banco não tem a categoria.
+    const categorySource = [
+        ...categorias,
+        ...commonExpenseCategories.filter((common) => !categorias.some((cat) => cat.id === common.id || cat.nome === common.nome)),
+    ];
 
     const categoriasDespesa = categorySource.map((cat) => ({
         id: cat.id,

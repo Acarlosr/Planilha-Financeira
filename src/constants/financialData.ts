@@ -74,6 +74,22 @@ export const aplicacaoData = {
             cor: "from-amber-500 to-amber-400",
             icone: "💰",
         },
+        {
+            id: "poupanca",
+            nome: "Poupança",
+            saldo: 0,
+            rentabilidade: 0,
+            cor: "from-emerald-500 to-emerald-400",
+            icone: "🐷",
+        },
+        {
+            id: "outros",
+            nome: "Outros",
+            saldo: 0,
+            rentabilidade: 0,
+            cor: "from-slate-500 to-slate-400",
+            icone: "📦",
+        },
     ],
     transacoes: [] as Transacao[]
 };

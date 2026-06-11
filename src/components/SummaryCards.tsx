@@ -54,9 +54,11 @@ const getShadowColor = (type: CardData["changeType"]) => {
 };
 
 export default function SummaryCards() {
-    const { currentIncome, currentExpenses, previousIncome, previousExpenses, totalInvestments, loading } = useDashboardOverview();
+    const { currentIncome, currentExpenses, previousIncome, previousExpenses, totalInvestments, loading, error, refetch } =
+        useDashboardOverview();
     const saldo = currentIncome - currentExpenses;
     const previousSaldo = previousIncome - previousExpenses;
+
     const cards: CardData[] = [
         {
             title: "Receita do Mês",
@@ -104,25 +106,36 @@ export default function SummaryCards() {
         },
     ];
 
+    if (error) {
+        return (
+            <div
+                className="glass-card flex items-center justify-between gap-4 p-5"
+                style={{ borderColor: "color-mix(in srgb, var(--danger) 35%, transparent)" }}
+            >
+                <p className="text-sm" style={{ color: "var(--danger)" }}>
+                    Não foi possível carregar o resumo do mês: {error}
+                </p>
+                <button
+                    onClick={() => refetch()}
+                    className="shrink-0 rounded-lg border px-3 py-2 text-sm font-medium text-foreground transition hover:bg-white/10"
+                    style={{ borderColor: "var(--card-border)" }}
+                >
+                    Tentar novamente
+                </button>
+            </div>
+        );
+    }
+
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
             {cards.map((card, index) => (
-                <div
-                    key={index}
-                    className="glass-card market-card p-5 cursor-pointer group"
-                >
+                <div key={index} className="glass-card market-card p-5 cursor-pointer group">
                     <div className="flex items-start justify-between">
                         <div className="flex-1">
-                            <p className="text-muted text-sm font-medium mb-1">
-                                {card.title}
-                            </p>
-                            <h3 className="text-2xl font-bold text-foreground mb-2">
-                                {card.value}
-                            </h3>
+                            <p className="text-muted text-sm font-medium mb-1">{card.title}</p>
+                            <h3 className="text-2xl font-bold text-foreground mb-2">{card.value}</h3>
                             <div className="flex items-center gap-1">
-                                <span className={`text-sm font-semibold ${getChangeColor(card.changeType)}`}>
-                                    {card.change}
-                                </span>
+                                <span className={`text-sm font-semibold ${getChangeColor(card.changeType)}`}>{card.change}</span>
                                 <span className="text-muted text-xs">vs mês</span>
                             </div>
                         </div>
@@ -142,7 +155,6 @@ export default function SummaryCards() {
                         <path d={`${card.sparkPath} L150 56 L2 56 Z`} fill={`color-mix(in srgb, ${card.sparkColor} 16%, transparent)`} />
                     </svg>
 
-                    {/* Progress Bar */}
                     <div className="mt-3">
                         <div className="flex h-9 gap-1 overflow-hidden rounded-lg">
                             {(card.allocation ?? ["100%"]).map((width, partIndex) => (
@@ -151,13 +163,14 @@ export default function SummaryCards() {
                                     className="h-full rounded-sm transition-all duration-500"
                                     style={{
                                         width,
-                                        background: partIndex === 0
-                                            ? card.iconBg
-                                            : partIndex === 1
-                                                ? "linear-gradient(135deg, rgba(255,213,46,0.92), rgba(255,159,28,0.82))"
-                                                : partIndex === 2
-                                                    ? "linear-gradient(135deg, rgba(124,92,255,0.7), rgba(24,242,230,0.28))"
-                                                    : "rgba(170,184,202,0.18)",
+                                        background:
+                                            partIndex === 0
+                                                ? card.iconBg
+                                                : partIndex === 1
+                                                    ? "linear-gradient(135deg, rgba(255,213,46,0.92), rgba(255,159,28,0.82))"
+                                                    : partIndex === 2
+                                                        ? "linear-gradient(135deg, rgba(124,92,255,0.7), rgba(24,242,230,0.28))"
+                                                        : "rgba(170,184,202,0.18)",
                                     }}
                                 />
                             ))}

@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { X, Plus } from "lucide-react";
 
 interface InvestmentModalProps {
@@ -20,7 +19,7 @@ interface InvestmentModalProps {
 export default function InvestmentModal({ isOpen, onClose, onSave, investmentTypes }: InvestmentModalProps) {
     const [description, setDescription] = useState("");
     const [value, setValue] = useState("");
-    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+    const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
     const [type, setType] = useState<"aporte" | "resgate">("aporte");
     const [investmentType, setInvestmentType] = useState(investmentTypes[0]?.id ?? "");
     const [loading, setLoading] = useState(false);
@@ -38,16 +37,15 @@ export default function InvestmentModal({ isOpen, onClose, onSave, investmentTyp
         try {
             await onSave({
                 description,
-                value: parseFloat(value.replace(',', '.')),
+                value: parseFloat(value.replace(",", ".")),
                 date,
                 type,
                 investmentType,
             });
 
-            // Reset form
             setDescription("");
             setValue("");
-            setDate(new Date().toISOString().split('T')[0]);
+            setDate(new Date().toISOString().split("T")[0]);
             setType("aporte");
             setInvestmentType(investmentTypes[0]?.id ?? "");
             onClose();
@@ -59,7 +57,7 @@ export default function InvestmentModal({ isOpen, onClose, onSave, investmentTyp
     };
 
     const formatValue = (val: string) => {
-        const cleaned = val.replace(/[^\d,\.]/g, '');
+        const cleaned = val.replace(/[^\d,.]/g, "");
         setValue(cleaned);
     };
 
@@ -67,29 +65,21 @@ export default function InvestmentModal({ isOpen, onClose, onSave, investmentTyp
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-            {/* Backdrop */}
-            <div
-                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-                onClick={onClose}
-            />
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
-            {/* Modal */}
             <div
                 className="relative w-full max-w-md mx-4 rounded-2xl border border-white/10 p-6 animate-in zoom-in-95 duration-200"
                 style={{
                     background: "rgba(15, 23, 42, 0.95)",
                     backdropFilter: "blur(20px)",
-                    boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)"
+                    boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
                 }}
             >
-                {/* Header */}
                 <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-3">
                         <div
                             className="w-10 h-10 rounded-xl flex items-center justify-center"
-                            style={{
-                                background: "linear-gradient(135deg, #FFD700 0%, #FFC700 100%)",
-                            }}
+                            style={{ background: "linear-gradient(135deg, #FFD700 0%, #FFC700 100%)" }}
                         >
                             <Plus className="text-white" size={20} />
                         </div>
@@ -105,36 +95,26 @@ export default function InvestmentModal({ isOpen, onClose, onSave, investmentTyp
                     </button>
                 </div>
 
-                {/* Form */}
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    {/* Type Toggle */}
                     <div className="flex gap-2 p-1 rounded-xl border border-white/10" style={{ background: "rgba(255, 255, 255, 0.03)" }}>
                         <button
                             type="button"
                             onClick={() => setType("aporte")}
-                            className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${type === "aporte"
-                                ? "bg-blue-500 text-white"
-                                : "text-gray-400 hover:text-foreground"
-                                }`}
+                            className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${type === "aporte" ? "bg-blue-500 text-white" : "text-gray-400 hover:text-foreground"}`}
                         >
                             Aporte
                         </button>
                         <button
                             type="button"
                             onClick={() => setType("resgate")}
-                            className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${type === "resgate"
-                                ? "bg-red-500 text-white"
-                                : "text-gray-400 hover:text-foreground"
-                                }`}
+                            className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${type === "resgate" ? "bg-red-500 text-white" : "text-gray-400 hover:text-foreground"}`}
                         >
                             Resgate
                         </button>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-muted mb-2">
-                            Tipo de aplicação
-                        </label>
+                        <label className="block text-sm font-medium text-muted mb-2">Tipo de aplicação</label>
                         <select
                             required
                             value={investmentType}
@@ -155,11 +135,8 @@ export default function InvestmentModal({ isOpen, onClose, onSave, investmentTyp
                         )}
                     </div>
 
-                    {/* Description */}
                     <div>
-                        <label className="block text-sm font-medium text-muted mb-2">
-                            Descrição
-                        </label>
+                        <label className="block text-sm font-medium text-muted mb-2">Descrição</label>
                         <input
                             type="text"
                             required
@@ -171,11 +148,8 @@ export default function InvestmentModal({ isOpen, onClose, onSave, investmentTyp
                         />
                     </div>
 
-                    {/* Value */}
                     <div>
-                        <label className="block text-sm font-medium text-muted mb-2">
-                            Valor (R$)
-                        </label>
+                        <label className="block text-sm font-medium text-muted mb-2">Valor (R$)</label>
                         <input
                             type="text"
                             required
@@ -187,11 +161,8 @@ export default function InvestmentModal({ isOpen, onClose, onSave, investmentTyp
                         />
                     </div>
 
-                    {/* Date */}
                     <div>
-                        <label className="block text-sm font-medium text-muted mb-2">
-                            Data
-                        </label>
+                        <label className="block text-sm font-medium text-muted mb-2">Data</label>
                         <input
                             type="date"
                             required
@@ -202,21 +173,22 @@ export default function InvestmentModal({ isOpen, onClose, onSave, investmentTyp
                         />
                     </div>
 
-                    {/* Submit Button */}
                     <button
                         type="submit"
                         disabled={loading || !description || !value || !investmentType}
                         className="w-full py-3.5 rounded-xl text-foreground font-semibold transition-all hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed mt-6"
                         style={{
-                            background: type === "aporte"
-                                ? "linear-gradient(135deg, #FFD700 0%, #FFC700 100%)"
-                                : "linear-gradient(135deg, #EF4444 0%, #F87171 100%)",
-                            boxShadow: type === "aporte"
-                                ? "0 4px 15px rgba(59, 130, 246, 0.4)"
-                                : "0 4px 15px rgba(239, 68, 68, 0.4)"
+                            background:
+                                type === "aporte"
+                                    ? "linear-gradient(135deg, #FFD700 0%, #FFC700 100%)"
+                                    : "linear-gradient(135deg, #EF4444 0%, #F87171 100%)",
+                            boxShadow:
+                                type === "aporte"
+                                    ? "0 4px 15px rgba(59, 130, 246, 0.4)"
+                                    : "0 4px 15px rgba(239, 68, 68, 0.4)",
                         }}
                     >
-                        {loading ? "Salvando..." : (type === "aporte" ? "Adicionar Aporte" : "Registrar Resgate")}
+                        {loading ? "Salvando..." : type === "aporte" ? "Adicionar Aporte" : "Registrar Resgate"}
                     </button>
                 </form>
             </div>
