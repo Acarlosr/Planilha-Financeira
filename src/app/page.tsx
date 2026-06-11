@@ -1,13 +1,18 @@
 import Link from "next/link";
 import { Bell, Search, Plus, TrendingDown, TrendingUp, Zap } from "lucide-react";
 import Sidebar from "@/components/Sidebar";
+import SummaryCards from "@/components/SummaryCards";
+import CashFlowChart from "@/components/CashFlowChart";
+import TransactionsTable from "@/components/TransactionsTable";
 import UserMenu from "@/components/UserMenu";
 import ThemeToggle from "@/components/ThemeToggle";
 import TrialBanner from "@/components/TrialBanner";
 import DataConnectionStatus from "@/components/DataConnectionStatus";
+import FinancialRadar from "@/components/FinancialRadar";
+import PaymentReminders from "@/components/PaymentReminders";
+import BudgetUsageAlert from "@/components/BudgetUsageAlert";
 import MarketInsightRail from "@/components/MarketInsightRail";
 import DashboardPulse from "@/components/DashboardPulse";
-import DashboardSections from "@/components/DashboardSections";
 
 export default function Home() {
   return (
@@ -120,8 +125,24 @@ export default function Home() {
               </Link>
             </section>
 
+            <section className="mb-8">
+              <SummaryCards />
+            </section>
+
+            <BudgetUsageAlert />
+
+            <div className="grid gap-6 2xl:grid-cols-[minmax(0,1fr)_430px]">
+              <CashFlowChart />
+              <PaymentReminders />
+            </div>
+
+            <FinancialRadar />
+
             <DataConnectionStatus />
-            <DashboardSections />
+
+            <section className="mb-8">
+              <TransactionsTable />
+            </section>
           </div>
 
           <MarketInsightRail />
