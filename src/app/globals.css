@@ -1,13 +1,13 @@
 @import "tailwindcss";
 
-/* FinançasPro - light product dashboard theme */
+/* FinançasPro - premium market dashboard theme */
 
 :root {
-  --graph-primary: #f59e0b;
-  --graph-accent: #ffbf47;
-  --graph-secondary: #17145f;
-  --graph-orange: #f59e0b;
-  --graph-red: #e05252;
+  --graph-primary: #18f2e6;
+  --graph-accent: #ffd52e;
+  --graph-secondary: #7c5cff;
+  --graph-orange: #ffb020;
+  --graph-red: #ff4f7b;
   --radius-card: 10px;
   --radius-control: 8px;
 }
@@ -40,27 +40,27 @@
 
 /* Dark Theme */
 [data-theme="dark"] {
-  --background: #050816;
-  --background-light: #0c1220;
-  --foreground: #ffffff;
-  --accent: #f59e0b;
-  --accent-hover: #ffbf47;
-  --accent-dark: #17145f;
-  --secondary: #38bdf8;
-  --secondary-light: #bae6fd;
-  --card-bg: rgba(255, 255, 255, 0.065);
-  --card-bg-solid: #111827;
-  --card-border: rgba(255, 255, 255, 0.12);
-  --text-primary: #ffffff;
-  --text-secondary: #cbd5e1;
-  --text-tertiary: #64748b;
-  --success: #22c55e;
-  --danger: #e05252;
-  --warning: #f59e0b;
-  --orange: #f59e0b;
-  --shadow-glass: 0 18px 48px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  --shadow-glass-hover: 0 24px 62px rgba(245, 158, 11, 0.14), inset 0 1px 0 rgba(255, 191, 71, 0.08);
-  --blur-glass: blur(16px);
+  --background: #070b15;
+  --background-light: rgba(15, 22, 36, 0.72);
+  --foreground: #f7fbff;
+  --accent: #ffd52e;
+  --accent-hover: #ffe66d;
+  --accent-dark: #6d5b00;
+  --secondary: #18f2e6;
+  --secondary-light: #93fff8;
+  --card-bg: rgba(20, 29, 46, 0.66);
+  --card-bg-solid: #111a2a;
+  --card-border: rgba(166, 191, 224, 0.14);
+  --text-primary: #f7fbff;
+  --text-secondary: #aab8ca;
+  --text-tertiary: #63738b;
+  --success: #15e3a0;
+  --danger: #ff4f7b;
+  --warning: #ffd52e;
+  --orange: #ff9f1c;
+  --shadow-glass: 0 22px 70px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --shadow-glass-hover: 0 30px 90px rgba(24, 242, 230, 0.13), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  --blur-glass: blur(18px);
 }
 
 @theme inline {
@@ -85,8 +85,23 @@ body {
 
 [data-theme="dark"] body {
   background:
-    linear-gradient(135deg, #050816 0%, #0c1220 52%, #050816 100%);
+    radial-gradient(circle at 82% 12%, rgba(255, 213, 46, 0.1), transparent 22rem),
+    radial-gradient(circle at 16% 88%, rgba(24, 242, 230, 0.15), transparent 28rem),
+    linear-gradient(135deg, #070b15 0%, #101827 48%, #071820 100%);
   background-attachment: fixed;
+}
+
+[data-theme="dark"] body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.35), transparent 76%);
 }
 
 [data-theme="light"] body {
@@ -104,6 +119,189 @@ body {
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-glass);
   transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.market-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.market-card::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 3px;
+  background: linear-gradient(90deg, rgba(24, 242, 230, 0.8), rgba(255, 213, 46, 0.72), rgba(255, 79, 123, 0.45));
+  opacity: 0.65;
+}
+
+.sparkline {
+  filter: drop-shadow(0 0 8px currentColor);
+}
+
+.dashboard-pulse {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0.72;
+  pointer-events: none;
+}
+
+.dashboard-pulse::before {
+  content: "";
+  position: absolute;
+  inset: -30% -10% auto 34%;
+  height: 170%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--secondary) 18%, transparent), transparent 62%);
+}
+
+.dashboard-pulse__chart {
+  position: absolute;
+  right: -2%;
+  bottom: -18%;
+  width: min(58vw, 760px);
+  height: 118%;
+  color: var(--secondary);
+}
+
+.dashboard-pulse__gridline {
+  stroke: color-mix(in srgb, var(--foreground) 10%, transparent);
+  stroke-width: 1;
+}
+
+.dashboard-pulse__area {
+  fill: color-mix(in srgb, var(--secondary) 9%, transparent);
+}
+
+.dashboard-pulse__line {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 3.5;
+  filter: drop-shadow(0 0 14px currentColor);
+  animation: dashboard-line-draw 4.8s ease-in-out infinite;
+}
+
+.dashboard-pulse__line--income {
+  stroke: url(#pulseLinePrimary);
+}
+
+.dashboard-pulse__line--expense {
+  animation-delay: 0.8s;
+  stroke: url(#pulseLineExpense);
+  stroke-width: 2.6;
+}
+
+.dashboard-pulse__dot {
+  fill: var(--accent);
+  filter: drop-shadow(0 0 12px var(--accent));
+  transform-origin: center;
+  animation: dashboard-dot-pulse 2.8s ease-in-out infinite;
+}
+
+.dashboard-pulse__dot--two {
+  animation-delay: 0.55s;
+  fill: var(--secondary);
+}
+
+.dashboard-pulse__dot--three {
+  animation-delay: 1.1s;
+  fill: var(--success);
+}
+
+.dashboard-pulse__glow {
+  opacity: 0.32;
+  animation: dashboard-glow 3.6s ease-in-out infinite;
+}
+
+.dashboard-pulse__scan {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--secondary) 10%, transparent), transparent);
+  transform: translateX(-70%);
+  animation: dashboard-scan 7s ease-in-out infinite;
+}
+
+@keyframes dashboard-line-draw {
+  0%,
+  14% {
+    stroke-dashoffset: 1;
+    opacity: 0.22;
+  }
+  45%,
+  72% {
+    stroke-dashoffset: 0;
+    opacity: 0.95;
+  }
+  100% {
+    stroke-dashoffset: -1;
+    opacity: 0.22;
+  }
+}
+
+@keyframes dashboard-dot-pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(0.88);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.28);
+  }
+}
+
+@keyframes dashboard-glow {
+  0%,
+  100% {
+    opacity: 0.12;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 0.38;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes dashboard-scan {
+  0%,
+  18% {
+    transform: translateX(-72%);
+    opacity: 0;
+  }
+  45% {
+    opacity: 1;
+  }
+  78%,
+  100% {
+    transform: translateX(72%);
+    opacity: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-pulse {
+    opacity: 0.36;
+  }
+
+  .dashboard-pulse__chart {
+    right: -36%;
+    width: 120vw;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-pulse__line,
+  .dashboard-pulse__dot,
+  .dashboard-pulse__glow,
+  .dashboard-pulse__scan {
+    animation: none;
+  }
+
+  .dashboard-pulse__line {
+    stroke-dashoffset: 0;
+  }
 }
 
 .glass-card:hover {

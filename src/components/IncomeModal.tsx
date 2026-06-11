@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { X, Plus } from "lucide-react";
 
 interface IncomeModalProps {
@@ -11,35 +11,32 @@ interface IncomeModalProps {
         value: number;
         date: string;
         category: string;
-    }) => void;
+    }) => void | Promise<void>;
+    categorias: { id: string; label: string; icone: string }[];
 }
 
-const categorias = [
-    { id: "salario", label: "Salário Mensal", icone: "💼" },
-    { id: "decimo", label: "13º Salário / Bônus", icone: "🎁" },
-    { id: "freela", label: "Freelance / Extra", icone: "⚡" },
-    { id: "vendas", label: "Vendas Online", icone: "📦" },
-    { id: "reembolso", label: "Reembolso", icone: "🔄" },
-    { id: "anterior", label: "Saldo Anterior", icone: "🏦" },
-];
-
-export default function IncomeModal({ isOpen, onClose, onSave }: IncomeModalProps) {
+export default function IncomeModal({ isOpen, onClose, onSave, categorias }: IncomeModalProps) {
     const [description, setDescription] = useState("");
     const [value, setValue] = useState("");
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-    const [category, setCategory] = useState("salario");
+    const [category, setCategory] = useState(categorias[0]?.id ?? "");
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        if (isOpen && categorias.length > 0 && !categorias.some((cat) => cat.id === category)) {
+            setCategory(categorias[0].id);
+        }
+    }, [category, categorias, isOpen]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
 
         try {
-            const formattedDate = new Date(date).toLocaleDateString('pt-BR');
-            onSave({
+            await onSave({
                 description,
                 value: parseFloat(value.replace(',', '.')),
-                date: formattedDate,
+                date,
                 category,
             });
 
@@ -47,7 +44,7 @@ export default function IncomeModal({ isOpen, onClose, onSave }: IncomeModalProp
             setDescription("");
             setValue("");
             setDate(new Date().toISOString().split('T')[0]);
-            setCategory("salario");
+            setCategory(categorias[0]?.id ?? "");
             onClose();
         } catch (error) {
             console.error("Error saving income:", error);
@@ -175,12 +172,17 @@ export default function IncomeModal({ isOpen, onClose, onSave }: IncomeModalProp
                                 </button>
                             ))}
                         </div>
+                        {categorias.length === 0 && (
+                            <p className="mt-2 text-xs text-red-300">
+                                Cadastre as categorias de receita no Supabase antes de salvar.
+                            </p>
+                        )}
                     </div>
 
                     {/* Submit Button */}
                     <button
                         type="submit"
-                        disabled={loading || !description || !value}
+                        disabled={loading || !description || !value || !category}
                         className="w-full py-3.5 rounded-xl text-foreground font-semibold transition-all hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed mt-6"
                         style={{
                             background: "linear-gradient(135deg, #10B981 0%, #34D399 100%)",

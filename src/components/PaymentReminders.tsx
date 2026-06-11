@@ -135,10 +135,6 @@ export default function PaymentReminders() {
             ]);
 
             if (receitasResult.error) throw receitasResult.error;
-            if (despesasBaseResult.error) throw despesasBaseResult.error;
-            if (cartoesResult.error) {
-                throw new Error("Atualize o schema de cartões para habilitar dia de vencimento.");
-            }
 
             const income = (receitasResult.data ?? []).reduce((sum, item) => sum + Number(item.valor), 0);
             const dueById = new Map(
@@ -146,7 +142,7 @@ export default function PaymentReminders() {
                     ? []
                     : (despesasDueResult.data ?? []).map((item) => [item.id, item])
             );
-            const expenses = ((despesasBaseResult.data ?? []) as ExpenseRow[]).map((expense) => {
+            const expenses = (despesasBaseResult.error ? [] : (despesasBaseResult.data ?? []) as ExpenseRow[]).map((expense) => {
                 const dueInfo = dueById.get(expense.id) as Pick<ExpenseRow, "boleto" | "data_vencimento"> | undefined;
                 return {
                     ...expense,
@@ -154,7 +150,7 @@ export default function PaymentReminders() {
                     data_vencimento: dueInfo?.data_vencimento ?? null,
                 };
             });
-            const cards = (cartoesResult.data ?? []) as CardRow[];
+            const cards = cartoesResult.error ? [] : (cartoesResult.data ?? []) as CardRow[];
 
             const cardReminders = cards
                 .map((card) => {
@@ -203,6 +199,7 @@ export default function PaymentReminders() {
             setReminders([...cardReminders, ...boletoReminders]
                 .sort((a, b) => a.dueDate.localeCompare(b.dueDate))
                 .slice(0, 6));
+            setError(null);
         } catch (err) {
             setError(err instanceof Error ? err.message : "Erro ao carregar lembretes");
         } finally {

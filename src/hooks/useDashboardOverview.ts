@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { getMonthRange, sumInRange, computeInvestmentsTotal } from "@/lib/finance";
 
 export interface RecentTransaction {
     id: string;
@@ -33,15 +34,6 @@ interface DashboardOverview {
 
 const monthLabels = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 
-const getMonthRange = (date: Date) => {
-    const start = new Date(date.getFullYear(), date.getMonth(), 1);
-    const end = new Date(date.getFullYear(), date.getMonth() + 1, 1);
-    return {
-        start: start.toISOString().slice(0, 10),
-        end: end.toISOString().slice(0, 10),
-    };
-};
-
 const formatDate = (value: string) => {
     const [year, month, day] = value.split("-");
     return `${day}/${month}/${year}`;
@@ -63,7 +55,9 @@ export function useDashboardOverview(): DashboardOverview {
             setLoading(true);
             setError(null);
 
-            const { data: { user } } = await supabase.auth.getUser();
+            const {
+                data: { user },
+            } = await supabase.auth.getUser();
             if (!user) {
                 setCurrentIncome(0);
                 setCurrentExpenses(0);
@@ -94,43 +88,31 @@ export function useDashboardOverview(): DashboardOverview {
                     .eq("user_id", user.id)
                     .gte("data", historyStart)
                     .order("data", { ascending: false }),
-                supabase
-                    .from("aplicacoes")
-                    .select("valor, tipo_transacao")
-                    .eq("user_id", user.id),
-                supabase
-                    .from("metas_poupanca")
-                    .select("valor_atual")
-                    .eq("user_id", user.id),
+                supabase.from("aplicacoes").select("valor, tipo_transacao").eq("user_id", user.id),
+                supabase.from("metas_poupanca").select("valor_atual").eq("user_id", user.id),
             ]);
 
-            if (receitasResult.error) throw receitasResult.error;
-            if (despesasResult.error) throw despesasResult.error;
-            if (aplicacoesResult.error) throw aplicacoesResult.error;
-            if (metasPoupancaResult.error) throw metasPoupancaResult.error;
+            const warnings = [
+                receitasResult.error ? `Receitas: ${receitasResult.error.message}` : null,
+                despesasResult.error ? `Despesas: ${despesasResult.error.message}` : null,
+                aplicacoesResult.error ? `Aplicações: ${aplicacoesResult.error.message}` : null,
+                metasPoupancaResult.error ? `Poupança: ${metasPoupancaResult.error.message}` : null,
+            ].filter(Boolean);
 
-            const receitas = receitasResult.data ?? [];
-            const despesas = despesasResult.data ?? [];
-            const aplicacoes = aplicacoesResult.data ?? [];
-            const metasPoupanca = metasPoupancaResult.data ?? [];
+            const receitas = receitasResult.error ? [] : receitasResult.data ?? [];
+            const despesas = despesasResult.error ? [] : despesasResult.data ?? [];
+            const aplicacoes = aplicacoesResult.error ? [] : aplicacoesResult.data ?? [];
+            const metasPoupanca = metasPoupancaResult.error ? [] : metasPoupancaResult.data ?? [];
 
-            const sumBetween = (
-                rows: Array<{ valor: number; data: string }>,
-                range: { start: string; end: string }
-            ) => rows
-                .filter((item) => item.data >= range.start && item.data < range.end)
-                .reduce((sum, item) => sum + Number(item.valor), 0);
+            const sumBetween = (rows: Array<{ valor: number; data: string }>, range: { start: string; end: string }) =>
+                sumInRange(rows, range);
 
             setCurrentIncome(sumBetween(receitas, currentRange));
             setCurrentExpenses(sumBetween(despesas, currentRange));
             setPreviousIncome(sumBetween(receitas, previousRange));
             setPreviousExpenses(sumBetween(despesas, previousRange));
-            setTotalInvestments(
-                aplicacoes.reduce((sum, item) => {
-                    const value = Number(item.valor);
-                    return item.tipo_transacao === "resgate" ? sum - value : sum + value;
-                }, 0) + metasPoupanca.reduce((sum, item) => sum + Number(item.valor_atual), 0)
-            );
+            setTotalInvestments(computeInvestmentsTotal(aplicacoes, metasPoupanca));
+            setError(warnings.length > 0 ? warnings.join(" | ") : null);
 
             const months = Array.from({ length: 6 }, (_, index) => {
                 const date = new Date(now.getFullYear(), now.getMonth() - 5 + index, 1);
@@ -168,6 +150,13 @@ export function useDashboardOverview(): DashboardOverview {
         } catch (err) {
             const message = err instanceof Error ? err.message : "Erro ao carregar dashboard";
             setError(message);
+            setCurrentIncome(0);
+            setCurrentExpenses(0);
+            setPreviousIncome(0);
+            setPreviousExpenses(0);
+            setTotalInvestments(0);
+            setRecentTransactions([]);
+            setMonthlyCashFlow([]);
         } finally {
             setLoading(false);
         }
@@ -177,27 +166,30 @@ export function useDashboardOverview(): DashboardOverview {
         loadOverview();
     }, [loadOverview]);
 
-    return useMemo(() => ({
-        currentIncome,
-        currentExpenses,
-        previousIncome,
-        previousExpenses,
-        totalInvestments,
-        recentTransactions,
-        monthlyCashFlow,
-        loading,
-        error,
-        refetch: loadOverview,
-    }), [
-        currentIncome,
-        currentExpenses,
-        previousIncome,
-        previousExpenses,
-        totalInvestments,
-        recentTransactions,
-        monthlyCashFlow,
-        loading,
-        error,
-        loadOverview,
-    ]);
+    return useMemo(
+        () => ({
+            currentIncome,
+            currentExpenses,
+            previousIncome,
+            previousExpenses,
+            totalInvestments,
+            recentTransactions,
+            monthlyCashFlow,
+            loading,
+            error,
+            refetch: loadOverview,
+        }),
+        [
+            currentIncome,
+            currentExpenses,
+            previousIncome,
+            previousExpenses,
+            totalInvestments,
+            recentTransactions,
+            monthlyCashFlow,
+            loading,
+            error,
+            loadOverview,
+        ]
+    );
 }

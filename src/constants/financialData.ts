@@ -1,5 +1,5 @@
 export interface Transacao {
-    id: number;
+    id: number | string;
     descricao: string;
     valor: number;
     data: string;
@@ -8,42 +8,26 @@ export interface Transacao {
     meta?: string;
 }
 
+export interface MetaPoupanca {
+    id: string;
+    nome: string;
+    valorAtual: number;
+    valorMeta: number;
+    cor: string;
+    icone: string;
+}
+
 export const poupancaData = {
     evolucao: [
-        { mes: "Jul", valor: 10200 },
-        { mes: "Ago", valor: 10850 },
-        { mes: "Set", valor: 11100 },
-        { mes: "Out", valor: 11450 },
-        { mes: "Nov", valor: 11900 },
-        { mes: "Dez", valor: 12450 },
-        { mes: "Jan", valor: 13100 },
+        { mes: "Jul", valor: 0 },
+        { mes: "Ago", valor: 0 },
+        { mes: "Set", valor: 0 },
+        { mes: "Out", valor: 0 },
+        { mes: "Nov", valor: 0 },
+        { mes: "Dez", valor: 0 },
+        { mes: "Jan", valor: 0 },
     ],
-    metas: [
-        {
-            id: "emergencia",
-            nome: "Reserva de Emergência",
-            valorAtual: 8500.0,
-            valorMeta: 15000.0,
-            cor: "from-red-500 to-red-400",
-            icone: "🚨",
-        },
-        {
-            id: "viagem",
-            nome: "Viagem Europa",
-            valorAtual: 3200.0,
-            valorMeta: 12000.0,
-            cor: "from-blue-500 to-blue-400",
-            icone: "✈️",
-        },
-        {
-            id: "carro",
-            nome: "Carro Novo",
-            valorAtual: 1400.0,
-            valorMeta: 30000.0,
-            cor: "from-purple-500 to-purple-400",
-            icone: "🚗",
-        },
-    ],
+    metas: [] as MetaPoupanca[],
     transacoes: [] as Transacao[]
 };
 
@@ -89,6 +73,22 @@ export const aplicacaoData = {
             rentabilidade: 0,
             cor: "from-amber-500 to-amber-400",
             icone: "💰",
+        },
+        {
+            id: "poupanca",
+            nome: "Poupança",
+            saldo: 0,
+            rentabilidade: 0,
+            cor: "from-emerald-500 to-emerald-400",
+            icone: "🐷",
+        },
+        {
+            id: "outros",
+            nome: "Outros",
+            saldo: 0,
+            rentabilidade: 0,
+            cor: "from-slate-500 to-slate-400",
+            icone: "📦",
         },
     ],
     transacoes: [] as Transacao[]

@@ -28,14 +28,6 @@ const sumRowsInMonth = (rows: MonthlyRow[], startDate: string, endDate: string) 
     .filter((item) => item.data && item.data >= startDate && item.data < endDate)
     .reduce((sum, item) => sum + Number(item.valor ?? 0), 0);
 
-const getErrorMessage = (err: unknown) => {
-    if (err instanceof Error) return err.message;
-    if (typeof err === "object" && err && "message" in err) {
-        return String((err as { message?: unknown }).message);
-    }
-    return "Erro ao carregar uso da receita";
-};
-
 const getTone = (usage: number) => {
     if (usage >= 100) {
         return {
@@ -73,12 +65,10 @@ export default function BudgetUsageAlert() {
     const [currentIncome, setCurrentIncome] = useState(0);
     const [currentExpenses, setCurrentExpenses] = useState(0);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
 
     const loadBudgetUsage = useCallback(async () => {
         try {
             setLoading(true);
-            setError(null);
 
             const { data: { session } } = await supabase.auth.getSession();
             if (!session?.user) {
@@ -102,13 +92,12 @@ export default function BudgetUsageAlert() {
                     .order("data", { ascending: false }),
             ]);
 
-            if (receitasResult.error) throw new Error(`Receitas: ${receitasResult.error.message}`);
-            if (despesasResult.error) throw new Error(`Despesas: ${despesasResult.error.message}`);
+            const receitas = receitasResult.error ? [] : (receitasResult.data ?? []) as MonthlyRow[];
+            const despesas = despesasResult.error ? [] : (despesasResult.data ?? []) as MonthlyRow[];
 
-            setCurrentIncome(sumRowsInMonth((receitasResult.data ?? []) as MonthlyRow[], startDate, endDate));
-            setCurrentExpenses(sumRowsInMonth((despesasResult.data ?? []) as MonthlyRow[], startDate, endDate));
-        } catch (err) {
-            setError(getErrorMessage(err));
+            setCurrentIncome(sumRowsInMonth(receitas, startDate, endDate));
+            setCurrentExpenses(sumRowsInMonth(despesas, startDate, endDate));
+        } catch {
             setCurrentIncome(0);
             setCurrentExpenses(0);
         } finally {
@@ -138,21 +127,21 @@ export default function BudgetUsageAlert() {
             : `Você atingiu ${usage.toFixed(1).replace(".", ",")}% da receita do mês.`;
 
     return (
-        <section className="mb-8 rounded-lg border p-5" style={{ background: tone.bg, borderColor: tone.border }}>
+        <section className="glass-card market-card mb-8 p-5" style={{ borderColor: tone.border }}>
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div className="flex items-start gap-3">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg" style={{ background: "var(--card-bg-solid)", color: tone.color }}>
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg" style={{ background: tone.bg, color: tone.color, boxShadow: `0 0 24px ${tone.color}` }}>
                         <Gauge size={22} />
                     </div>
                     <div>
                         <div className="flex flex-wrap items-center gap-2">
                             <h2 className="text-lg font-bold text-foreground">Uso da receita do mês</h2>
-                            <span className="flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold" style={{ color: tone.color, background: "var(--card-bg-solid)" }}>
+                            <span className="flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold" style={{ color: tone.color, background: tone.bg }}>
                                 {tone.icon}
                                 {tone.label}
                             </span>
                         </div>
-                        <p className="mt-1 text-sm text-muted">{loading ? "Calculando receita e despesas..." : error ?? message}</p>
+                        <p className="mt-1 text-sm text-muted">{loading ? "Calculando receita e despesas..." : message}</p>
                     </div>
                 </div>
 
@@ -182,12 +171,13 @@ export default function BudgetUsageAlert() {
                         {currentIncome > 0 ? `${usage.toFixed(1).replace(".", ",")}%` : "0%"}
                     </span>
                 </div>
-                <div className="h-3 overflow-hidden rounded-full" style={{ background: "color-mix(in srgb, var(--foreground) 10%, transparent)" }}>
+                <div className="h-4 overflow-hidden rounded-full border" style={{ background: "color-mix(in srgb, var(--foreground) 8%, transparent)", borderColor: "var(--card-border)" }}>
                     <div
                         className="h-full rounded-full transition-all duration-700"
                         style={{
                             width: `${loading ? 0 : cappedUsage}%`,
                             background: tone.bar,
+                            boxShadow: `0 0 20px ${tone.color}`,
                         }}
                     />
                 </div>

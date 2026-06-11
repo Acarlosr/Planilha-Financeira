@@ -63,7 +63,7 @@ export default function CadastroPage() {
             const { error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
-                    redirectTo: `${window.location.origin}/`,
+                    redirectTo: `${window.location.origin}/auth/callback`,
                 }
             });
             if (error) throw error;
@@ -80,7 +80,7 @@ export default function CadastroPage() {
             const { error } = await supabase.auth.signInWithOAuth({
                 provider: 'apple',
                 options: {
-                    redirectTo: `${window.location.origin}/`,
+                    redirectTo: `${window.location.origin}/auth/callback`,
                 }
             });
             if (error) throw error;
@@ -95,7 +95,7 @@ export default function CadastroPage() {
             const { error } = await supabase.auth.signInWithOAuth({
                 provider: 'facebook',
                 options: {
-                    redirectTo: `${window.location.origin}/`,
+                    redirectTo: `${window.location.origin}/auth/callback`,
                 }
             });
             if (error) throw error;

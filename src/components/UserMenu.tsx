@@ -4,10 +4,12 @@ import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { User, LogOut, ChevronDown } from "lucide-react";
+import { User, LogOut, ChevronDown, Settings, Crown } from "lucide-react";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 
 export default function UserMenu() {
     const router = useRouter();
+    const { isAdmin } = useSubscription();
     const [isOpen, setIsOpen] = useState(false);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [userName, setUserName] = useState("Usuário");
@@ -15,12 +17,13 @@ export default function UserMenu() {
     const menuRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        // Buscar dados do usuário
         const getUser = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
+            const {
+                data: { user },
+            } = await supabase.auth.getUser();
             if (user) {
                 setIsAuthenticated(true);
-                setUserName(user.user_metadata?.nome || user.email?.split('@')[0] || "Usuário");
+                setUserName(user.user_metadata?.nome || user.email?.split("@")[0] || "Usuário");
                 setUserEmail(user.email || "");
             } else {
                 setIsAuthenticated(false);
@@ -28,18 +31,18 @@ export default function UserMenu() {
         };
         getUser();
 
-        // Listener para mudanças de autenticação
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        const {
+            data: { subscription },
+        } = supabase.auth.onAuthStateChange((_event, session) => {
             if (session?.user) {
                 setIsAuthenticated(true);
-                setUserName(session.user.user_metadata?.nome || session.user.email?.split('@')[0] || "Usuário");
+                setUserName(session.user.user_metadata?.nome || session.user.email?.split("@")[0] || "Usuário");
                 setUserEmail(session.user.email || "");
             } else {
                 setIsAuthenticated(false);
             }
         });
 
-        // Fechar menu ao clicar fora
         const handleClickOutside = (event: MouseEvent) => {
             if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
                 setIsOpen(false);
@@ -59,7 +62,6 @@ export default function UserMenu() {
         router.refresh();
     };
 
-    // Se não estiver autenticado, mostrar botões de login/cadastro
     if (!isAuthenticated) {
         return (
             <div className="flex items-center gap-3">
@@ -71,9 +73,9 @@ export default function UserMenu() {
                 </Link>
                 <Link
                     href="/cadastro"
-                    className="px-4 py-2 text-white font-medium rounded-lg transition-all hover:brightness-105"
+                    className="px-4 py-2 text-black font-semibold rounded-lg transition-all hover:brightness-105"
                     style={{
-                        background: "var(--accent)",
+                        background: "linear-gradient(135deg, var(--accent), var(--secondary))",
                         boxShadow: "0 10px 24px color-mix(in srgb, var(--accent) 22%, transparent)",
                     }}
                 >
@@ -83,7 +85,6 @@ export default function UserMenu() {
         );
     }
 
-    // Se estiver autenticado, mostrar menu do usuário
     return (
         <div className="relative" ref={menuRef}>
             <div
@@ -96,23 +97,17 @@ export default function UserMenu() {
             >
                 <div
                     className="w-9 h-9 rounded-lg flex items-center justify-center"
-                    style={{
-                        background: "var(--accent)",
-                    }}
+                    style={{ background: "linear-gradient(135deg, var(--accent), var(--secondary))" }}
                 >
-                    <User size={18} className="text-white" />
+                    <User size={18} className="text-black" />
                 </div>
                 <div className="hidden md:block">
                     <p className="text-sm font-medium text-foreground">{userName}</p>
                     <p className="text-xs text-muted">{userEmail}</p>
                 </div>
-                <ChevronDown
-                    size={16}
-                    className={`text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`}
-                />
+                <ChevronDown size={16} className={`text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`} />
             </div>
 
-            {/* Dropdown Menu */}
             {isOpen && (
                 <div
                     className="absolute right-0 mt-2 w-56 rounded-lg overflow-hidden z-50 border"
@@ -128,9 +123,29 @@ export default function UserMenu() {
                         <p className="text-xs text-muted mt-0.5">{userEmail}</p>
                     </div>
 
+                    <Link
+                        href="/settings"
+                        onClick={() => setIsOpen(false)}
+                        className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-white/5 transition-colors"
+                    >
+                        <Settings size={18} className="text-muted" />
+                        <span className="text-sm font-medium text-muted">Configurações</span>
+                    </Link>
+
+                    {isAdmin && (
+                        <Link
+                            href="/admin"
+                            onClick={() => setIsOpen(false)}
+                            className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-white/5 transition-colors"
+                        >
+                            <Crown size={18} style={{ color: "var(--accent)" }} />
+                            <span className="text-sm font-medium text-muted">Painel admin</span>
+                        </Link>
+                    )}
+
                     <button
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-white/5 transition-colors"
+                        className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-white/5 transition-colors border-t border-white/10"
                     >
                         <LogOut size={18} className="text-red-400" />
                         <span className="text-sm font-medium text-muted">Sair</span>

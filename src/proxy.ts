@@ -61,7 +61,7 @@ export async function proxy(request: NextRequest) {
     const path = request.nextUrl.pathname;
 
     // Protected app routes
-    const protectedRoutes = ['/receitas', '/despesas', '/aplicacao', '/poupanca', '/criptomoedas', '/settings', '/checkout'];
+    const protectedRoutes = ['/receitas', '/despesas', '/cartoes', '/aplicacao', '/poupanca', '/criptomoedas', '/settings', '/checkout'];
     if (protectedRoutes.some(route => path.startsWith(route))) {
         if (!user) {
             return NextResponse.redirect(new URL('/cadastro', request.url));
@@ -88,28 +88,6 @@ export async function proxy(request: NextRequest) {
         }
     }
 
-    // Protected premium routes (requires active subscription)
-    const premiumRoutes = ['/export', '/api-access', '/advanced-reports'];
-    if (premiumRoutes.some(route => path.startsWith(route))) {
-        if (!user) {
-            return NextResponse.redirect(new URL('/login', request.url));
-        }
-
-        const { data: profile } = await supabase
-            .from('user_profiles')
-            .select('subscription_status, subscription_plan:subscription_plans(slug)')
-            .eq('id', user.id)
-            .single();
-
-        const isActive = profile?.subscription_status === 'active' || profile?.subscription_status === 'trial';
-        const planSlug = (profile?.subscription_plan as any)?.slug;
-
-        // Free plan can't access premium routes
-        if (!isActive || planSlug === 'free') {
-            return NextResponse.redirect(new URL('/pricing?upgrade=required', request.url));
-        }
-    }
-
     return response;
 }
 
@@ -117,11 +95,9 @@ export const config = {
     matcher: [
         '/auth/callback',
         '/admin/:path*',
-        '/export/:path*',
-        '/api-access/:path*',
-        '/advanced-reports/:path*',
         '/receitas/:path*',
         '/despesas/:path*',
+        '/cartoes/:path*',
         '/aplicacao/:path*',
         '/poupanca/:path*',
         '/criptomoedas/:path*',

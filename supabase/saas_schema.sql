@@ -269,16 +269,12 @@ CREATE OR REPLACE FUNCTION initialize_dashboard_preferences(p_user_id UUID)
 RETURNS VOID AS $$
 DECLARE
     default_cards TEXT[] := ARRAY[
+        'budget_vs_actual',
+        'bills_calendar',
+        'financial_radar',
         'summary_cards',
         'cash_flow_chart',
-        'transactions_table',
-        'category_breakdown',
-        'monthly_comparison',
-        'savings_goals',
-        'investment_portfolio',
-        'crypto_portfolio',
-        'bills_calendar',
-        'budget_vs_actual'
+        'transactions_table'
     ];
     card TEXT;
     free_plan_max_cards INT;
@@ -305,6 +301,17 @@ BEGIN
     END LOOP;
 END;
 $$ LANGUAGE plpgsql;
+
+-- Remover preferências legadas de cards que não existem mais no dashboard atual
+DELETE FROM dashboard_preferences
+WHERE card_id NOT IN (
+    'budget_vs_actual',
+    'bills_calendar',
+    'financial_radar',
+    'summary_cards',
+    'cash_flow_chart',
+    'transactions_table'
+);
 
 -- =============================================
 -- FUNCTION: Verificar quota de transações

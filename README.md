@@ -344,20 +344,20 @@ Redireciona para `/pricing` se não tiver acesso.
 
 ### 🚧 Fase 3: Dashboard Customization
 - [ ] Drag & drop cards
-- [ ] Salvar preferências
+- [x] Salvar preferências (tabela `dashboard_preferences` + painel "Personalizar painel")
 - [ ] Resize cards
-- [ ] Restore defaults
+- [x] Restore defaults (botão "Mostrar todos")
 
 ### 🚧 Fase 4: Admin Area
-- [ ] Dashboard de métricas
-- [ ] Lista de usuários
-- [ ] User management
+- [x] Dashboard de métricas (`/admin`)
+- [x] Lista de usuários (busca + status + plano)
+- [ ] User management (editar/suspender pelo painel)
 - [ ] Activity logs viewer
 
 ### 🚧 Fase 5: Payments
-- [ ] Integração Stripe
-- [ ] Checkout flow
-- [ ] Webhooks
+- [ ] Integração com gateway (Stripe / Mercado Pago / PagSeguro) — requer credenciais do provedor
+- [ ] Checkout flow real
+- [ ] Webhooks de confirmação
 - [ ] Invoice management
 
 ### 🚧 Fase 6: Advanced Features
