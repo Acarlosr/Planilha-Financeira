@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 
 interface QuoteResponse {
     symbol: string;
@@ -22,24 +24,31 @@ const toYahooSymbol = (symbol: string) => {
     return `${normalized}.SA`;
 };
 
+const fetchWithTimeout = async (url: string, timeoutMs = 8000, options?: RequestInit) => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+        return await fetch(url, { ...options, signal: controller.signal });
+    } finally {
+        clearTimeout(timer);
+    }
+};
+
 const fetchQuote = async (symbol: string): Promise<QuoteResponse> => {
     const normalized = normalizeSymbol(symbol);
 
     try {
-        const response = await fetch(
+        const response = await fetchWithTimeout(
             `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(toYahooSymbol(symbol))}?range=1d&interval=1d`,
-            { next: { revalidate: 60 } }
+            8000,
+            { next: { revalidate: 60 } } as RequestInit
         );
 
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
         const data = await response.json();
         const meta = data?.chart?.result?.[0]?.meta;
-        if (!meta) {
-            throw new Error("Cotacao indisponivel");
-        }
+        if (!meta) throw new Error("Cotacao indisponivel");
 
         const price = Number(meta.regularMarketPrice ?? meta.previousClose ?? 0) || null;
         const previousClose = Number(meta.previousClose ?? meta.chartPreviousClose ?? 0) || null;
@@ -60,7 +69,9 @@ const fetchQuote = async (symbol: string): Promise<QuoteResponse> => {
             source: "Yahoo Finance",
         };
     } catch (error) {
-        const message = error instanceof Error ? error.message : "Erro ao buscar cotacao";
+        const message = error instanceof Error
+            ? (error.name === "AbortError" ? "Timeout ao buscar cotação" : error.message)
+            : "Erro ao buscar cotacao";
         return {
             symbol: normalized,
             price: null,
@@ -76,6 +87,18 @@ const fetchQuote = async (symbol: string): Promise<QuoteResponse> => {
 };
 
 export async function GET(request: Request) {
+    // Verificar autenticação
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        { cookies: { getAll: () => cookieStore.getAll(), setAll: () => {} } }
+    );
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const symbols = (searchParams.get("symbols") ?? "")
         .split(",")

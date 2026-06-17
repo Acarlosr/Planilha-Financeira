@@ -17,6 +17,8 @@ import {
     PiggyBank,
     Trash2,
 } from "lucide-react";
+import { useToast } from "@/hooks/useToast";
+import { ToastContainer } from "@/components/Toast";
 import {
     AreaChart,
     Area,
@@ -86,6 +88,7 @@ function PoupancaContent() {
     const [transacoesData, setTransacoesData] = useState<SavingsTransaction[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const { toasts, toast, removeToast } = useToast();
 
     const loadSavings = useCallback(async () => {
         try {
@@ -170,7 +173,7 @@ function PoupancaContent() {
     const handleSaveSaving = async (saving: any) => {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
-            alert("Faça login novamente para registrar poupança.");
+            toast.error("Faça login novamente para registrar poupança.");
             throw new Error("Usuário não autenticado");
         }
 
@@ -184,7 +187,7 @@ function PoupancaContent() {
         });
 
         if (insertError) {
-            alert(`Erro ao salvar aporte: ${insertError.message}`);
+            toast.error(`Erro ao salvar aporte: ${insertError.message}`);
             throw insertError;
         }
 
@@ -509,6 +512,7 @@ function PoupancaContent() {
                 onSave={handleSaveSaving}
                 metas={metas.map(m => ({ id: m.id, nome: m.nome, icone: m.icone }))}
             />
+            <ToastContainer toasts={toasts} onRemove={removeToast} />
         </div>
     );
 }

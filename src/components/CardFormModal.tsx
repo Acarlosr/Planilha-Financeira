@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { X, Hash, Type } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { useToast } from "@/hooks/useToast";
+import { ToastContainer } from "@/components/Toast";
 
 interface CardFormModalProps {
     isOpen: boolean;
@@ -25,6 +27,7 @@ const BRANDS = ["Mastercard", "Visa", "Amex", "Elo", "Hipercard"];
 
 export default function CardFormModal({ isOpen, onClose, onSave }: CardFormModalProps) {
     const [loading, setLoading] = useState(false);
+    const { toasts, toast, removeToast } = useToast();
     const [formData, setFormData] = useState({
         nome: "",
         banco: "Nubank",
@@ -64,7 +67,7 @@ export default function CardFormModal({ isOpen, onClose, onSave }: CardFormModal
             onClose();
         } catch (error) {
             console.error("Erro ao salvar cartão:", error);
-            alert("Erro ao salvar cartão.");
+            toast.error("Erro ao salvar cartão.");
         } finally {
             setLoading(false);
         }
@@ -183,5 +186,6 @@ export default function CardFormModal({ isOpen, onClose, onSave }: CardFormModal
                 </form>
             </div>
         </div>
+        <ToastContainer toasts={toasts} onRemove={removeToast} />
     );
 }

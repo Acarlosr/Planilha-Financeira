@@ -10,6 +10,9 @@ import { useCartoes } from "@/hooks/useCartoes";
 import { useCategorias } from "@/hooks/useCategorias";
 import { useDespesas } from "@/hooks/useDespesas";
 import PrintExportButtons from "@/components/PrintExportButtons";
+import { v4 as uuidv4 } from 'uuid';
+import { useToast } from "@/hooks/useToast";
+import { ToastContainer } from "@/components/Toast";
 import {
     Plus,
     Edit,
@@ -110,7 +113,7 @@ const displayDateToIso = (date: string) => {
 
 const normalizeLocalExpenses = (rawExpenses: Partial<ExpenseItem>[]) => {
     const expenses = rawExpenses.map((expense) => ({
-        id: expense.id ?? `local-${Date.now()}-${Math.random()}`,
+        id: expense.id ?? uuidv4(),
         description: expense.repeatType ? (expense.description ?? "Despesa") : stripRecurrenceSuffix(expense.description ?? "Despesa"),
         value: Number(expense.value ?? 0),
         date: expense.date ?? "01/01/2026",
@@ -177,6 +180,7 @@ function DespesasContent() {
     });
     const [editingExpense, setEditingExpense] = useState<ExpenseItem | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const { toasts, toast, removeToast } = useToast();
     const { despesas, loading: loadingDespesas, error, refetch } = useDespesas(currentMonth, currentYear, statementScope);
     const { cartoes } = useCartoes();
     const { categorias, loading: loadingCategorias } = useCategorias();
@@ -208,7 +212,7 @@ function DespesasContent() {
 
         const { error } = await supabase.from("despesas").delete().eq("id", id);
         if (error) {
-            alert("Erro ao excluir despesa. Tente novamente.");
+            toast.error("Erro ao excluir despesa. Tente novamente.");
             return;
         }
         refetch();
@@ -278,7 +282,7 @@ function DespesasContent() {
 
     const handleSaveLocalExpenses = (newExpenses: any[]) => {
         const formattedExpenses = newExpenses.map((expense) => ({
-            id: `local-${Date.now()}-${Math.random()}`,
+            id: uuidv4(),
             description: expense.description,
             value: Number(expense.value),
             date: expense.date,
@@ -306,7 +310,7 @@ function DespesasContent() {
             .eq("id", expense.id);
 
         if (error) {
-            alert("Erro ao atualizar despesa: " + error.message);
+            toast.error("Erro ao atualizar despesa: " + error.message);
             return;
         }
         refetch();
@@ -359,6 +363,16 @@ function DespesasContent() {
                             </button>
                         </div>
                     </div>
+
+                    {/* Aviso modo offline */}
+                    {databaseUnavailable && (
+                        <div className="mt-4 flex items-start gap-3 rounded-lg border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-300 no-print">
+                            <span className="text-amber-400 shrink-0 mt-0.5">⚠️</span>
+                            <span>
+                                <strong>Modo offline ativo:</strong> O banco de dados está indisponível. Os lançamentos estão sendo salvos apenas neste navegador e serão perdidos ao limpar os dados do site.
+                            </span>
+                        </div>
+                    )}
 
                     {/* Total Summary */}
                     <div data-print-hide="true" className="mt-6 glass-card p-6">
@@ -621,6 +635,7 @@ function DespesasContent() {
                 initialCategoryId={selectedCategoryForModal}
                 initialExpense={editingExpense}
             />
+            <ToastContainer toasts={toasts} onRemove={removeToast} />
         </div>
     );
 }

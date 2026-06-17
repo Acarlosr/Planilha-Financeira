@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useToast } from "@/hooks/useToast";
+import { ToastContainer } from "@/components/Toast";
 import { X, Calendar, Tag, AlignLeft, FileText } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import InstallmentsForm, { InstallmentsData } from "./InstallmentsForm";
@@ -40,6 +42,7 @@ interface ExpenseModalProps {
 
 export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categorias, onSaveLocal, initialCategoryId, initialExpense }: ExpenseModalProps) {
     const [loading, setLoading] = useState(false);
+    const { toasts, toast, removeToast } = useToast();
     const isEditing = Boolean(initialExpense);
 
     // Dados básicos
@@ -107,14 +110,9 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
         setLoading(true);
 
         try {
-            // Se tiver onSaveLocal, ignoramos Auth/Supabase por enquanto (modo preview)
-            let userId = "user_preview_id";
-
-            if (!onSaveLocal) {
-                const { data: { user } } = await supabase.auth.getUser();
-                if (!user) throw new Error("Usuário não autenticado");
-                userId = user.id;
-            }
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) throw new Error("Usuário não autenticado");
+            const userId = user.id;
 
             const valorTotal = parseFloat(amount.replace(/\./g, '').replace(',', '.'));
             if (isNaN(valorTotal)) throw new Error("Valor inválido");
@@ -178,7 +176,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                         : descricaoFinalBase;
 
                     novasDespesas.push({
-                        id: Math.random(), // ID temporário para local
+                        id: uuidv4(), // ID temporário para local
                         user_id: userId,
                         descricao: descricaoFinal,
                         description: descricaoFinal, // Compatibilidade com frontend
@@ -203,7 +201,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
             } else {
                 // Despesa única
                 novasDespesas.push({
-                    id: Math.random(),
+                    id: uuidv4(),
                     user_id: userId,
                     descricao: descricaoFinalBase,
                     description: descricaoFinalBase,
@@ -266,7 +264,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
             onClose();
         } catch (error) {
             console.error("Erro ao salvar despesa:", error);
-            alert("Erro ao salvar despesa. Verifique os dados e tente novamente.");
+            toast.error("Erro ao salvar despesa. Verifique os dados e tente novamente.");
         } finally {
             setLoading(false);
         }
@@ -513,5 +511,6 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                 </form>
             </div>
         </div>
+        <ToastContainer toasts={toasts} onRemove={removeToast} />
     );
 }

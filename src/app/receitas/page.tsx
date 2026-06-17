@@ -14,6 +14,8 @@ import {
     RotateCcw,
     Edit,
 } from "lucide-react";
+import { useToast } from "@/hooks/useToast";
+import { ToastContainer } from "@/components/Toast";
 
 // Categorias de Receita conforme especificado
 const fallbackCategoriasReceita = [
@@ -54,6 +56,7 @@ function ReceitasContent() {
     const [isLoadingData, setIsLoadingData] = useState(true);
     const [categoriasReceitaDb, setCategoriasReceitaDb] = useState<CategoriaReceita[]>([]);
     const [categoriasReady, setCategoriasReady] = useState(false);
+    const { toasts, toast, removeToast } = useToast();
 
     const currentMonth = searchParams.get("month") ? parseInt(searchParams.get("month")!) : new Date().getMonth() + 1;
     const currentYear = searchParams.get("year") ? parseInt(searchParams.get("year")!) : new Date().getFullYear();
@@ -148,12 +151,12 @@ function ReceitasContent() {
 
     const handleSaveIncome = async (newIncome: { description: string; value: number; date: string; category: string }) => {
         if (!user) {
-            alert("Sua sessão expirou. Faça login novamente.");
+            toast.error("Sua sessão expirou. Faça login novamente.");
             throw new Error("Usuário não autenticado");
         }
 
         if (!categoriasReceitaDb.some((categoria) => categoria.id === newIncome.category)) {
-            alert("Categoria de receita inválida. Rode o script de reparo/seed no Supabase e recarregue a página.");
+            toast.error("Categoria de receita inválida. Rode o script de reparo/seed no Supabase e recarregue a página.");
             throw new Error("Categoria de receita inválida");
         }
 
@@ -173,7 +176,7 @@ function ReceitasContent() {
 
         if (error) {
             console.error(error);
-            alert(`Erro ao salvar receita: ${error.message}`);
+            toast.error(`Erro ao salvar receita: ${error.message}`);
             throw error;
         }
 
@@ -192,7 +195,7 @@ function ReceitasContent() {
         const { error } = await supabase.from('receitas').delete().eq('id', id);
         if (error) {
             console.error("Erro ao deletar:", error);
-            alert("Erro ao excluir do banco de dados.");
+            toast.error("Erro ao excluir do banco de dados.");
             return;
         }
         setIncomeData(prev => prev.filter(item => item.id !== id));
@@ -217,7 +220,7 @@ function ReceitasContent() {
 
         if (error) {
             console.error("Erro ao atualizar receita:", error);
-            alert(`Erro ao atualizar receita: ${error.message}`);
+            toast.error(`Erro ao atualizar receita: ${error.message}`);
             throw error;
         }
 
@@ -475,6 +478,7 @@ function ReceitasContent() {
                 categorias={categoriasReady && categoriasReceitaDb.length > 0 ? categoriasReceita : []}
                 initialIncome={editingIncome}
             />
+            <ToastContainer toasts={toasts} onRemove={removeToast} />
         </div>
     );
 }

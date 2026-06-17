@@ -9,6 +9,8 @@ import CryptoPortfolio from "@/components/CryptoPortfolio";
 import CryptoModal from "@/components/CryptoModal";
 import PrintExportButtons from "@/components/PrintExportButtons";
 import { Coins, LineChart, Wallet, Plus, Search, X } from "lucide-react";
+import { useToast } from "@/hooks/useToast";
+import { ToastContainer } from "@/components/Toast";
 
 function CriptoContent() {
     const router = useRouter();
@@ -35,6 +37,7 @@ function CriptoContent() {
     const [marketError, setMarketError] = useState<string | null>(null);
     const [lastMarketUpdate, setLastMarketUpdate] = useState<string | null>(null);
     const [search, setSearch] = useState("");
+    const { toasts, toast, removeToast } = useToast();
 
     useEffect(() => {
         const fetchCoins = async () => {
@@ -299,11 +302,11 @@ function CriptoContent() {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onSave={(crypto) => {
-                    console.log("Nova cripto adicionada:", crypto);
                     setMyCryptos(prev => [...prev, { ...crypto, id: Date.now() }]);
-                    alert(`${crypto.coinName} adicionado com sucesso!`);
+                    toast.success(`${crypto.coinName} adicionado com sucesso!`);
                 }}
             />
+            <ToastContainer toasts={toasts} onRemove={removeToast} />
         </div>
     );
 }

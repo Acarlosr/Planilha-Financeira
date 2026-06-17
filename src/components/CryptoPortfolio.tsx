@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Plus, Trash2, Printer, Coins } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { v4 as uuidv4 } from 'uuid';
 
 interface CryptoTransaction {
     id: string;
@@ -47,7 +48,7 @@ export default function CryptoPortfolio() {
         const totalBrl = priceBrl || (priceUsd * dollarRate);
 
         const newTransaction: CryptoTransaction = {
-            id: Math.random().toString(36).substr(2, 9),
+            id: uuidv4(),
             coin: formData.coin,
             date: formData.date,
             quantity: quantity,

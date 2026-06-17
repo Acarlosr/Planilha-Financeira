@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 
 type RadarCategory = "cambio" | "commodities" | "acoes" | "fiis" | "cripto";
 type RadarTone = "positive" | "negative" | "neutral" | "warning";
@@ -69,11 +71,22 @@ const getTone = (changePercent: number | null): RadarTone => {
     return "neutral";
 };
 
+const fetchWithTimeout = async (url: string, timeoutMs = 8000, options?: RequestInit) => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+        return await fetch(url, { ...options, signal: controller.signal });
+    } finally {
+        clearTimeout(timer);
+    }
+};
+
 const fetchRadarQuote = async (asset: RadarAsset): Promise<RadarQuote> => {
     try {
-        const response = await fetch(
+        const response = await fetchWithTimeout(
             `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(asset.yahooSymbol)}?range=1d&interval=1d`,
-            { next: { revalidate: 180 } }
+            8000,
+            { next: { revalidate: 180 } } as RequestInit
         );
 
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -177,6 +190,18 @@ const buildInsight = (quote: RadarQuote): RadarInsight => {
 };
 
 export async function GET() {
+    // Verificar autenticação
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        { cookies: { getAll: () => cookieStore.getAll(), setAll: () => {} } }
+    );
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const quotes = await Promise.all(assets.map(fetchRadarQuote));
     const insights = quotes
         .map(buildInsight)

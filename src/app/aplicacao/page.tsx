@@ -28,6 +28,8 @@ import {
 } from "recharts";
 
 import { aplicacaoData } from "@/constants/financialData";
+import { useToast } from "@/hooks/useToast";
+import { ToastContainer } from "@/components/Toast";
 
 // Dados vindos da constant
 const { rentabilidade: rentabilidadeData, tipos: tiposInvestimento, transacoes } = aplicacaoData;
@@ -60,6 +62,7 @@ function AplicacaoContent() {
     const [tiposDb, setTiposDb] = useState<TipoInvestimento[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const { toasts, toast, removeToast } = useToast();
 
     const loadInvestments = useCallback(async () => {
         try {
@@ -147,12 +150,12 @@ function AplicacaoContent() {
     const handleSaveInvestment = async (investment: any) => {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
-            alert("Faça login novamente para registrar aplicações.");
+            toast.error("Faça login novamente para registrar aplicações.");
             throw new Error("Usuário não autenticado");
         }
 
         if (!tiposDb.some((item) => item.id === investment.investmentType)) {
-            alert("Tipo de investimento inválido. Rode o script de reparo/seed no Supabase e recarregue a página.");
+            toast.error("Tipo de investimento inválido. Rode o script de reparo/seed no Supabase e recarregue a página.");
             throw new Error("Tipo de investimento inválido");
         }
 
@@ -166,7 +169,7 @@ function AplicacaoContent() {
         });
 
         if (insertError) {
-            alert(`Erro ao salvar aplicação: ${insertError.message}`);
+            toast.error(`Erro ao salvar aplicação: ${insertError.message}`);
             throw insertError;
         }
 
@@ -423,6 +426,7 @@ function AplicacaoContent() {
                 onSave={handleSaveInvestment}
                 investmentTypes={investmentTypesForModal}
             />
+            <ToastContainer toasts={toasts} onRemove={removeToast} />
         </div>
     );
 }

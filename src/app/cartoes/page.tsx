@@ -16,6 +16,8 @@ import {
     TrendingDown,
     Loader2,
 } from "lucide-react";
+import { useToast } from "@/hooks/useToast";
+import { ToastContainer } from "@/components/Toast";
 
 interface FaturaPorCartao {
     cartaoId: string;
@@ -47,6 +49,7 @@ export default function CartoesPage() {
     const [faturas, setFaturas] = useState<FaturaPorCartao[]>([]);
     const [faturasLoading, setFaturasLoading] = useState(true);
     const [deletingId, setDeletingId] = useState<string | null>(null);
+    const { toasts, toast, removeToast } = useToast();
 
     // Carrega o total da fatura aberta (despesas do mês vinculadas a cada cartão)
     const carregarFaturas = useCallback(async () => {
@@ -132,7 +135,7 @@ export default function CartoesPage() {
             await carregarFaturas();
         } catch (err) {
             console.error("Erro ao excluir cartão:", err);
-            alert("Não foi possível excluir o cartão.");
+            toast.error("Não foi possível excluir o cartão.");
         } finally {
             setDeletingId(null);
         }
@@ -362,6 +365,7 @@ export default function CartoesPage() {
                 onClose={() => setModalOpen(false)}
                 onSave={handleSave}
             />
+            <ToastContainer toasts={toasts} onRemove={removeToast} />
         </div>
     );
 }

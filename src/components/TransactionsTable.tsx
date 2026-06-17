@@ -4,6 +4,8 @@ import { ArrowUpRight, ArrowDownRight, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { useDashboardOverview } from "@/hooks/useDashboardOverview";
+import { useToast } from "@/hooks/useToast";
+import { ToastContainer } from "@/components/Toast";
 
 const categoryColors: { [key: string]: string } = {
     Salário: "bg-cyan-500/15 text-cyan-300 border-cyan-500/25",
@@ -17,6 +19,7 @@ const categoryColors: { [key: string]: string } = {
 
 export default function TransactionsTable() {
     const { recentTransactions: transactions, loading, refetch } = useDashboardOverview();
+    const { toasts, toast, removeToast } = useToast();
 
     const handleDelete = async (id: string) => {
         const separatorIndex = id.indexOf("-");
@@ -25,7 +28,7 @@ export default function TransactionsTable() {
         const table = type === "receita" ? "receitas" : "despesas";
         const { error } = await supabase.from(table).delete().eq("id", realId);
         if (error) {
-            alert("Erro ao excluir transação. Tente novamente.");
+            toast.error("Erro ao excluir transação. Tente novamente.");
             return;
         }
         refetch();
@@ -167,5 +170,6 @@ export default function TransactionsTable() {
                 </div>
             </div>
         </div>
+        <ToastContainer toasts={toasts} onRemove={removeToast} />
     );
 }
