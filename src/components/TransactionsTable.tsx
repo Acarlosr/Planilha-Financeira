@@ -35,6 +35,7 @@ export default function TransactionsTable() {
     };
 
     return (
+        <>
         <div className="glass-card p-6">
             <div className="flex items-center justify-between mb-6">
                 <div>
@@ -171,5 +172,6 @@ export default function TransactionsTable() {
             </div>
         </div>
         <ToastContainer toasts={toasts} onRemove={removeToast} />
+        </>
     );
 }

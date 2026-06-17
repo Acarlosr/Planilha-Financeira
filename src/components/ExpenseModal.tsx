@@ -271,6 +271,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
     };
 
     return (
+        <>
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-2 sm:items-center sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
             <div
                 className="relative my-auto w-full max-w-2xl rounded-xl border border-white/10 p-4 animate-in zoom-in-95 duration-200 sm:rounded-2xl sm:p-6"
@@ -512,5 +513,6 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
             </div>
         </div>
         <ToastContainer toasts={toasts} onRemove={removeToast} />
+        </>
     );
 }
