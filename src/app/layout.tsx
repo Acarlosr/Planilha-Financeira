@@ -1,16 +1,31 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import AuthProvider from "@/components/AuthProvider";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
+import ServiceWorkerRegistrar from "@/components/ServiceWorkerRegistrar";
+
+export const viewport: Viewport = {
+  themeColor: "#f59e0b",
+  width: "device-width",
+  initialScale: 1,
+  minimumScale: 1,
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://saldoclaro.xyz"),
   title: "SaldoClaro | Dashboard financeiro",
   description: "Dashboard financeiro para gerenciar suas finanças pessoais",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "SaldoClaro",
+  },
   icons: {
     icon: [
       { url: "/logo-saldoclaro.svg", type: "image/svg+xml" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
       { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
     ],
     apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
@@ -54,6 +69,7 @@ export default function RootLayout({
             </SubscriptionProvider>
           </AuthProvider>
         </ThemeProvider>
+        <ServiceWorkerRegistrar />
       </body>
     </html>
   );
