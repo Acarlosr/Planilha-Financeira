@@ -297,19 +297,19 @@ export default function PaymentReminders() {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                        <div className="grid grid-cols-2 gap-3">
                             {reminders.map((reminder) => {
                                 const status = statusStyles[reminder.status];
                                 return (
                                     <article
                                         key={reminder.id}
-                                        className="rounded-lg border p-4 flex flex-col gap-3"
+                                        className="rounded-lg border p-3 flex flex-col gap-2"
                                         style={{ borderColor: "var(--card-border)", background: "var(--card-bg-solid)" }}
                                     >
-                                        {/* Cabeçalho: ícone + título + data */}
-                                        <div className="flex items-center gap-3">
+                                        {/* Ícone + título */}
+                                        <div className="flex items-center gap-2">
                                             <div
-                                                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+                                                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md"
                                                 style={{
                                                     background: reminder.type === "cartao"
                                                         ? "color-mix(in srgb, var(--accent) 10%, transparent)"
@@ -317,36 +317,38 @@ export default function PaymentReminders() {
                                                     color: reminder.type === "cartao" ? "var(--accent)" : "var(--warning)",
                                                 }}
                                             >
-                                                {reminder.type === "cartao" ? <CreditCard size={18} /> : <FileText size={18} />}
+                                                {reminder.type === "cartao" ? <CreditCard size={14} /> : <FileText size={14} />}
                                             </div>
                                             <div className="min-w-0 flex-1">
-                                                <h3 className="text-sm font-bold text-foreground leading-tight">{reminder.title}</h3>
-                                                <p className="text-xs text-muted truncate">{reminder.detail}</p>
+                                                <h3 className="text-xs font-bold text-foreground leading-tight truncate">{reminder.title}</h3>
+                                                <p className="text-[10px] text-muted truncate">{reminder.detail}</p>
                                             </div>
-                                            <span
-                                                className="shrink-0 rounded-full px-2 py-1 text-xs font-semibold"
-                                                style={{ background: status.bg, color: status.color }}
-                                            >
-                                                {formatShortDate(reminder.dueDate)}
-                                            </span>
                                         </div>
 
+                                        {/* Data de vencimento */}
+                                        <span
+                                            className="self-start rounded-full px-2 py-0.5 text-[10px] font-semibold"
+                                            style={{ background: status.bg, color: status.color }}
+                                        >
+                                            {formatShortDate(reminder.dueDate)}
+                                        </span>
+
                                         {/* Valores */}
-                                        <div className="rounded-lg p-3 flex flex-col gap-2" style={{ background: "rgba(255,255,255,0.04)" }}>
-                                            <div className="flex items-center justify-between">
-                                                <p className="text-xs text-muted">Valor</p>
-                                                <p className="text-sm font-bold text-foreground">{formatCurrency(reminder.amount)}</p>
+                                        <div className="rounded-md p-2 flex flex-col gap-1" style={{ background: "rgba(255,255,255,0.04)" }}>
+                                            <div className="flex items-center justify-between gap-1">
+                                                <p className="text-[10px] text-muted whitespace-nowrap">Valor</p>
+                                                <p className="text-xs font-bold text-foreground">{formatCurrency(reminder.amount)}</p>
                                             </div>
-                                            <div className="flex items-center justify-between">
-                                                <p className="text-xs text-muted">Saldo após pagar</p>
-                                                <p className="text-sm font-bold" style={{ color: reminder.balanceAfter < 0 ? "var(--danger)" : "var(--success)" }}>
+                                            <div className="flex items-center justify-between gap-1">
+                                                <p className="text-[10px] text-muted whitespace-nowrap">Saldo restante</p>
+                                                <p className="text-xs font-bold" style={{ color: reminder.balanceAfter < 0 ? "var(--danger)" : "var(--success)" }}>
                                                     {formatCurrency(reminder.balanceAfter)}
                                                 </p>
                                             </div>
                                         </div>
 
                                         {/* Status */}
-                                        <div className="flex items-center gap-2 text-xs font-semibold" style={{ color: status.color }}>
+                                        <div className="flex items-center gap-1 text-[10px] font-semibold" style={{ color: status.color }}>
                                             {status.icon}
                                             {status.label}
                                         </div>
