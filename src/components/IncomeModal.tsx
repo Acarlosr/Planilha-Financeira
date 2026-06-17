@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X, Plus } from "lucide-react";
+import { X, Plus, Edit } from "lucide-react";
 
 interface IncomeModalProps {
     isOpen: boolean;
@@ -13,29 +13,58 @@ interface IncomeModalProps {
         category: string;
     }) => void | Promise<void>;
     categorias: { id: string; label: string; icone: string }[];
+    initialIncome?: {
+        id: number | string;
+        description: string;
+        value: number;
+        date: string;
+        category: string;
+    } | null;
 }
 
-export default function IncomeModal({ isOpen, onClose, onSave, categorias }: IncomeModalProps) {
+export default function IncomeModal({ isOpen, onClose, onSave, categorias, initialIncome }: IncomeModalProps) {
     const [description, setDescription] = useState("");
     const [value, setValue] = useState("");
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
     const [category, setCategory] = useState(categorias[0]?.id ?? "");
     const [loading, setLoading] = useState(false);
+    const isEditing = Boolean(initialIncome);
 
     useEffect(() => {
-        if (isOpen && categorias.length > 0 && !categorias.some((cat) => cat.id === category)) {
+        if (isOpen) {
+            if (initialIncome) {
+                setDescription(initialIncome.description);
+                // Converte de dd/MM/yyyy para yyyy-MM-dd se necessário
+                const isoDate = initialIncome.date.includes("/")
+                    ? initialIncome.date.split("/").reverse().join("-")
+                    : initialIncome.date;
+                setDate(isoDate);
+                setValue(initialIncome.value.toLocaleString("pt-BR", { minimumFractionDigits: 2 }));
+                setCategory(initialIncome.category);
+            } else {
+                setDescription("");
+                setValue("");
+                setDate(new Date().toISOString().split('T')[0]);
+                if (categorias.length > 0) setCategory(categorias[0].id);
+            }
+        }
+    }, [isOpen, initialIncome]);
+
+    useEffect(() => {
+        if (isOpen && !initialIncome && categorias.length > 0 && !categorias.some((cat) => cat.id === category)) {
             setCategory(categorias[0].id);
         }
-    }, [category, categorias, isOpen]);
+    }, [category, categorias, isOpen, initialIncome]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
 
         try {
+            const numericValue = parseFloat(value.replace(/\./g, '').replace(',', '.'));
             await onSave({
                 description,
-                value: parseFloat(value.replace(',', '.')),
+                value: numericValue,
                 date,
                 category,
             });
@@ -87,9 +116,9 @@ export default function IncomeModal({ isOpen, onClose, onSave, categorias }: Inc
                                 background: "linear-gradient(135deg, #10B981 0%, #34D399 100%)",
                             }}
                         >
-                            <Plus className="text-white" size={20} />
+                            {isEditing ? <Edit className="text-white" size={20} /> : <Plus className="text-white" size={20} />}
                         </div>
-                        <h2 className="text-xl font-bold text-foreground">Nova Receita</h2>
+                        <h2 className="text-xl font-bold text-foreground">{isEditing ? "Editar Receita" : "Nova Receita"}</h2>
                     </div>
                     <button
                         onClick={onClose}
@@ -189,7 +218,7 @@ export default function IncomeModal({ isOpen, onClose, onSave, categorias }: Inc
                             boxShadow: "0 4px 15px rgba(16, 185, 129, 0.4)"
                         }}
                     >
-                        {loading ? "Salvando..." : "Adicionar Receita"}
+                        {loading ? "Salvando..." : isEditing ? "Salvar Alterações" : "Adicionar Receita"}
                     </button>
                 </form>
             </div>

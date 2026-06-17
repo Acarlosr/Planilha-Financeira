@@ -225,6 +225,23 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
             if (onSaveLocal) {
                 // Modo Local: Apenas devolve os objetos
                 onSaveLocal(novasDespesas);
+            } else if (isEditing && initialExpense) {
+                // Modo Real: Atualiza no Supabase (apenas a despesa única)
+                const d = novasDespesas[0];
+                const { error } = await supabase
+                    .from("despesas")
+                    .update({
+                        descricao: d.descricao,
+                        valor: d.valor,
+                        data: d.data,
+                        categoria_id: d.categoria_id,
+                        cartao_id: d.cartao_id,
+                        boleto: d.boleto,
+                        data_vencimento: d.data_vencimento,
+                    })
+                    .eq("id", initialExpense.id);
+                if (error) throw error;
+                onSave();
             } else {
                 // Modo Real: Salva no Supabase (apenas campos oficiais)
                 const despesasParaSalvar = novasDespesas.map(d => ({

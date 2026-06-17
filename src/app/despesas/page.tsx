@@ -294,6 +294,24 @@ function DespesasContent() {
         setEditingExpense(null);
     };
 
+    const handleUpdateDatabaseExpense = async (expense: ExpenseItem, updated: { description: string; value: number; date: string; category: string }) => {
+        const { error } = await supabase
+            .from("despesas")
+            .update({
+                descricao: updated.description,
+                valor: updated.value,
+                data: updated.date,
+                categoria_id: updated.category,
+            })
+            .eq("id", expense.id);
+
+        if (error) {
+            alert("Erro ao atualizar despesa: " + error.message);
+            return;
+        }
+        refetch();
+    };
+
     return (
         <div className="min-h-screen">
             <Sidebar />
@@ -555,13 +573,7 @@ function DespesasContent() {
                                         <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <button
                                                 type="button"
-                                                onClick={() => {
-                                                    if (databaseUnavailable || item.id.startsWith("local-")) {
-                                                        openEditExpense(item);
-                                                        return;
-                                                    }
-                                                    alert("Edição direta das despesas salvas no banco será habilitada na próxima etapa.");
-                                                }}
+                                                onClick={() => openEditExpense(item)}
                                                 className="p-2 hover:bg-white/10 rounded-lg transition-colors"
                                             >
                                                 <Edit size={16} className="text-muted" />

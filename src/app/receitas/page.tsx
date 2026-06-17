@@ -12,6 +12,7 @@ import {
     Plus,
     Trash2,
     RotateCcw,
+    Edit,
 } from "lucide-react";
 
 // Categorias de Receita conforme especificado
@@ -49,6 +50,7 @@ function ReceitasContent() {
     const [activeCategory, setActiveCategory] = useState<string | null>(null);
     const [incomeData, setIncomeData] = useState<IncomeItem[]>(initialIncomeData);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingIncome, setEditingIncome] = useState<IncomeItem | null>(null);
     const [isLoadingData, setIsLoadingData] = useState(true);
     const [categoriasReceitaDb, setCategoriasReceitaDb] = useState<CategoriaReceita[]>([]);
     const [categoriasReady, setCategoriasReady] = useState(false);
@@ -194,6 +196,40 @@ function ReceitasContent() {
             return;
         }
         setIncomeData(prev => prev.filter(item => item.id !== id));
+    };
+
+    const handleUpdateIncome = async (updated: { description: string; value: number; date: string; category: string }) => {
+        if (!editingIncome) return;
+
+        const pgDate = updated.date.includes("/")
+            ? updated.date.split("/").reverse().join("-")
+            : updated.date;
+
+        const { error } = await supabase
+            .from("receitas")
+            .update({
+                descricao: updated.description,
+                valor: updated.value,
+                data: pgDate,
+                categoria_id: updated.category,
+            })
+            .eq("id", editingIncome.id);
+
+        if (error) {
+            console.error("Erro ao atualizar receita:", error);
+            alert(`Erro ao atualizar receita: ${error.message}`);
+            throw error;
+        }
+
+        const [year, month, day] = pgDate.split("-");
+        setIncomeData(prev =>
+            prev.map(item =>
+                item.id === editingIncome.id
+                    ? { ...item, description: updated.description, value: updated.value, date: `${day}/${month}/${year}`, category: updated.category }
+                    : item
+            )
+        );
+        setEditingIncome(null);
     };
 
     const getItemsByCategory = (categoryId: string) => {
@@ -398,16 +434,27 @@ function ReceitasContent() {
                                                 <span className="font-bold text-emerald-400 text-sm md:text-lg whitespace-nowrap">
                                                     + R$ {item.value.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                                                 </span>
-                                                <button
-                                                    onClick={() => {
-                                                        if (confirm(`Excluir "${item.description}"?`)) {
-                                                            handleDeleteIncome(item.id);
-                                                        }
-                                                    }}
-                                                    className="p-1.5 md:p-2 hover:bg-red-500/20 active:bg-red-500/30 rounded-lg transition-colors md:opacity-0 md:group-hover:opacity-100"
-                                                >
-                                                    <Trash2 size={14} className="text-red-400" />
-                                                </button>
+                                                <div className="flex items-center gap-1 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                                                    <button
+                                                        onClick={() => {
+                                                            setEditingIncome(item);
+                                                            setIsModalOpen(true);
+                                                        }}
+                                                        className="p-1.5 md:p-2 hover:bg-white/10 active:bg-white/20 rounded-lg transition-colors"
+                                                    >
+                                                        <Edit size={14} className="text-muted" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => {
+                                                            if (confirm(`Excluir "${item.description}"?`)) {
+                                                                handleDeleteIncome(item.id);
+                                                            }
+                                                        }}
+                                                        className="p-1.5 md:p-2 hover:bg-red-500/20 active:bg-red-500/30 rounded-lg transition-colors"
+                                                    >
+                                                        <Trash2 size={14} className="text-red-400" />
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     );
@@ -420,9 +467,13 @@ function ReceitasContent() {
 
             <IncomeModal
                 isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onSave={handleSaveIncome}
+                onClose={() => {
+                    setIsModalOpen(false);
+                    setEditingIncome(null);
+                }}
+                onSave={editingIncome ? handleUpdateIncome : handleSaveIncome}
                 categorias={categoriasReady && categoriasReceitaDb.length > 0 ? categoriasReceita : []}
+                initialIncome={editingIncome}
             />
         </div>
     );
