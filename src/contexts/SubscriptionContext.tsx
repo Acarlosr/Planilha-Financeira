@@ -12,7 +12,7 @@ interface SubscriptionContextType {
     isTrial: boolean;
     trialDaysLeft: number | null;
     hasActiveSubscription: boolean;
-    refreshProfile: () => Promise<void>;
+    refreshProfile: () => void;
 }
 
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
@@ -117,7 +117,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
         isTrial,
         trialDaysLeft,
         hasActiveSubscription,
-        refreshProfile: loadUserProfile,
+        refreshProfile: () => { loadUserProfile(); },
     };
 
     return (
