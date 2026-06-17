@@ -92,11 +92,12 @@ export function useDashboardOverview(): DashboardOverview {
                 supabase.from("metas_poupanca").select("valor_atual").eq("user_id", user.id),
             ]);
 
+            const isAbort = (msg?: string) => msg?.includes("AbortError") || msg?.includes("steal");
             const warnings = [
-                receitasResult.error ? `Receitas: ${receitasResult.error.message}` : null,
-                despesasResult.error ? `Despesas: ${despesasResult.error.message}` : null,
-                aplicacoesResult.error ? `Aplicações: ${aplicacoesResult.error.message}` : null,
-                metasPoupancaResult.error ? `Poupança: ${metasPoupancaResult.error.message}` : null,
+                receitasResult.error && !isAbort(receitasResult.error.message) ? `Receitas: ${receitasResult.error.message}` : null,
+                despesasResult.error && !isAbort(despesasResult.error.message) ? `Despesas: ${despesasResult.error.message}` : null,
+                aplicacoesResult.error && !isAbort(aplicacoesResult.error.message) ? `Aplicações: ${aplicacoesResult.error.message}` : null,
+                metasPoupancaResult.error && !isAbort(metasPoupancaResult.error.message) ? `Poupança: ${metasPoupancaResult.error.message}` : null,
             ].filter(Boolean);
 
             const receitas = receitasResult.error ? [] : receitasResult.data ?? [];
@@ -148,6 +149,8 @@ export function useDashboardOverview(): DashboardOverview {
 
             setRecentTransactions(recent);
         } catch (err) {
+            // Ignora AbortError (requisição cancelada por remount do componente)
+            if (err instanceof Error && err.name === "AbortError") return;
             const message = err instanceof Error ? err.message : "Erro ao carregar dashboard";
             setError(message);
             setCurrentIncome(0);

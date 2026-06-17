@@ -8,7 +8,7 @@ import MonthYearPicker from "@/components/MonthYearPicker";
 import CryptoPortfolio from "@/components/CryptoPortfolio";
 import CryptoModal from "@/components/CryptoModal";
 import PrintExportButtons from "@/components/PrintExportButtons";
-import { Coins, LineChart, Wallet, Plus } from "lucide-react";
+import { Coins, LineChart, Wallet, Plus, Search, X } from "lucide-react";
 
 function CriptoContent() {
     const router = useRouter();
@@ -34,6 +34,7 @@ function CriptoContent() {
     const [loading, setLoading] = useState(true);
     const [marketError, setMarketError] = useState<string | null>(null);
     const [lastMarketUpdate, setLastMarketUpdate] = useState<string | null>(null);
+    const [search, setSearch] = useState("");
 
     useEffect(() => {
         const fetchCoins = async () => {
@@ -178,17 +179,36 @@ function CriptoContent() {
                 <div className="glass-card p-6 min-h-[400px]">
                     {activeTab === "market" ? (
                         <>
-                            <div className="mb-5 flex flex-col gap-2 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between" style={{ borderColor: "var(--card-border)", background: "var(--card-bg)" }}>
+                            <div className="mb-5 flex flex-col gap-3 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between" style={{ borderColor: "var(--card-border)", background: "var(--card-bg)" }}>
                                 <div>
                                     <p className="text-sm font-semibold text-foreground">Top 20 por valor de mercado</p>
                                     <p className="text-sm text-muted">
                                         Dados da CoinGecko atualizados automaticamente a cada 60 segundos.
                                     </p>
                                 </div>
-                                <div className="text-sm font-medium" style={{ color: "var(--accent)" }}>
-                                    {lastMarketUpdate
-                                        ? `Atualizado ${new Date(lastMarketUpdate).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`
-                                        : "Aguardando dados"}
+                                <div className="flex items-center gap-3">
+                                    {/* Campo de busca */}
+                                    <div className="relative">
+                                        <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
+                                        <input
+                                            type="text"
+                                            value={search}
+                                            onChange={(e) => setSearch(e.target.value)}
+                                            placeholder="Buscar moeda..."
+                                            className="pl-9 pr-8 py-2 rounded-lg text-sm text-foreground placeholder:text-muted border border-white/10 outline-none focus:border-amber-400/50 transition-colors"
+                                            style={{ background: "rgba(255,255,255,0.05)", width: "180px" }}
+                                        />
+                                        {search && (
+                                            <button onClick={() => setSearch("")} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted hover:text-foreground">
+                                                <X size={14} />
+                                            </button>
+                                        )}
+                                    </div>
+                                    <div className="text-sm font-medium whitespace-nowrap" style={{ color: "var(--accent)" }}>
+                                        {lastMarketUpdate
+                                            ? `Atualizado ${new Date(lastMarketUpdate).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`
+                                            : "Aguardando dados"}
+                                    </div>
                                 </div>
                             </div>
                             {marketError && (
@@ -214,7 +234,11 @@ function CriptoContent() {
                                             </tr>
                                         </thead>
                                         <tbody className="text-sm">
-                                            {coins.map((coin) => (
+                                            {coins.filter((coin) =>
+                                                !search ||
+                                                coin.name.toLowerCase().includes(search.toLowerCase()) ||
+                                                coin.symbol.toLowerCase().includes(search.toLowerCase())
+                                            ).map((coin) => (
                                                 <tr key={coin.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                                                     <td className="py-4 pl-4">
                                                         <div className="flex items-center gap-3">
