@@ -21,7 +21,7 @@ export default function Home() {
 
       <main className="md:ml-64 p-4 pt-24 md:p-8 transition-all duration-300">
         <header
-          className="relative mb-8 overflow-hidden rounded-xl border p-5 lg:p-6"
+          className="relative mb-8 rounded-xl border p-5 lg:p-6"
           style={{
             background:
               "linear-gradient(135deg, color-mix(in srgb, var(--card-bg-solid) 68%, transparent), color-mix(in srgb, var(--secondary) 7%, transparent))",

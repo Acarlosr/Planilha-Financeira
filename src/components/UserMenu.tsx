@@ -110,7 +110,7 @@ export default function UserMenu() {
 
             {isOpen && (
                 <div
-                    className="absolute right-0 mt-2 w-56 rounded-lg overflow-hidden z-50 border"
+                    className="absolute right-0 mt-2 w-56 rounded-lg overflow-hidden z-[9999] border"
                     style={{
                         background: "var(--card-bg-solid)",
                         borderColor: "var(--card-border)",
