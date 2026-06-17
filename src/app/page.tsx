@@ -13,6 +13,7 @@ import PaymentReminders from "@/components/PaymentReminders";
 import BudgetUsageAlert from "@/components/BudgetUsageAlert";
 import MarketInsightRail from "@/components/MarketInsightRail";
 import DashboardPulse from "@/components/DashboardPulse";
+import InstallPWAButton from "@/components/InstallPWAButton";
 
 export default function Home() {
   return (
@@ -80,6 +81,7 @@ export default function Home() {
                 />
               </button>
 
+              <InstallPWAButton />
               <ThemeToggle />
               <UserMenu />
             </div>
