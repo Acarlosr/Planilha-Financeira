@@ -21,25 +21,29 @@ interface CustomTooltipProps {
     label?: string;
 }
 
+const formatBRL = (value: number) =>
+    value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
 const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
     if (active && payload && payload.length) {
         return (
             <div
                 className="p-4 rounded-xl border border-white/20"
                 style={{
-                    background: "var(--card-bg-solid)",
+                    background: "color-mix(in srgb, var(--card-bg-solid) 78%, transparent)",
                     color: "var(--foreground)",
-                    backdropFilter: "blur(10px)",
-                    boxShadow: "var(--shadow-glass)",
+                    backdropFilter: "blur(16px) saturate(140%)",
+                    WebkitBackdropFilter: "blur(16px) saturate(140%)",
+                    boxShadow: "0 18px 45px rgba(0, 0, 0, 0.28)",
                 }}
             >
                 <p className="font-semibold text-foreground mb-2">{label}</p>
                 {payload.map((entry, index) => (
-                    <p key={index} className="text-sm" style={{ color: entry.color }}>
+                    <p key={index} className="text-sm tabular-nums" style={{ color: entry.color }}>
                         <span className="font-medium">
                             {entry.dataKey === "entradas" ? "Entradas" : "Saídas"}:
                         </span>{" "}
-                        R$ {entry.value.toLocaleString("pt-BR")}
+                        {formatBRL(entry.value)}
                     </p>
                 ))}
             </div>
@@ -94,7 +98,7 @@ export default function CashFlowChart() {
                         </defs>
                         <CartesianGrid
                             strokeDasharray="3 3"
-                            stroke="color-mix(in srgb, var(--secondary) 13%, transparent)"
+                            stroke="color-mix(in srgb, var(--foreground) 10%, transparent)"
                             vertical={false}
                         />
                         <XAxis
@@ -111,7 +115,14 @@ export default function CashFlowChart() {
                             tickFormatter={(value) => `${value / 1000}k`}
                             dx={-10}
                         />
-                        <Tooltip content={<CustomTooltip />} />
+                        <Tooltip
+                            content={<CustomTooltip />}
+                            cursor={{
+                                stroke: "color-mix(in srgb, var(--secondary) 35%, transparent)",
+                                strokeWidth: 1.5,
+                                strokeDasharray: "4 4",
+                            }}
+                        />
                         <Area
                             type="monotone"
                             dataKey="entradas"
@@ -119,6 +130,17 @@ export default function CashFlowChart() {
                             strokeWidth={3}
                             fillOpacity={1}
                             fill="url(#colorEntradas)"
+                            animationDuration={1000}
+                            animationEasing="ease-out"
+                            dot={false}
+                            activeDot={{
+                                r: 6,
+                                fill: "#15e3a0",
+                                stroke: "var(--card-bg-solid)",
+                                strokeWidth: 2,
+                                className: "chart-active-dot",
+                                style: { filter: "drop-shadow(0 0 6px #15e3a0)" },
+                            }}
                         />
                         <Area
                             type="monotone"
@@ -127,6 +149,17 @@ export default function CashFlowChart() {
                             strokeWidth={3}
                             fillOpacity={1}
                             fill="url(#colorSaidas)"
+                            animationDuration={1000}
+                            animationEasing="ease-out"
+                            dot={false}
+                            activeDot={{
+                                r: 6,
+                                fill: "#ff4f7b",
+                                stroke: "var(--card-bg-solid)",
+                                strokeWidth: 2,
+                                className: "chart-active-dot",
+                                style: { filter: "drop-shadow(0 0 6px #ff4f7b)" },
+                            }}
                         />
                     </AreaChart>
                 </ResponsiveContainer>

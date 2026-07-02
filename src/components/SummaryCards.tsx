@@ -150,9 +150,15 @@ export default function SummaryCards() {
                         </div>
                     </div>
 
-                    <svg className="sparkline mt-4 h-14 w-full" viewBox="0 0 152 56" fill="none" aria-hidden="true">
-                        <path d={card.sparkPath} stroke={card.sparkColor} strokeWidth="3" strokeLinecap="round" />
-                        <path d={`${card.sparkPath} L150 56 L2 56 Z`} fill={`color-mix(in srgb, ${card.sparkColor} 16%, transparent)`} />
+                    <svg
+                        className="sparkline mt-4 h-14 w-full"
+                        viewBox="0 0 152 56"
+                        fill="none"
+                        aria-hidden="true"
+                        style={{ "--enter-index": index } as React.CSSProperties}
+                    >
+                        <path className="sparkline-line" pathLength="1" d={card.sparkPath} stroke={card.sparkColor} strokeWidth="3" strokeLinecap="round" />
+                        <path className="sparkline-fill" d={`${card.sparkPath} L150 56 L2 56 Z`} fill={`color-mix(in srgb, ${card.sparkColor} 16%, transparent)`} />
                     </svg>
 
                     <div className="mt-3">

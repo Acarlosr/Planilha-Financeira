@@ -7,6 +7,7 @@ import { getMonthRange, sumInRange, computeInvestmentsTotal } from "@/lib/financ
 export interface RecentTransaction {
     id: string;
     date: string;
+    isoDate: string;
     description: string;
     category: string;
     value: number;
@@ -130,6 +131,7 @@ export function useDashboardOverview(): DashboardOverview {
                 ...receitas.map((item) => ({
                     id: `receita-${item.id}`,
                     date: formatDate(item.data),
+                    isoDate: item.data,
                     description: item.descricao,
                     category: "Receita",
                     value: Number(item.valor),
@@ -138,14 +140,15 @@ export function useDashboardOverview(): DashboardOverview {
                 ...despesas.map((item) => ({
                     id: `despesa-${item.id}`,
                     date: formatDate(item.data),
+                    isoDate: item.data,
                     description: item.descricao,
                     category: "Despesa",
                     value: Number(item.valor),
                     type: "saida" as const,
                 })),
             ]
-                .sort((a, b) => b.date.split("/").reverse().join("").localeCompare(a.date.split("/").reverse().join("")))
-                .slice(0, 8);
+                .sort((a, b) => b.isoDate.localeCompare(a.isoDate))
+                .slice(0, 40);
 
             setRecentTransactions(recent);
         } catch (err) {

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useTheme } from "@/contexts/ThemeContext";
+import UserMenu from "@/components/UserMenu";
 import {
     LayoutDashboard,
     TrendingUp,
@@ -16,8 +17,6 @@ import {
     CreditCard,
     Sun,
     Moon,
-    Menu,
-    X,
     Sparkles,
 } from "lucide-react";
 
@@ -76,30 +75,30 @@ export default function Sidebar() {
             </div>
 
             <div
-                className="md:hidden fixed top-8 left-0 w-full z-40 p-4 flex items-center justify-between border-b"
-                style={{
-                    background: "color-mix(in srgb, var(--background-light) 88%, transparent)",
-                    borderColor: "var(--card-border)",
-                    backdropFilter: "blur(12px)",
-                }}
+                className="md:hidden fixed top-8 left-0 w-full z-40 p-4 flex items-center justify-between border-b sidebar-glass"
+                style={{ borderColor: "var(--card-border)" }}
             >
-                <Link href="/" className="flex items-center gap-3">
+                <Link href="/" className="sidebar-focus flex items-center gap-3 rounded-lg">
                     <div
-                        className="w-10 h-10 rounded-xl flex items-center justify-center"
-                        style={{
-                            background: "linear-gradient(135deg, var(--accent), var(--secondary))",
-                            boxShadow: "0 10px 24px color-mix(in srgb, var(--accent) 22%, transparent)",
-                        }}
+                        className="logo-glow w-10 h-10 rounded-xl flex items-center justify-center"
+                        style={{ background: "linear-gradient(135deg, var(--accent), var(--secondary))" }}
                     >
-                        <Sparkles className="text-black" size={20} />
+                        <Sparkles className="text-black" size={20} aria-hidden="true" />
                     </div>
                     <span className="font-semibold text-foreground text-lg">FinançasPro</span>
                 </Link>
                 <button
                     onClick={() => setMobileOpen(!mobileOpen)}
-                    className="p-2 rounded-lg bg-white/5 text-white hover:bg-white/10 transition-colors"
+                    aria-expanded={mobileOpen}
+                    aria-controls="sidebar-nav"
+                    aria-label={mobileOpen ? "Fechar menu" : "Abrir menu"}
+                    className="sidebar-focus p-2 rounded-lg bg-white/5 text-foreground hover:bg-white/10 transition-colors"
                 >
-                    {mobileOpen ? <X size={24} /> : <Menu size={24} />}
+                    <span className={`hamburger ${mobileOpen ? "is-open" : ""}`} aria-hidden="true">
+                        <span />
+                        <span />
+                        <span />
+                    </span>
                 </button>
             </div>
 
@@ -107,31 +106,28 @@ export default function Sidebar() {
                 <div
                     className="md:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
                     onClick={() => setMobileOpen(false)}
+                    aria-hidden="true"
                 />
             )}
 
             <aside
-                className={`fixed left-0 top-8 h-[calc(100vh-2rem)] transition-all duration-300 ease-in-out z-50 border-r ${
+                id="sidebar-nav"
+                className={`sidebar-glass fixed left-0 top-8 h-[calc(100vh-2rem)] flex flex-col transition-all duration-300 ease-in-out z-50 border-r ${
                     collapsed ? "w-64 md:w-20" : "w-64"
                 } ${mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
                 style={{
-                    background: "linear-gradient(180deg, rgba(13, 19, 32, 0.94), rgba(9, 15, 27, 0.84))",
                     borderColor: "var(--card-border)",
-                    backdropFilter: "blur(20px)",
                     boxShadow: "14px 0 48px rgba(0, 0, 0, 0.24)",
                 }}
             >
                 <div className="flex items-center justify-between p-6 border-b" style={{ borderColor: "var(--card-border)" }}>
                     {!collapsed && (
-                        <Link href="/" className="flex items-center gap-3">
+                        <Link href="/" className="sidebar-focus flex items-center gap-3 rounded-lg">
                             <div
-                                className="w-10 h-10 rounded-xl flex items-center justify-center"
-                                style={{
-                                    background: "linear-gradient(135deg, var(--accent), var(--secondary))",
-                                    boxShadow: "0 10px 24px color-mix(in srgb, var(--secondary) 24%, transparent)",
-                                }}
+                                className="logo-glow w-10 h-10 rounded-xl flex items-center justify-center"
+                                style={{ background: "linear-gradient(135deg, var(--accent), var(--secondary))" }}
                             >
-                                <Sparkles className="text-black" size={20} />
+                                <Sparkles className="text-black" size={20} aria-hidden="true" />
                             </div>
                             <span className="font-semibold text-foreground text-lg">FinançasPro</span>
                         </Link>
@@ -139,78 +135,64 @@ export default function Sidebar() {
                     {collapsed && (
                         <Link
                             href="/"
-                            className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto"
-                            style={{
-                                background: "linear-gradient(135deg, var(--accent), var(--secondary))",
-                                boxShadow: "0 10px 24px color-mix(in srgb, var(--secondary) 24%, transparent)",
-                            }}
+                            aria-label="FinançasPro — Dashboard"
+                            className="sidebar-focus logo-glow w-10 h-10 rounded-xl flex items-center justify-center mx-auto"
+                            style={{ background: "linear-gradient(135deg, var(--accent), var(--secondary))" }}
                         >
-                            <Sparkles className="text-black" size={20} />
+                            <Sparkles className="text-black" size={20} aria-hidden="true" />
                         </Link>
                     )}
                 </div>
 
-                <nav className="p-4 space-y-2">
+                <nav className="flex-1 overflow-y-auto p-4 space-y-2" aria-label="Navegação principal">
                     {navItems.map((item, index) => (
                         <Link
                             key={index}
                             href={item.href}
                             onClick={() => setMobileOpen(false)}
-                            className={`w-full flex items-center gap-4 px-4 py-3 rounded-lg transition-all duration-200 ${
-                                isActive(item.href) ? "" : "hover:bg-white/5"
-                            }`}
-                            style={
-                                isActive(item.href)
-                                    ? {
-                                          background:
-                                              "linear-gradient(135deg, color-mix(in srgb, var(--secondary) 17%, transparent), color-mix(in srgb, var(--accent) 10%, transparent))",
-                                          border: "1px solid color-mix(in srgb, var(--secondary) 30%, transparent)",
-                                          color: "var(--foreground)",
-                                          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06), 0 12px 28px rgba(24,242,230,0.08)",
-                                      }
-                                    : {
-                                          color: "var(--text-secondary)",
-                                      }
-                            }
+                            aria-current={isActive(item.href) ? "page" : undefined}
+                            className={`nav-item w-full flex items-center gap-4 py-3 rounded-lg ${
+                                isActive(item.href) ? "nav-item--active" : ""
+                            } ${collapsed ? "px-4 md:px-0 md:justify-center" : "px-4"}`}
                         >
-                            {item.icon}
+                            <span className="nav-item__icon" aria-hidden="true">
+                                {item.icon}
+                            </span>
                             {!collapsed && <span className="font-medium">{item.label}</span>}
                         </Link>
                     ))}
                 </nav>
 
-                <div className="mt-auto px-4 pb-20">
+                <div className="p-4 space-y-2 border-t" style={{ borderColor: "var(--card-border)" }}>
+                    <UserMenu dropUp collapsed={collapsed} />
+
                     <button
                         onClick={toggleTheme}
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-white/10"
+                        aria-label={theme === "dark" ? "Ativar modo claro" : "Ativar modo escuro"}
+                        className={`sidebar-focus w-full flex items-center gap-3 py-3 rounded-xl transition-all hover:bg-white/10 ${
+                            collapsed ? "px-4 md:px-0 md:justify-center" : "px-4"
+                        }`}
                         style={{ color: "var(--text-secondary)" }}
-                        title={theme === "dark" ? "Modo Light" : "Modo Dark"}
                     >
-                        {theme === "dark" ? (
-                            <>
-                                <Sun size={22} />
-                                {!collapsed && <span className="font-medium">Modo Light</span>}
-                            </>
+                        <span key={theme} className="theme-toggle-icon" aria-hidden="true">
+                            {theme === "dark" ? <Sun size={22} /> : <Moon size={22} />}
+                        </span>
+                        {!collapsed && <span className="font-medium">{theme === "dark" ? "Modo Light" : "Modo Dark"}</span>}
+                    </button>
+
+                    <button
+                        onClick={() => setCollapsed(!collapsed)}
+                        aria-label={collapsed ? "Expandir menu lateral" : "Recolher menu lateral"}
+                        className="sidebar-focus hidden md:flex w-full h-10 rounded-xl items-center justify-center transition-all duration-200 border border-white/10 hover:border-white/20"
+                        style={{ background: "rgba(255, 255, 255, 0.05)" }}
+                    >
+                        {collapsed ? (
+                            <ChevronRight size={18} className="text-muted" aria-hidden="true" />
                         ) : (
-                            <>
-                                <Moon size={22} />
-                                {!collapsed && <span className="font-medium">Modo Dark</span>}
-                            </>
+                            <ChevronLeft size={18} className="text-muted" aria-hidden="true" />
                         )}
                     </button>
                 </div>
-
-                <button
-                    onClick={() => setCollapsed(!collapsed)}
-                    className="hidden md:flex absolute bottom-6 left-1/2 -translate-x-1/2 w-10 h-10 rounded-xl items-center justify-center transition-all duration-200 border border-white/10 hover:border-white/20"
-                    style={{ background: "rgba(255, 255, 255, 0.05)" }}
-                >
-                    {collapsed ? (
-                        <ChevronRight size={18} className="text-muted" />
-                    ) : (
-                        <ChevronLeft size={18} className="text-muted" />
-                    )}
-                </button>
             </aside>
         </>
     );

@@ -7,7 +7,14 @@ import Link from "next/link";
 import { User, LogOut, ChevronDown, Settings, Crown } from "lucide-react";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 
-export default function UserMenu() {
+interface UserMenuProps {
+    /** Abre o menu para cima (uso no footer da sidebar) */
+    dropUp?: boolean;
+    /** Mostra apenas o avatar (sidebar colapsada) */
+    collapsed?: boolean;
+}
+
+export default function UserMenu({ dropUp = false, collapsed = false }: UserMenuProps) {
     const router = useRouter();
     const { isAdmin } = useSubscription();
     const [isOpen, setIsOpen] = useState(false);
@@ -87,30 +94,47 @@ export default function UserMenu() {
 
     return (
         <div className="relative" ref={menuRef}>
-            <div
+            <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-all hover:bg-white/10 border"
+                aria-expanded={isOpen}
+                aria-haspopup="menu"
+                aria-label={`Menu do usuário ${userName}`}
+                className={`sidebar-focus flex items-center gap-3 rounded-lg cursor-pointer transition-all hover:bg-white/10 border ${
+                    collapsed ? "w-full justify-center px-2 py-2" : "w-full px-3 py-2"
+                }`}
                 style={{
                     background: "var(--card-bg)",
                     borderColor: "var(--card-border)",
                 }}
             >
                 <div
-                    className="w-9 h-9 rounded-lg flex items-center justify-center"
+                    className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
                     style={{ background: "linear-gradient(135deg, var(--accent), var(--secondary))" }}
                 >
                     <User size={18} className="text-black" />
                 </div>
-                <div className="hidden md:block">
-                    <p className="text-sm font-medium text-foreground">{userName}</p>
-                    <p className="text-xs text-muted">{userEmail}</p>
-                </div>
-                <ChevronDown size={16} className={`text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`} />
-            </div>
+                {!collapsed && (
+                    <div className={`min-w-0 flex-1 text-left ${dropUp ? "block" : "hidden md:block"}`}>
+                        <p className="text-sm font-medium text-foreground truncate">{userName}</p>
+                        <p className="text-xs text-muted truncate">{userEmail}</p>
+                    </div>
+                )}
+                {!collapsed && (
+                    <ChevronDown
+                        size={16}
+                        className={`shrink-0 text-gray-400 transition-transform ${
+                            isOpen !== dropUp ? "rotate-180" : ""
+                        }`}
+                    />
+                )}
+            </button>
 
             {isOpen && (
                 <div
-                    className="absolute right-0 mt-2 w-56 rounded-lg overflow-hidden z-[9999] border"
+                    role="menu"
+                    className={`absolute w-56 rounded-lg overflow-hidden z-[9999] border ${
+                        dropUp ? "bottom-full mb-2 left-0" : "right-0 mt-2"
+                    }`}
                     style={{
                         background: "var(--card-bg-solid)",
                         borderColor: "var(--card-border)",
