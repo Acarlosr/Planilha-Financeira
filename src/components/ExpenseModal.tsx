@@ -9,6 +9,7 @@ import InstallmentsForm, { InstallmentsData } from "./InstallmentsForm";
 import { Database } from "@/types/database.types";
 import { addMonths, format, parseISO } from "date-fns";
 import { v4 as uuidv4 } from 'uuid';
+import { getCreditCardDueDate } from "@/lib/finance";
 
 type Cartao = Database["public"]["Tables"]["cartoes"]["Row"];
 type Categoria = Database["public"]["Tables"]["categorias_despesa"]["Row"];
@@ -37,6 +38,8 @@ interface ExpenseModalProps {
         isoDate?: string;
         category: string;
         cardLabel?: string | null;
+        cardId?: string | null;
+        dueDate?: string | null;
     } | null;
 }
 
@@ -66,6 +69,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
         cartaoManual: false,
         cartaoBandeira: "Mastercard",
         cartaoNome: "",
+        cartaoDiaFechamento: 30,
         cartaoDiaVencimento: 10,
     });
 
@@ -83,8 +87,8 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
             setDescription(removeTelecomDetail(initialDescription));
             setAmount(initialExpense ? initialExpense.value.toLocaleString("pt-BR", { minimumFractionDigits: 2 }) : "");
             setDate(initialDate);
-            setIsBoleto(false);
-            setDueDate(initialDate);
+            setIsBoleto(Boolean(initialExpense?.dueDate && !initialExpense.cardId && !cardLabel));
+            setDueDate(initialExpense?.dueDate || initialDate);
             setCategoryId(initialExpense?.category || initialCategoryId || (categorias.length > 0 ? categorias[0].id : ""));
             setTelecomService(detailMatch ? telecomServiceOptions.find((option) => detailMatch[0].includes(option)) ?? telecomServiceOptions[0] : telecomServiceOptions[0]);
             setTelecomProvider(detailMatch ? telecomProviderOptions.find((option) => detailMatch[0].includes(option)) ?? telecomProviderOptions[0] : telecomProviderOptions[0]);
@@ -94,10 +98,11 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                 baseValorParcelado: "total",
                 numeroParcelas: 2,
                 dataPrimeiraParcela: initialDate,
-                cartaoId: null,
+                cartaoId: initialExpense?.cardId ?? null,
                 cartaoManual: Boolean(cardLabel),
                 cartaoBandeira: knownBrand || "Mastercard",
                 cartaoNome: cardName,
+                cartaoDiaFechamento: 30,
                 cartaoDiaVencimento: 10,
             });
         }
@@ -138,7 +143,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                         ultimos_digitos: "",
                         cor: "gray",
                         limite: 0,
-                        dia_fechamento: 1,
+                        dia_fechamento: installmentsData.cartaoDiaFechamento,
                         dia_vencimento: installmentsData.cartaoDiaVencimento,
                     })
                     .select("id")
@@ -151,6 +156,17 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
             const cartaoManualResumo = installmentsData.cartaoManual && cartaoManualNome
                 ? `${cartaoManualNome} ${installmentsData.cartaoBandeira}`
                 : null;
+            const selectedCard = cartaoId ? cartoes.find((item) => item.id === cartaoId) : null;
+            const hasCreditCard = Boolean(cartaoId || cartaoManualResumo);
+            const getFinancialDueDate = (purchaseDate: string) => {
+                if (hasCreditCard) {
+                    return getCreditCardDueDate(purchaseDate, {
+                        closingDay: selectedCard?.dia_fechamento ?? installmentsData.cartaoDiaFechamento,
+                        dueDay: selectedCard?.dia_vencimento ?? installmentsData.cartaoDiaVencimento,
+                    });
+                }
+                return isBoleto ? dueDate : purchaseDate;
+            };
 
             const novasDespesas = [];
 
@@ -168,6 +184,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
 
                 for (let i = 0; i < installmentsData.numeroParcelas; i++) {
                     const dataParcela = addMonths(parseISO(installmentsData.dataPrimeiraParcela), i);
+                    const dataCompra = format(dataParcela, 'yyyy-MM-dd');
                     const valorFinal = isInstallmentPurchase && i === installmentsData.numeroParcelas - 1
                         ? parseFloat((valorParcela + diferenca).toFixed(2))
                         : valorParcela;
@@ -182,7 +199,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                         description: descricaoFinal, // Compatibilidade com frontend
                         valor: valorFinal,
                         value: valorFinal, // Compatibilidade com frontend
-                        data: format(dataParcela, 'yyyy-MM-dd'), // Formato banco import
+                        data: dataCompra, // Data real da compra/despesa
                         date: format(dataParcela, 'dd/MM/yyyy'), // Formato frontend
                         category: categoryId, // Compatibilidade com frontend
                         categoria_id: categoryId,
@@ -190,8 +207,8 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                         cartao_manual: cartaoManualResumo,
                         tipo_repeticao: installmentsData.tipoRepeticao,
                         base_valor_parcelado: installmentsData.baseValorParcelado,
-                        boleto: isBoleto && !cartaoId,
-                        data_vencimento: isBoleto && !cartaoId ? dueDate : format(dataParcela, 'yyyy-MM-dd'),
+                        boleto: isBoleto && !hasCreditCard,
+                        data_vencimento: getFinancialDueDate(dataCompra),
                         parcelada: true,
                         parcela_atual: i + 1,
                         parcela_total: installmentsData.numeroParcelas,
@@ -214,8 +231,8 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                     cartao_id: cartaoId,
                     cartao_manual: cartaoManualResumo,
                     tipo_repeticao: "unica",
-                    boleto: isBoleto && !cartaoId,
-                    data_vencimento: isBoleto && !cartaoId ? dueDate : date,
+                    boleto: isBoleto && !hasCreditCard,
+                    data_vencimento: getFinancialDueDate(date),
                     parcelada: false,
                 });
             }

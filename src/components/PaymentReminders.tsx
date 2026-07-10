@@ -32,6 +32,7 @@ interface CardRow {
     id: string;
     nome: string;
     bandeira: string;
+    dia_fechamento?: number | null;
     dia_vencimento?: number | null;
 }
 
@@ -46,15 +47,6 @@ const formatShortDate = (value: string) => {
 };
 
 const toISODate = (date: Date) => date.toISOString().slice(0, 10);
-
-const getNextDueDate = (dueDay: number, now: Date) => {
-    const safeDay = Math.min(Math.max(dueDay || 10, 1), 28);
-    const currentMonthDue = new Date(now.getFullYear(), now.getMonth(), safeDay);
-    if (currentMonthDue >= new Date(now.getFullYear(), now.getMonth(), now.getDate())) {
-        return currentMonthDue;
-    }
-    return new Date(now.getFullYear(), now.getMonth() + 1, safeDay);
-};
 
 const getStatus = (balanceAfter: number, dueDate: string): ReminderStatus => {
     const today = toISODate(new Date());
@@ -103,12 +95,12 @@ export default function PaymentReminders() {
             }
 
             const now = new Date();
-            const monthStart = toISODate(new Date(now.getFullYear(), now.getMonth(), 1));
             const nextMonthEnd = toISODate(new Date(now.getFullYear(), now.getMonth() + 2, 0));
             const today = toISODate(now);
             const nextFifteenDays = toISODate(new Date(now.getFullYear(), now.getMonth(), now.getDate() + 15));
+            const monthStart = toISODate(new Date(now.getFullYear(), now.getMonth(), 1));
 
-            const [receitasResult, despesasBaseResult, despesasDueResult, cartoesResult] = await Promise.all([
+            const [receitasResult, despesasResult, cartoesResult] = await Promise.all([
                 supabase
                     .from("receitas")
                     .select("valor")
@@ -117,63 +109,60 @@ export default function PaymentReminders() {
                     .lte("data", nextMonthEnd),
                 supabase
                     .from("despesas")
-                    .select("id, descricao, valor, data, cartao_id")
+                    .select("id, descricao, valor, data, cartao_id, boleto, data_vencimento")
                     .eq("user_id", user.id)
-                    .gte("data", monthStart)
-                    .lte("data", nextMonthEnd)
-                    .order("data", { ascending: true }),
-                supabase
-                    .from("despesas")
-                    .select("id, boleto, data_vencimento")
-                    .eq("user_id", user.id)
-                    .gte("data", monthStart)
-                    .lte("data", nextMonthEnd),
+                    .or(
+                        [
+                            `and(cartao_id.not.is.null,data_vencimento.gte.${today},data_vencimento.lte.${nextFifteenDays})`,
+                            `and(cartao_id.is.null,boleto.eq.true,data_vencimento.gte.${today},data_vencimento.lte.${nextFifteenDays})`,
+                            `and(cartao_id.is.null,boleto.eq.true,data_vencimento.is.null,data.gte.${today},data.lte.${nextFifteenDays})`,
+                        ].join(",")
+                    )
+                    .order("data_vencimento", { ascending: true }),
                 supabase
                     .from("cartoes")
-                    .select("id, nome, bandeira, dia_vencimento")
+                    .select("id, nome, bandeira, dia_fechamento, dia_vencimento")
                     .eq("user_id", user.id),
             ]);
 
             if (receitasResult.error) throw receitasResult.error;
 
             const income = (receitasResult.data ?? []).reduce((sum, item) => sum + Number(item.valor), 0);
-            const dueById = new Map(
-                despesasDueResult.error
-                    ? []
-                    : (despesasDueResult.data ?? []).map((item) => [item.id, item])
-            );
-            const expenses = (despesasBaseResult.error ? [] : (despesasBaseResult.data ?? []) as ExpenseRow[]).map((expense) => {
-                const dueInfo = dueById.get(expense.id) as Pick<ExpenseRow, "boleto" | "data_vencimento"> | undefined;
-                return {
-                    ...expense,
-                    boleto: dueInfo?.boleto ?? false,
-                    data_vencimento: dueInfo?.data_vencimento ?? null,
-                };
-            });
+            const expenses = despesasResult.error ? [] : (despesasResult.data ?? []) as ExpenseRow[];
             const cards = cartoesResult.error ? [] : (cartoesResult.data ?? []) as CardRow[];
+            const cardById = new Map(cards.map((card) => [card.id, card]));
+            const cardStatementGroups = new Map<string, { card: CardRow; dueDate: string; amount: number }>();
 
-            const cardReminders = cards
-                .map((card) => {
-                    const dueDate = toISODate(getNextDueDate(card.dia_vencimento ?? 10, now));
-                    const amount = expenses
-                        .filter((expense) => expense.cartao_id === card.id)
-                        .reduce((sum, expense) => sum + Number(expense.valor), 0);
-
-                    if (amount <= 0) return null;
-
-                    const balanceAfter = income - amount;
-                    return {
-                        id: `card-${card.id}`,
-                        type: "cartao" as const,
-                        title: `Vencimento ${card.bandeira}`,
-                        detail: `${card.nome} - dia ${card.dia_vencimento ?? 10}`,
-                        dueDate,
-                        amount,
-                        balanceAfter,
-                        status: getStatus(balanceAfter, dueDate),
+            expenses
+                .filter((expense) => expense.cartao_id && expense.data_vencimento)
+                .forEach((expense) => {
+                    const card = cardById.get(expense.cartao_id!);
+                    if (!card || !expense.data_vencimento) return;
+                    const key = `${card.id}|${expense.data_vencimento}`;
+                    const current = cardStatementGroups.get(key) ?? {
+                        card,
+                        dueDate: expense.data_vencimento,
+                        amount: 0,
                     };
-                })
-                .filter(Boolean) as Reminder[];
+                    current.amount += Number(expense.valor);
+                    cardStatementGroups.set(key, current);
+                });
+
+            const cardReminders = Array.from(cardStatementGroups.values())
+                .filter((group) => group.amount > 0)
+                .map((group) => {
+                    const balanceAfter = income - group.amount;
+                    return {
+                        id: `card-${group.card.id}-${group.dueDate}`,
+                        type: "cartao" as const,
+                        title: `Fatura ${group.card.bandeira}`,
+                        detail: `${group.card.nome} - fecha dia ${group.card.dia_fechamento ?? 30}`,
+                        dueDate: group.dueDate,
+                        amount: group.amount,
+                        balanceAfter,
+                        status: getStatus(balanceAfter, group.dueDate),
+                    };
+                });
 
             const boletoReminders = expenses
                 .filter((expense) => {

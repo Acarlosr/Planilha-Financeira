@@ -18,9 +18,9 @@
   --background: #f7f7f4;
   --background-light: #ffffff;
   --foreground: #101828;
-  --accent: #f59e0b;
-  --accent-hover: #d97706;
-  --accent-dark: #17145f;
+  --accent: #16a34a;
+  --accent-hover: #15803d;
+  --accent-dark: #14532d;
   --secondary: #2563eb;
   --secondary-light: #eaf2ff;
   --card-bg: rgba(255, 255, 255, 0.92);
@@ -43,9 +43,9 @@
   --background: #070b15;
   --background-light: rgba(15, 22, 36, 0.72);
   --foreground: #f7fbff;
-  --accent: #ffd52e;
-  --accent-hover: #ffe66d;
-  --accent-dark: #6d5b00;
+  --accent: #7cff6b;
+  --accent-hover: #a3ff96;
+  --accent-dark: #1d6b14;
   --secondary: #18f2e6;
   --secondary-light: #93fff8;
   --card-bg: rgba(20, 29, 46, 0.66);
@@ -493,6 +493,27 @@ body {
 }
 
 /* Premium sidebar */
+.glass-card.market-card {
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.glass-card.market-card:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--card-border));
+  box-shadow:
+    var(--shadow-glass),
+    0 0 0 1px color-mix(in srgb, var(--accent) 25%, transparent),
+    0 0 24px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glass-card.market-card,
+  .glass-card.market-card:hover {
+    transform: none;
+    transition: none;
+  }
+}
+
 .sidebar-glass {
   background: color-mix(in srgb, var(--card-bg-solid) 80%, transparent);
   backdrop-filter: blur(20px) saturate(140%);
@@ -554,14 +575,14 @@ body {
 .nav-item--active {
   background: linear-gradient(
     135deg,
-    color-mix(in srgb, var(--secondary) 22%, transparent),
-    color-mix(in srgb, var(--accent) 13%, transparent)
+    color-mix(in srgb, var(--accent) 18%, transparent),
+    color-mix(in srgb, var(--secondary) 8%, transparent)
   );
-  border: 1px solid color-mix(in srgb, var(--secondary) 32%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 38%, transparent);
   color: var(--foreground);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 12px 28px color-mix(in srgb, var(--secondary) 12%, transparent);
+    0 12px 28px color-mix(in srgb, var(--accent) 14%, transparent);
 }
 
 .nav-item--active::before {

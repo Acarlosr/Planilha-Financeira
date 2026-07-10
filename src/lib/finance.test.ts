@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
     getMonthRange,
     sumInRange,
+    getCreditCardDueDate,
     computeInvestmentsTotal,
     percentChange,
     formatCurrency,
@@ -37,6 +38,40 @@ describe("sumInRange", () => {
     it("retorna 0 quando não há valores no intervalo", () => {
         const range = getMonthRange(new Date(2026, 5, 10));
         expect(sumInRange(rows, range)).toBe(0);
+    });
+});
+
+describe("getCreditCardDueDate", () => {
+    it("joga compra apos fechamento para o vencimento do mes seguinte", () => {
+        const dueDate = getCreditCardDueDate("2026-07-01", {
+            closingDay: 30,
+            dueDay: 10,
+        });
+        expect(dueDate).toBe("2026-08-10");
+    });
+
+    it("mantem compra ate o fechamento na fatura do ciclo atual", () => {
+        const dueDate = getCreditCardDueDate("2026-06-30", {
+            closingDay: 30,
+            dueDay: 10,
+        });
+        expect(dueDate).toBe("2026-07-10");
+    });
+
+    it("usa vencimento no mesmo mes quando ele vem depois do fechamento", () => {
+        const dueDate = getCreditCardDueDate("2026-06-19", {
+            closingDay: 20,
+            dueDay: 28,
+        });
+        expect(dueDate).toBe("2026-06-28");
+    });
+
+    it("ajusta dias maiores que o ultimo dia do mes", () => {
+        const dueDate = getCreditCardDueDate("2026-01-31", {
+            closingDay: 31,
+            dueDay: 31,
+        });
+        expect(dueDate).toBe("2026-02-28");
     });
 });
 

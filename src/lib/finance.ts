@@ -13,6 +13,25 @@ export interface ValorComData {
     data: string; // YYYY-MM-DD
 }
 
+export interface CreditCardBillingRule {
+    closingDay?: number | null;
+    dueDay?: number | null;
+}
+
+const clampBillingDay = (day: number | null | undefined, fallback: number) => {
+    const value = Number(day ?? fallback);
+    if (!Number.isFinite(value)) return fallback;
+    return Math.min(Math.max(Math.trunc(value), 1), 31);
+};
+
+const daysInMonth = (year: number, monthIndex: number) =>
+    new Date(year, monthIndex + 1, 0).getDate();
+
+const formatDateParts = (year: number, monthIndex: number, day: number) => {
+    const safeDay = Math.min(day, daysInMonth(year, monthIndex));
+    return `${year}-${String(monthIndex + 1).padStart(2, "0")}-${String(safeDay).padStart(2, "0")}`;
+};
+
 /**
  * Retorna o intervalo [início, fim) do mês da data informada.
  * O fim é o primeiro dia do mês seguinte (exclusivo).
@@ -33,6 +52,36 @@ export function sumInRange(rows: ValorComData[], range: DateRange): number {
     return rows
         .filter((item) => item.data >= range.start && item.data < range.end)
         .reduce((sum, item) => sum + Number(item.valor), 0);
+}
+
+/**
+ * Calcula o vencimento da fatura que receberá uma compra no cartão.
+ *
+ * Exemplo: compra em 2026-07-01, fechamento dia 30 e vencimento dia 10
+ * entra na fatura que fecha em julho e vence em 2026-08-10.
+ */
+export function getCreditCardDueDate(
+    purchaseDate: string,
+    { closingDay, dueDay }: CreditCardBillingRule
+): string {
+    const [year, month, day] = purchaseDate.split("-").map(Number);
+    if (!year || !month || !day) return purchaseDate;
+
+    const purchaseMonthIndex = month - 1;
+    const closing = clampBillingDay(closingDay, 30);
+    const due = clampBillingDay(dueDay, 10);
+    const closingDayInPurchaseMonth = Math.min(closing, daysInMonth(year, purchaseMonthIndex));
+
+    const closingMonthOffset = day <= closingDayInPurchaseMonth ? 0 : 1;
+    const closingDate = new Date(year, purchaseMonthIndex + closingMonthOffset, 1);
+    const dueMonthOffset = due > closing ? 0 : 1;
+    const dueDate = new Date(
+        closingDate.getFullYear(),
+        closingDate.getMonth() + dueMonthOffset,
+        1
+    );
+
+    return formatDateParts(dueDate.getFullYear(), dueDate.getMonth(), due);
 }
 
 /**

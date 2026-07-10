@@ -34,8 +34,13 @@ export function useDespesas(month: number, year: number, scope: "monthly" | "ann
                 .from("despesas")
                 .select("*")
                 .eq("user_id", user.id)
-                .gte("data", startDate)
-                .lte("data", endDate)
+                .or(
+                    [
+                        `and(cartao_id.not.is.null,data_vencimento.gte.${startDate},data_vencimento.lte.${endDate})`,
+                        `and(cartao_id.not.is.null,data_vencimento.is.null,data.gte.${startDate},data.lte.${endDate})`,
+                        `and(cartao_id.is.null,data.gte.${startDate},data.lte.${endDate})`,
+                    ].join(",")
+                )
                 .order("data", { ascending: false });
 
             if (error) throw error;

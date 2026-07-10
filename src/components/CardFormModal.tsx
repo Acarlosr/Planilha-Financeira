@@ -34,7 +34,7 @@ export default function CardFormModal({ isOpen, onClose, onSave }: CardFormModal
         bandeira: "Mastercard",
         ultimos_digitos: "",
         limite: "",
-        dia_fechamento: "1",
+        dia_fechamento: "30",
         dia_vencimento: "10",
     });
 

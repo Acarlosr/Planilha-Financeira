@@ -96,7 +96,9 @@ interface ExpenseItem {
     value: number;
     date: string;
     isoDate: string;
+    dueDate?: string | null;
     category: string;
+    cardId?: string | null;
     cardLabel?: string | null;
     repeatType?: "unica" | "recorrente" | "parcelada";
 }
@@ -118,7 +120,9 @@ const normalizeLocalExpenses = (rawExpenses: Partial<ExpenseItem>[]) => {
         value: Number(expense.value ?? 0),
         date: expense.date ?? "01/01/2026",
         isoDate: expense.isoDate ?? displayDateToIso(expense.date ?? ""),
+        dueDate: expense.dueDate ?? null,
         category: expense.category ?? "",
+        cardId: expense.cardId ?? null,
         cardLabel: expense.cardLabel ?? null,
         repeatType: expense.repeatType ?? "unica",
     }));
@@ -151,7 +155,8 @@ const normalizeLocalExpenses = (rawExpenses: Partial<ExpenseItem>[]) => {
 };
 
 const isExpenseInPeriod = (expense: ExpenseItem, month: number, year: number, scope: "monthly" | "annual") => {
-    const [expenseYear, expenseMonth] = expense.isoDate.split("-").map(Number);
+    const referenceDate = (expense.cardId || expense.cardLabel) && expense.dueDate ? expense.dueDate : expense.isoDate;
+    const [expenseYear, expenseMonth] = referenceDate.split("-").map(Number);
     if (scope === "annual") return expenseYear === year;
     return expenseYear === year && expenseMonth === month;
 };
@@ -185,6 +190,14 @@ function DespesasContent() {
     const { cartoes } = useCartoes();
     const { categorias, loading: loadingCategorias } = useCategorias();
     const databaseUnavailable = Boolean(error?.includes("Could not find the table") || error?.includes("schema cache"));
+    const formatIsoDate = (value: string) => {
+        const [year, month, day] = value.split("-");
+        return `${day}/${month}/${year}`;
+    };
+    const getCardLabel = (cardId?: string | null) => {
+        const card = cartoes.find((item) => item.id === cardId);
+        return card ? `${card.nome}` : null;
+    };
 
     useEffect(() => {
         if (typeof window === "undefined") return;
@@ -226,7 +239,10 @@ function DespesasContent() {
             value: Number(item.valor),
             date: `${day}/${month}/${year}`,
             isoDate: item.data,
+            dueDate: item.data_vencimento,
             category: item.categoria_id,
+            cardId: item.cartao_id,
+            cardLabel: getCardLabel(item.cartao_id),
         };
     });
     const localExpensesForPeriod = localExpenses.filter((item) => isExpenseInPeriod(item, currentMonth, currentYear, statementScope));
@@ -287,7 +303,9 @@ function DespesasContent() {
             value: Number(expense.value),
             date: expense.date,
             isoDate: expense.data,
+            dueDate: expense.data_vencimento ?? null,
             category: expense.category,
+            cardId: expense.cartao_id ?? null,
             cardLabel: expense.cartao_manual ?? null,
             repeatType: expense.tipo_repeticao ?? "unica",
         }));
@@ -563,6 +581,12 @@ function DespesasContent() {
                                                     <>
                                                         <span className="text-xs text-muted">•</span>
                                                         <span className="text-xs text-muted">Cartão: {item.cardLabel}</span>
+                                                    </>
+                                                )}
+                                                {(item.cardId || item.cardLabel) && item.dueDate && (
+                                                    <>
+                                                        <span className="text-xs text-muted">•</span>
+                                                        <span className="text-xs text-muted">Fatura: {formatIsoDate(item.dueDate)}</span>
                                                     </>
                                                 )}
                                                 {item.repeatType === "parcelada" && (

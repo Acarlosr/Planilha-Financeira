@@ -51,7 +51,7 @@ export default function CartoesPage() {
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const { toasts, toast, removeToast } = useToast();
 
-    // Carrega o total da fatura aberta (despesas do mês vinculadas a cada cartão)
+    // Carrega o total da fatura do mês pelo vencimento calculado da fatura.
     const carregarFaturas = useCallback(async () => {
         try {
             setFaturasLoading(true);
@@ -74,8 +74,8 @@ export default function CartoesPage() {
                 .select("valor, cartao_id")
                 .eq("user_id", user.id)
                 .not("cartao_id", "is", null)
-                .gte("data", monthStart)
-                .lte("data", monthEnd);
+                .gte("data_vencimento", monthStart)
+                .lte("data_vencimento", monthEnd);
 
             if (error) throw error;
 
@@ -158,8 +158,8 @@ export default function CartoesPage() {
                             Cartões de crédito
                         </h1>
                         <p className="text-muted mt-1 max-w-2xl">
-                            Gerencie seus cartões, acompanhe limites e a fatura aberta do mês com base
-                            nas despesas vinculadas.
+                            Gerencie seus cartões, acompanhe limites e a fatura do mês pelo vencimento
+                            calculado da fatura.
                         </p>
                     </div>
 
@@ -332,7 +332,7 @@ export default function CartoesPage() {
                                         <div className="flex items-center justify-between border-t pt-3 text-xs text-muted" style={{ borderColor: "var(--card-border)" }}>
                                             <span className="flex items-center gap-1.5">
                                                 <CalendarClock size={14} />
-                                                Vence dia {cartao.dia_vencimento ?? "—"}
+                                                Fecha dia {cartao.dia_fechamento ?? "—"} · vence dia {cartao.dia_vencimento ?? "—"}
                                             </span>
                                             <button
                                                 onClick={() => handleDelete(cartao.id, cartao.nome)}

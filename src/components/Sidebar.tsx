@@ -66,7 +66,7 @@ export default function Sidebar() {
                     <span className="relative inline-flex rounded-full h-2 w-2" style={{ background: "var(--accent)" }} />
                 </span>
                 <span
-                    className="rounded-full px-2 py-0.5 text-[11px] font-bold text-white"
+                    className="rounded-full px-2 py-0.5 text-[11px] font-bold text-black"
                     style={{ background: "var(--accent)" }}
                 >
                     FinançasPro Beta

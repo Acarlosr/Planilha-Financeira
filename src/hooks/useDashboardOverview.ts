@@ -40,6 +40,12 @@ const formatDate = (value: string) => {
     return `${day}/${month}/${year}`;
 };
 
+const getExpenseReferenceDate = (item: {
+    data: string;
+    cartao_id?: string | null;
+    data_vencimento?: string | null;
+}) => (item.cartao_id && item.data_vencimento ? item.data_vencimento : item.data);
+
 export function useDashboardOverview(): DashboardOverview {
     const [currentIncome, setCurrentIncome] = useState(0);
     const [currentExpenses, setCurrentExpenses] = useState(0);
@@ -74,7 +80,9 @@ export function useDashboardOverview(): DashboardOverview {
             const currentRange = getMonthRange(now);
             const previousRange = getMonthRange(new Date(now.getFullYear(), now.getMonth() - 1, 1));
             const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+            const expenseHistoryStart = new Date(now.getFullYear(), now.getMonth() - 7, 1);
             const historyStart = sixMonthsAgo.toISOString().slice(0, 10);
+            const expenseQueryStart = expenseHistoryStart.toISOString().slice(0, 10);
 
             const [receitasResult, despesasResult, aplicacoesResult, metasPoupancaResult] = await Promise.all([
                 supabase
@@ -85,9 +93,9 @@ export function useDashboardOverview(): DashboardOverview {
                     .order("data", { ascending: false }),
                 supabase
                     .from("despesas")
-                    .select("id, descricao, valor, data, categoria_id")
+                    .select("id, descricao, valor, data, categoria_id, cartao_id, data_vencimento")
                     .eq("user_id", user.id)
-                    .gte("data", historyStart)
+                    .gte("data", expenseQueryStart)
                     .order("data", { ascending: false }),
                 supabase.from("aplicacoes").select("valor, tipo_transacao").eq("user_id", user.id),
                 supabase.from("metas_poupanca").select("valor_atual").eq("user_id", user.id),
@@ -103,6 +111,10 @@ export function useDashboardOverview(): DashboardOverview {
 
             const receitas = receitasResult.error ? [] : receitasResult.data ?? [];
             const despesas = despesasResult.error ? [] : despesasResult.data ?? [];
+            const despesasPorCompetencia = despesas.map((item) => ({
+                ...item,
+                data: getExpenseReferenceDate(item),
+            }));
             const aplicacoes = aplicacoesResult.error ? [] : aplicacoesResult.data ?? [];
             const metasPoupanca = metasPoupancaResult.error ? [] : metasPoupancaResult.data ?? [];
 
@@ -110,9 +122,9 @@ export function useDashboardOverview(): DashboardOverview {
                 sumInRange(rows, range);
 
             setCurrentIncome(sumBetween(receitas, currentRange));
-            setCurrentExpenses(sumBetween(despesas, currentRange));
+            setCurrentExpenses(sumBetween(despesasPorCompetencia, currentRange));
             setPreviousIncome(sumBetween(receitas, previousRange));
-            setPreviousExpenses(sumBetween(despesas, previousRange));
+            setPreviousExpenses(sumBetween(despesasPorCompetencia, previousRange));
             setTotalInvestments(computeInvestmentsTotal(aplicacoes, metasPoupanca));
             setError(warnings.length > 0 ? warnings.join(" | ") : null);
 
@@ -122,7 +134,7 @@ export function useDashboardOverview(): DashboardOverview {
                 return {
                     month: monthLabels[date.getMonth()],
                     entradas: sumBetween(receitas, range),
-                    saidas: sumBetween(despesas, range),
+                    saidas: sumBetween(despesasPorCompetencia, range),
                 };
             });
             setMonthlyCashFlow(months);
@@ -137,15 +149,18 @@ export function useDashboardOverview(): DashboardOverview {
                     value: Number(item.valor),
                     type: "entrada" as const,
                 })),
-                ...despesas.map((item) => ({
-                    id: `despesa-${item.id}`,
-                    date: formatDate(item.data),
-                    isoDate: item.data,
-                    description: item.descricao,
-                    category: "Despesa",
-                    value: Number(item.valor),
-                    type: "saida" as const,
-                })),
+                ...despesas.map((item) => {
+                    const referenceDate = getExpenseReferenceDate(item);
+                    return {
+                        id: `despesa-${item.id}`,
+                        date: formatDate(referenceDate),
+                        isoDate: referenceDate,
+                        description: item.descricao,
+                        category: "Despesa",
+                        value: Number(item.valor),
+                        type: "saida" as const,
+                    };
+                }),
             ]
                 .sort((a, b) => b.isoDate.localeCompare(a.isoDate))
                 .slice(0, 40);

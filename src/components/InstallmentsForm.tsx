@@ -35,6 +35,7 @@ export interface InstallmentsData {
     cartaoManual: boolean;
     cartaoBandeira: string;
     cartaoNome: string;
+    cartaoDiaFechamento: number;
     cartaoDiaVencimento: number;
 }
 
@@ -268,7 +269,7 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
                         {(() => {
                             const selectedCard = cartoes.find((item) => item.id === data.cartaoId);
                             return selectedCard?.dia_vencimento
-                                ? `Fatura vence todo dia ${selectedCard.dia_vencimento}.`
+                                ? `Fatura fecha todo dia ${selectedCard.dia_fechamento ?? 30} e vence todo dia ${selectedCard.dia_vencimento}.`
                                 : "Cartão selecionado sem vencimento cadastrado.";
                         })()}
                     </div>
@@ -324,22 +325,39 @@ export default function InstallmentsForm({ data, onChange, cartoes }: Installmen
                             </div>
                         </div>
 
-                        <div>
-                            <label className="mb-1 block text-xs font-medium text-muted">Dia de vencimento da fatura</label>
-                            <input
-                                type="number"
-                                min="1"
-                                max="31"
-                                value={data.cartaoDiaVencimento}
-                                onChange={(e) => onChange({
-                                    ...data,
-                                    cartaoDiaVencimento: Math.min(Math.max(Number(e.target.value) || 10, 1), 31),
-                                })}
-                                className="w-full rounded-lg border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-red-500/50"
-                                style={{ background: "rgba(255, 255, 255, 0.05)" }}
-                            />
-                            <p className="mt-1 text-xs text-muted">
-                                Esse dia será usado nos lembretes de vencimento do dashboard.
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                            <div>
+                                <label className="mb-1 block text-xs font-medium text-muted">Dia de fechamento</label>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    max="31"
+                                    value={data.cartaoDiaFechamento}
+                                    onChange={(e) => onChange({
+                                        ...data,
+                                        cartaoDiaFechamento: Math.min(Math.max(Number(e.target.value) || 30, 1), 31),
+                                    })}
+                                    className="w-full rounded-lg border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-red-500/50"
+                                    style={{ background: "rgba(255, 255, 255, 0.05)" }}
+                                />
+                            </div>
+                            <div>
+                                <label className="mb-1 block text-xs font-medium text-muted">Dia de vencimento</label>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    max="31"
+                                    value={data.cartaoDiaVencimento}
+                                    onChange={(e) => onChange({
+                                        ...data,
+                                        cartaoDiaVencimento: Math.min(Math.max(Number(e.target.value) || 10, 1), 31),
+                                    })}
+                                    className="w-full rounded-lg border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-red-500/50"
+                                    style={{ background: "rgba(255, 255, 255, 0.05)" }}
+                                />
+                            </div>
+                            <p className="text-xs text-muted sm:col-span-2">
+                                Compras no crédito entram no mês do vencimento calculado pela fatura.
                             </p>
                         </div>
                     </div>

@@ -5,6 +5,7 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { Database } from "@/types/database.types";
 import Sidebar from "@/components/Sidebar";
+import PageHeader from "@/components/PageHeader";
 import MonthYearPicker from "@/components/MonthYearPicker";
 import PrintExportButtons from "@/components/PrintExportButtons";
 import IncomeModal from "@/components/IncomeModal";
@@ -272,16 +273,11 @@ function ReceitasContent() {
             <Sidebar />
 
             <main className="md:ml-64 p-4 pt-20 md:p-8 md:pt-8 transition-all duration-300">
-                {/* Header */}
-                <header className="mb-6 md:mb-8">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                        <div>
-                            <h1 className="text-2xl md:text-3xl font-bold text-foreground">Receitas</h1>
-                            <p className="text-muted mt-1 text-sm md:text-base">
-                                Gerencie suas fontes de renda
-                            </p>
-                        </div>
-                        <div className="flex items-center gap-2 sm:gap-3">
+                <PageHeader
+                    title="Receitas"
+                    description="Gerencie suas fontes de renda"
+                    actions={
+                        <>
                             <PrintExportButtons title="Receitas" period={mesAnoLabel} />
                             <div className="no-print flex rounded-lg border p-1" style={{ borderColor: "var(--card-border)", background: "var(--card-bg)" }}>
                                 <button
@@ -313,9 +309,9 @@ function ReceitasContent() {
                                 <span className="hidden sm:inline">Nova Receita</span>
                                 <span className="sm:hidden">Nova</span>
                             </button>
-                        </div>
-                    </div>
-
+                        </>
+                    }
+                >
                     {/* Total Summary */}
                     <div className="mt-6 glass-card p-6">
                         <div className="flex items-center justify-between">
@@ -333,7 +329,7 @@ function ReceitasContent() {
                             </div>
                         </div>
                     </div>
-                </header>
+                </PageHeader>
 
                 {/* Category Cards */}
                 <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-2 md:gap-4 mb-6 md:mb-8">
