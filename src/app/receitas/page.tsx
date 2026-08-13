@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/useToast";
 import { ToastContainer } from "@/components/Toast";
+import { useConfirm } from "@/hooks/useConfirm";
+import { useContas } from "@/hooks/useContas";
 
 // Categorias de Receita conforme especificado
 const fallbackCategoriasReceita = [
@@ -39,6 +41,7 @@ interface IncomeItem {
     value: number;
     date: string;
     category: string;
+    contaId?: string | null;
 }
 
 const initialIncomeData: IncomeItem[] = [];
@@ -58,6 +61,8 @@ function ReceitasContent() {
     const [categoriasReceitaDb, setCategoriasReceitaDb] = useState<CategoriaReceita[]>([]);
     const [categoriasReady, setCategoriasReady] = useState(false);
     const { toasts, toast, removeToast } = useToast();
+    const { confirm, ConfirmDialog } = useConfirm();
+    const { contas } = useContas();
 
     const currentMonth = searchParams.get("month") ? parseInt(searchParams.get("month")!) : new Date().getMonth() + 1;
     const currentYear = searchParams.get("year") ? parseInt(searchParams.get("year")!) : new Date().getFullYear();
@@ -126,7 +131,8 @@ function ReceitasContent() {
                 description: dbItem.descricao,
                 value: Number(dbItem.valor),
                 date: `${day}/${month}/${year}`,
-                category: dbItem.categoria_id
+                category: dbItem.categoria_id,
+                contaId: dbItem.conta_id ?? null,
             };
         });
 
@@ -150,7 +156,7 @@ function ReceitasContent() {
         init();
     }, [currentMonth, currentYear, loadCategorias, loadData]);
 
-    const handleSaveIncome = async (newIncome: { description: string; value: number; date: string; category: string }) => {
+    const handleSaveIncome = async (newIncome: { description: string; value: number; date: string; category: string; contaId: string | null }) => {
         if (!user) {
             toast.error("Sua sessão expirou. Faça login novamente.");
             throw new Error("Usuário não autenticado");
@@ -171,6 +177,7 @@ function ReceitasContent() {
             valor: newIncome.value,
             data: pgDate,
             categoria_id: newIncome.category,
+            conta_id: newIncome.contaId,
         };
 
         const { data, error } = await supabase.from('receitas').insert(dbItem).select().single();
@@ -187,6 +194,7 @@ function ReceitasContent() {
             value: Number(data.valor),
             date: newIncome.date, // mantém formato visual pt-BR
             category: data.categoria_id,
+            contaId: data.conta_id ?? null,
         };
         
         setIncomeData(prev => [newItem, ...prev]);
@@ -202,7 +210,7 @@ function ReceitasContent() {
         setIncomeData(prev => prev.filter(item => item.id !== id));
     };
 
-    const handleUpdateIncome = async (updated: { description: string; value: number; date: string; category: string }) => {
+    const handleUpdateIncome = async (updated: { description: string; value: number; date: string; category: string; contaId: string | null }) => {
         if (!editingIncome) return;
 
         const pgDate = updated.date.includes("/")
@@ -216,6 +224,7 @@ function ReceitasContent() {
                 valor: updated.value,
                 data: pgDate,
                 categoria_id: updated.category,
+                conta_id: updated.contaId,
             })
             .eq("id", editingIncome.id);
 
@@ -229,7 +238,7 @@ function ReceitasContent() {
         setIncomeData(prev =>
             prev.map(item =>
                 item.id === editingIncome.id
-                    ? { ...item, description: updated.description, value: updated.value, date: `${day}/${month}/${year}`, category: updated.category }
+                    ? { ...item, description: updated.description, value: updated.value, date: `${day}/${month}/${year}`, category: updated.category, contaId: updated.contaId }
                     : item
             )
         );
@@ -444,8 +453,8 @@ function ReceitasContent() {
                                                         <Edit size={14} className="text-muted" />
                                                     </button>
                                                     <button
-                                                        onClick={() => {
-                                                            if (confirm(`Excluir "${item.description}"?`)) {
+                                                        onClick={async () => {
+                                                            if (await confirm(`Excluir "${item.description}"?`)) {
                                                                 handleDeleteIncome(item.id);
                                                             }
                                                         }}
@@ -472,9 +481,11 @@ function ReceitasContent() {
                 }}
                 onSave={editingIncome ? handleUpdateIncome : handleSaveIncome}
                 categorias={categoriasReady && categoriasReceitaDb.length > 0 ? categoriasReceita : []}
+                contas={contas.map((c) => ({ id: c.id, nome: c.nome, icone: c.icone }))}
                 initialIncome={editingIncome}
             />
             <ToastContainer toasts={toasts} onRemove={removeToast} />
+            {ConfirmDialog}
         </div>
     );
 }

@@ -28,6 +28,7 @@ interface ExpenseModalProps {
     onSave: () => void;
     cartoes: Cartao[];
     categorias: Categoria[];
+    contas?: { id: string; nome: string; icone: string }[];
     onSaveLocal?: (expenses: any[]) => void;
     initialCategoryId?: string | null;
     initialExpense?: {
@@ -40,10 +41,11 @@ interface ExpenseModalProps {
         cardLabel?: string | null;
         cardId?: string | null;
         dueDate?: string | null;
+        contaId?: string | null;
     } | null;
 }
 
-export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categorias, onSaveLocal, initialCategoryId, initialExpense }: ExpenseModalProps) {
+export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categorias, contas = [], onSaveLocal, initialCategoryId, initialExpense }: ExpenseModalProps) {
     const [loading, setLoading] = useState(false);
     const { toasts, toast, removeToast } = useToast();
     const isEditing = Boolean(initialExpense);
@@ -55,6 +57,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
     const [isBoleto, setIsBoleto] = useState(false);
     const [dueDate, setDueDate] = useState(new Date().toISOString().split('T')[0]);
     const [categoryId, setCategoryId] = useState("");
+    const [contaId, setContaId] = useState("");
     const [telecomService, setTelecomService] = useState(telecomServiceOptions[0]);
     const [telecomProvider, setTelecomProvider] = useState(telecomProviderOptions[0]);
 
@@ -90,6 +93,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
             setIsBoleto(Boolean(initialExpense?.dueDate && !initialExpense.cardId && !cardLabel));
             setDueDate(initialExpense?.dueDate || initialDate);
             setCategoryId(initialExpense?.category || initialCategoryId || (categorias.length > 0 ? categorias[0].id : ""));
+            setContaId(initialExpense?.contaId ?? "");
             setTelecomService(detailMatch ? telecomServiceOptions.find((option) => detailMatch[0].includes(option)) ?? telecomServiceOptions[0] : telecomServiceOptions[0]);
             setTelecomProvider(detailMatch ? telecomProviderOptions.find((option) => detailMatch[0].includes(option)) ?? telecomProviderOptions[0] : telecomProviderOptions[0]);
             setInstallmentsData({
@@ -204,6 +208,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                         category: categoryId, // Compatibilidade com frontend
                         categoria_id: categoryId,
                         cartao_id: cartaoId,
+                        conta_id: contaId || null,
                         cartao_manual: cartaoManualResumo,
                         tipo_repeticao: installmentsData.tipoRepeticao,
                         base_valor_parcelado: installmentsData.baseValorParcelado,
@@ -229,6 +234,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                     category: categoryId,
                     categoria_id: categoryId,
                     cartao_id: cartaoId,
+                    conta_id: contaId || null,
                     cartao_manual: cartaoManualResumo,
                     tipo_repeticao: "unica",
                     boleto: isBoleto && !hasCreditCard,
@@ -251,6 +257,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                         data: d.data,
                         categoria_id: d.categoria_id,
                         cartao_id: d.cartao_id,
+                        conta_id: d.conta_id,
                         boleto: d.boleto,
                         data_vencimento: d.data_vencimento,
                     })
@@ -266,6 +273,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                     data: d.data,
                     categoria_id: d.categoria_id,
                     cartao_id: d.cartao_id,
+                    conta_id: d.conta_id,
                     boleto: d.boleto,
                     data_vencimento: d.data_vencimento,
                     parcelada: d.parcelada,
@@ -426,6 +434,23 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cartoes, categor
                                 A categoria selecionada será usada no card e no histórico.
                             </div>
                         </div>
+
+                        {contas.length > 0 && (
+                            <div className="col-span-1 md:col-span-2">
+                                <label className="block text-sm font-medium text-muted mb-1">Conta (opcional)</label>
+                                <select
+                                    value={contaId}
+                                    onChange={(e) => setContaId(e.target.value)}
+                                    className="w-full px-4 py-2.5 rounded-xl text-white outline-none transition-all border border-white/10 focus:border-red-500/50"
+                                    style={{ background: "rgba(255, 255, 255, 0.05)" }}
+                                >
+                                    <option value="">Sem conta vinculada</option>
+                                    {contas.map((c) => (
+                                        <option key={c.id} value={c.id}>{c.icone} {c.nome}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
 
                         {categoryId === INTERNET_TV_CELULAR_CATEGORY_ID && (
                             <div className="col-span-1 md:col-span-2 rounded-xl border border-white/10 p-3" style={{ background: "rgba(255, 255, 255, 0.03)" }}>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import Sidebar from "@/components/Sidebar";
 import BotaoVoltar from "@/components/BotaoVoltar";
 import CardResumo from "@/components/CardResumo";
@@ -9,22 +10,31 @@ import TabelaDividendos from "@/components/TabelaDividendos";
 import ResumoDividendos from "@/components/ResumoDividendos";
 import NovaPosicaoFIIModal from "@/components/NovaPosicaoFIIModal";
 import RegistrarDividendoModal from "@/components/RegistrarDividendoModal";
+import VenderAtivoModal, { AtivoParaVenda } from "@/components/VenderAtivoModal";
 import PrintExportButtons from "@/components/PrintExportButtons";
-import { Plus, HandCoins, Building, TrendingUp, Percent } from "lucide-react";
-import { mockFIIs, mockDividendos } from "@/data/aplicacoes-mock";
+import { Plus, HandCoins, Building, TrendingUp, Percent, Receipt, FileUp } from "lucide-react";
 import { useMarketQuotes } from "@/hooks/useMarketQuotes";
+import { usePosicoesFiis } from "@/hooks/usePosicoesFiis";
+import { useProventos } from "@/hooks/useProventos";
+import { useVendasAtivos } from "@/hooks/useVendasAtivos";
+import { useToast } from "@/hooks/useToast";
+import { ToastContainer } from "@/components/Toast";
 import { Dividendo, FII } from "@/types/aplicacoes";
 
 const currentMonthKey = new Date().toISOString().slice(0, 7);
 const currentMonthLabel = new Date().toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
 
 export default function FIIsPage() {
-    const [fiis, setFiis] = useState(mockFIIs);
-    const [dividendos, setDividendos] = useState(mockDividendos.filter(d => ['rendimento_fii', 'amortizacao'].includes(d.tipo)));
+    const { fiis, loading: fiisLoading, error: fiisError, insertFii, deleteFii, refetch: refetchFiis } = usePosicoesFiis();
+    const { proventos, loading: proventosLoading, error: proventosError, insertProvento, deleteProvento } = useProventos();
+    const { registrarVenda } = useVendasAtivos();
+    const dividendos = proventos.filter(d => ['rendimento_fii', 'amortizacao'].includes(d.tipo));
     const { quotes, updatedAt, loading: quotesLoading, error: quotesError } = useMarketQuotes(fiis.map((fii) => fii.ticker));
+    const { toasts, toast, removeToast } = useToast();
 
     const [isPosicaoModalOpen, setPosicaoModalOpen] = useState(false);
     const [isDividendoModalOpen, setDividendoModalOpen] = useState(false);
+    const [ativoParaVender, setAtivoParaVender] = useState<AtivoParaVenda | null>(null);
 
     const fiisComCotacao = fiis.map((fii) => {
         const quote = quotes[fii.ticker];
@@ -48,12 +58,20 @@ export default function FIIsPage() {
 
     const dividendosAcumulados = dividendos.reduce((acc, d) => acc + d.valorTotal, 0);
 
-    const handleDeleteFII = (id: string) => {
-        setFiis(prev => prev.filter(f => f.id !== id));
+    const handleDeleteFII = async (id: string) => {
+        try {
+            await deleteFii(id);
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : "Erro ao excluir fundo");
+        }
     };
 
-    const handleDeleteDividendo = (id: string) => {
-        setDividendos(prev => prev.filter(d => d.id !== id));
+    const handleDeleteDividendo = async (id: string) => {
+        try {
+            await deleteProvento(id);
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : "Erro ao excluir rendimento");
+        }
     };
 
     return (
@@ -67,11 +85,35 @@ export default function FIIsPage() {
                     <div>
                         <h1 className="text-3xl font-bold text-foreground">Fundos Imobiliários</h1>
                         <p className="text-muted mt-1">
-                            Renda mensal passiva com imóveis e recebíveis
+                            {fiisLoading || proventosLoading
+                                ? "Carregando seus fundos..."
+                                : "Renda mensal passiva com imóveis e recebíveis"}
                         </p>
                     </div>
                     <div className="flex gap-3">
                         <PrintExportButtons title="Fundos Imobiliários" period="Extrato de posições e rendimentos" />
+                        <Link
+                            href="/aplicacao/impostos"
+                            className="flex items-center justify-center gap-2 px-4 py-3 text-foreground font-medium rounded-lg transition-all border"
+                            style={{
+                                background: "var(--card-bg)",
+                                borderColor: "var(--card-border)",
+                            }}
+                        >
+                            <Receipt size={18} style={{ color: "var(--accent)" }} />
+                            IR &amp; DARF
+                        </Link>
+                        <Link
+                            href="/aplicacao/importar-nota"
+                            className="flex items-center justify-center gap-2 px-4 py-3 text-foreground font-medium rounded-lg transition-all border"
+                            style={{
+                                background: "var(--card-bg)",
+                                borderColor: "var(--card-border)",
+                            }}
+                        >
+                            <FileUp size={18} style={{ color: "var(--accent)" }} />
+                            Importar Nota
+                        </Link>
                         <button
                             onClick={() => setDividendoModalOpen(true)}
                             className="flex items-center justify-center gap-2 px-4 py-3 text-foreground font-medium rounded-lg transition-all border"
@@ -92,6 +134,12 @@ export default function FIIsPage() {
                         </button>
                     </div>
                 </header>
+
+                {(fiisError || proventosError) && (
+                    <div className="mb-6 rounded-xl border p-4 text-sm text-red-300" style={{ borderColor: "rgba(248, 113, 113, 0.24)", background: "rgba(239, 68, 68, 0.08)" }}>
+                        Não foi possível carregar seus dados: {fiisError || proventosError}
+                    </div>
+                )}
 
                 {/* Resumo */}
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-10">
@@ -152,7 +200,11 @@ export default function FIIsPage() {
                             Meus Fundos
                         </h2>
                         <div className="glass-card rounded-2xl p-1 overflow-hidden">
-                            <TabelaFIIs fiis={fiisComCotacao} onDelete={handleDeleteFII} />
+                            <TabelaFIIs
+                                fiis={fiisComCotacao}
+                                onDelete={handleDeleteFII}
+                                onSell={(fii) => setAtivoParaVender({ id: fii.id, ticker: fii.ticker, quantidade: fii.quantidade, precoMedio: fii.precoMedio })}
+                            />
                         </div>
                     </section>
 
@@ -186,15 +238,58 @@ export default function FIIsPage() {
             <NovaPosicaoFIIModal
                 isOpen={isPosicaoModalOpen}
                 onClose={() => setPosicaoModalOpen(false)}
-                onSave={(fii: FII) => setFiis((prev) => [fii, ...prev])}
+                onSave={async (fii: FII) => {
+                    try {
+                        await insertFii(fii);
+                        toast.success("Fundo registrado com sucesso.");
+                    } catch (err) {
+                        toast.error(err instanceof Error ? err.message : "Erro ao salvar fundo");
+                    }
+                }}
             />
 
             {/* Reusing dividendos modal since they share structure */}
             <RegistrarDividendoModal
                 isOpen={isDividendoModalOpen}
                 onClose={() => setDividendoModalOpen(false)}
-                onSave={(div: Dividendo) => setDividendos((prev) => [div, ...prev])}
+                onSave={async (div: Dividendo) => {
+                    try {
+                        await insertProvento(div);
+                        toast.success("Rendimento registrado com sucesso.");
+                    } catch (err) {
+                        toast.error(err instanceof Error ? err.message : "Erro ao salvar rendimento");
+                    }
+                }}
             />
+
+            <VenderAtivoModal
+                isOpen={Boolean(ativoParaVender)}
+                ativo={ativoParaVender}
+                onClose={() => setAtivoParaVender(null)}
+                onConfirm={async ({ quantidade, precoVenda, taxas, dataVenda, modalidade }) => {
+                    if (!ativoParaVender) return;
+                    try {
+                        await registrarVenda({
+                            classe: "fii",
+                            ticker: ativoParaVender.ticker,
+                            modalidade,
+                            quantidade,
+                            precoVenda,
+                            precoCusto: ativoParaVender.precoMedio,
+                            taxas,
+                            dataVenda,
+                            posicaoId: ativoParaVender.id,
+                            quantidadeRestanteNaPosicao: ativoParaVender.quantidade - quantidade,
+                        });
+                        await refetchFiis();
+                        toast.success("Venda registrada. Confira a apuração em IR & DARF.");
+                    } catch (err) {
+                        toast.error(err instanceof Error ? err.message : "Erro ao registrar venda");
+                    }
+                }}
+            />
+
+            <ToastContainer toasts={toasts} onRemove={removeToast} />
         </div>
     );
 }

@@ -1,14 +1,18 @@
 "use client";
 
 import { FII } from "@/types/aplicacoes";
-import { Trash2 } from "lucide-react";
+import { Trash2, ArrowDownCircle } from "lucide-react";
+import { useConfirm } from "@/hooks/useConfirm";
 
 interface TabelaFIIsProps {
     fiis: FII[];
     onDelete?: (id: string) => void;
+    onSell?: (fii: FII) => void;
 }
 
-export default function TabelaFIIs({ fiis, onDelete }: TabelaFIIsProps) {
+export default function TabelaFIIs({ fiis, onDelete, onSell }: TabelaFIIsProps) {
+    const hasActions = Boolean(onDelete || onSell);
+    const { confirm, ConfirmDialog } = useConfirm();
     const getCorSector = (setor: string) => {
         switch (setor.toLowerCase()) {
             case 'logística': return 'bg-blue-500/10 text-blue-700';
@@ -30,7 +34,7 @@ export default function TabelaFIIs({ fiis, onDelete }: TabelaFIIsProps) {
                         <th className="pb-3 px-4 font-medium text-right hidden sm:table-cell">Preço Médio</th>
                         <th className="pb-3 px-4 font-medium text-right">Valor Atual</th>
                         <th className="pb-3 px-4 font-medium text-right">DY (12m)</th>
-                        {onDelete && <th className="pb-3 px-4 font-medium text-center w-16"></th>}
+                        {hasActions && <th className="pb-3 px-4 font-medium text-center w-24"></th>}
                     </tr>
                 </thead>
                 <tbody className="text-sm">
@@ -59,30 +63,44 @@ export default function TabelaFIIs({ fiis, onDelete }: TabelaFIIsProps) {
                                     {fii.dyAnual.toFixed(2)}%
                                 </span>
                             </td>
-                            {onDelete && (
-                                <td className="py-4 px-4 text-center">
-                                    <button
-                                        onClick={() => {
-                                            if (confirm(`Excluir "${fii.ticker} - ${fii.nome}"?`)) {
-                                                onDelete(fii.id);
-                                            }
-                                        }}
-                                            className="p-2 hover:bg-red-500/10 rounded-lg transition-all opacity-0 group-hover:opacity-100"
-                                        title="Excluir"
-                                    >
-                                            <Trash2 size={16} className="text-red-500" />
-                                    </button>
+                            {hasActions && (
+                                <td className="py-4 px-4">
+                                    <div className="flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                                        {onSell && (
+                                            <button
+                                                onClick={() => onSell(fii)}
+                                                className="p-2 hover:bg-amber-500/10 rounded-lg transition-all"
+                                                title="Vender"
+                                            >
+                                                <ArrowDownCircle size={16} className="text-amber-500" />
+                                            </button>
+                                        )}
+                                        {onDelete && (
+                                            <button
+                                                onClick={async () => {
+                                                    if (await confirm(`Excluir "${fii.ticker} - ${fii.nome}"?`)) {
+                                                        onDelete(fii.id);
+                                                    }
+                                                }}
+                                                className="p-2 hover:bg-red-500/10 rounded-lg transition-all"
+                                                title="Excluir"
+                                            >
+                                                <Trash2 size={16} className="text-red-500" />
+                                            </button>
+                                        )}
+                                    </div>
                                 </td>
                             )}
                         </tr>
                     ))}
                     {fiis.length === 0 && (
                         <tr>
-                            <td colSpan={onDelete ? 7 : 6} className="py-8 text-center text-muted">Nenhum FII cadastrado.</td>
+                            <td colSpan={hasActions ? 7 : 6} className="py-8 text-center text-muted">Nenhum FII cadastrado.</td>
                         </tr>
                     )}
                 </tbody>
             </table>
+            {ConfirmDialog}
         </div>
     );
 }

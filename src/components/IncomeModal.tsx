@@ -11,22 +11,26 @@ interface IncomeModalProps {
         value: number;
         date: string;
         category: string;
+        contaId: string | null;
     }) => void | Promise<void>;
     categorias: { id: string; label: string; icone: string }[];
+    contas?: { id: string; nome: string; icone: string }[];
     initialIncome?: {
         id: number | string;
         description: string;
         value: number;
         date: string;
         category: string;
+        contaId?: string | null;
     } | null;
 }
 
-export default function IncomeModal({ isOpen, onClose, onSave, categorias, initialIncome }: IncomeModalProps) {
+export default function IncomeModal({ isOpen, onClose, onSave, categorias, contas = [], initialIncome }: IncomeModalProps) {
     const [description, setDescription] = useState("");
     const [value, setValue] = useState("");
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
     const [category, setCategory] = useState(categorias[0]?.id ?? "");
+    const [contaId, setContaId] = useState<string>("");
     const [loading, setLoading] = useState(false);
     const isEditing = Boolean(initialIncome);
 
@@ -41,11 +45,13 @@ export default function IncomeModal({ isOpen, onClose, onSave, categorias, initi
                 setDate(isoDate);
                 setValue(initialIncome.value.toLocaleString("pt-BR", { minimumFractionDigits: 2 }));
                 setCategory(initialIncome.category);
+                setContaId(initialIncome.contaId ?? "");
             } else {
                 setDescription("");
                 setValue("");
                 setDate(new Date().toISOString().split('T')[0]);
                 if (categorias.length > 0) setCategory(categorias[0].id);
+                setContaId("");
             }
         }
     }, [isOpen, initialIncome]);
@@ -67,6 +73,7 @@ export default function IncomeModal({ isOpen, onClose, onSave, categorias, initi
                 value: numericValue,
                 date,
                 category,
+                contaId: contaId || null,
             });
 
             // Reset form
@@ -74,6 +81,7 @@ export default function IncomeModal({ isOpen, onClose, onSave, categorias, initi
             setValue("");
             setDate(new Date().toISOString().split('T')[0]);
             setCategory(categorias[0]?.id ?? "");
+            setContaId("");
             onClose();
         } catch (error) {
             console.error("Error saving income:", error);
@@ -207,6 +215,26 @@ export default function IncomeModal({ isOpen, onClose, onSave, categorias, initi
                             </p>
                         )}
                     </div>
+
+                    {/* Conta (opcional) */}
+                    {contas.length > 0 && (
+                        <div>
+                            <label className="block text-sm font-medium text-muted mb-2">
+                                Conta (opcional)
+                            </label>
+                            <select
+                                value={contaId}
+                                onChange={(e) => setContaId(e.target.value)}
+                                className="w-full px-4 py-3 rounded-xl text-white outline-none transition-all border border-white/10 focus:border-emerald-500/50"
+                                style={{ background: "rgba(255, 255, 255, 0.05)" }}
+                            >
+                                <option value="">Sem conta vinculada</option>
+                                {contas.map((c) => (
+                                    <option key={c.id} value={c.id}>{c.icone} {c.nome}</option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
 
                     {/* Submit Button */}
                     <button

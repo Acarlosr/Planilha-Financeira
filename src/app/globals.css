@@ -747,6 +747,46 @@ body {
   filter: brightness(1.1);
 }
 
+/* Secondary / Danger / Ghost Buttons — usados pelo componente <Button /> */
+.btn-secondary-glass {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  color: var(--foreground);
+}
+
+.btn-secondary-glass:hover {
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--card-border));
+}
+
+.btn-danger-glass {
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
+  color: var(--danger);
+}
+
+.btn-danger-glass:hover {
+  background: color-mix(in srgb, var(--danger) 20%, transparent);
+}
+
+.btn-ghost-glass {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+}
+
+.btn-ghost-glass:hover {
+  background: color-mix(in srgb, var(--text-secondary) 10%, transparent);
+  color: var(--foreground);
+}
+
+/* Tipografia numérica — valores monetários com números tabulares e fonte mono,
+   para leitura mais precisa em tabelas e cards financeiros. */
+.font-numeric {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;

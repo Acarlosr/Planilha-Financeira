@@ -2,6 +2,7 @@
 
 import { RendaFixaPrivada } from "@/types/aplicacoes";
 import { Trash2 } from "lucide-react";
+import { useConfirm } from "@/hooks/useConfirm";
 
 interface TabelaRendaFixaProps {
     titulos: RendaFixaPrivada[];
@@ -9,6 +10,7 @@ interface TabelaRendaFixaProps {
 }
 
 export default function TabelaRendaFixa({ titulos, onDelete }: TabelaRendaFixaProps) {
+    const { confirm, ConfirmDialog } = useConfirm();
     const getTipoBadge = (tipo: string) => {
         switch (tipo) {
             case 'CDB': return <span className="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs font-medium rounded-full border border-blue-500/30">CDB</span>;
@@ -78,8 +80,8 @@ export default function TabelaRendaFixa({ titulos, onDelete }: TabelaRendaFixaPr
                                 {onDelete && (
                                     <td className="py-4 px-4 text-center">
                                         <button
-                                            onClick={() => {
-                                                if (confirm(`Excluir "${t.tipo} - ${t.instituicao}"?`)) {
+                                            onClick={async () => {
+                                                if (await confirm(`Excluir "${t.tipo} - ${t.instituicao}"?`)) {
                                                     onDelete(t.id);
                                                 }
                                             }}
@@ -100,6 +102,7 @@ export default function TabelaRendaFixa({ titulos, onDelete }: TabelaRendaFixaPr
                     )}
                 </tbody>
             </table>
+            {ConfirmDialog}
         </div>
     );
 }

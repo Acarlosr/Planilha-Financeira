@@ -9,15 +9,22 @@ import HistoricoAportes from "@/components/HistoricoAportes";
 import NovoTituloModal from "@/components/NovoTituloModal";
 import PrintExportButtons from "@/components/PrintExportButtons";
 import { Plus, Landmark, TrendingUp, CalendarDays } from "lucide-react";
-import { mockTesouroDireto } from "@/data/aplicacoes-mock";
+import { useTitulosTesouro } from "@/hooks/useTitulosTesouro";
+import { useToast } from "@/hooks/useToast";
+import { ToastContainer } from "@/components/Toast";
 import { TesouroDireto } from "@/types/aplicacoes";
 
 export default function TesouroDiretoPage() {
-    const [titulos, setTitulos] = useState(mockTesouroDireto);
+    const { titulos, loading, error, insertTitulo, deleteTitulo } = useTitulosTesouro();
+    const { toasts, toast, removeToast } = useToast();
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const handleDeleteTitulo = (id: string) => {
-        setTitulos(prev => prev.filter(t => t.id !== id));
+    const handleDeleteTitulo = async (id: string) => {
+        try {
+            await deleteTitulo(id);
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : "Erro ao excluir título");
+        }
     };
 
     const historico = titulos.map((titulo, index) => ({
@@ -41,7 +48,7 @@ export default function TesouroDiretoPage() {
                     <div>
                         <h1 className="text-3xl font-bold text-foreground">Tesouro Direto</h1>
                         <p className="text-muted mt-1">
-                            Títulos públicos federais com garantia do Governo
+                            {loading ? "Carregando seus títulos..." : "Títulos públicos federais com garantia do Governo"}
                         </p>
                     </div>
                     <div className="flex items-center gap-3">
@@ -58,6 +65,12 @@ export default function TesouroDiretoPage() {
                         </button>
                     </div>
                 </header>
+
+                {error && (
+                    <div className="mb-6 rounded-xl border p-4 text-sm text-red-300" style={{ borderColor: "rgba(248, 113, 113, 0.24)", background: "rgba(239, 68, 68, 0.08)" }}>
+                        Não foi possível carregar seus títulos: {error}
+                    </div>
+                )}
 
                 {/* Resumo */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
@@ -78,7 +91,7 @@ export default function TesouroDiretoPage() {
                         valor="+ R$ 0,00"
                         icone={<CalendarDays size={24} />}
                         corGrafico="from-amber-500 to-amber-400"
-                        subtexto="<span class='text-muted'>Sem rendimento lançado</span>"
+                        subtexto={<span className="text-muted">Sem rendimento lançado</span>}
                     />
                 </div>
 
@@ -107,8 +120,17 @@ export default function TesouroDiretoPage() {
             <NovoTituloModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                onSave={(titulo: TesouroDireto) => setTitulos((prev) => [titulo, ...prev])}
+                onSave={async (titulo: TesouroDireto) => {
+                    try {
+                        await insertTitulo(titulo);
+                        toast.success("Título registrado com sucesso.");
+                    } catch (err) {
+                        toast.error(err instanceof Error ? err.message : "Erro ao salvar título");
+                    }
+                }}
             />
+
+            <ToastContainer toasts={toasts} onRemove={removeToast} />
         </div>
     );
 }

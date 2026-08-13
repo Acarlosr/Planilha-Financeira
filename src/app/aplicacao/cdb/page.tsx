@@ -8,14 +8,22 @@ import TabelaRendaFixa from "@/components/TabelaRendaFixa";
 import NovoTituloRFModal from "@/components/NovoTituloRFModal";
 import PrintExportButtons from "@/components/PrintExportButtons";
 import { Plus, Building2, TrendingUp, AlertTriangle } from "lucide-react";
-import { mockRendaFixaPrivada } from "@/data/aplicacoes-mock";
+import { useTitulosRendaFixa } from "@/hooks/useTitulosRendaFixa";
+import { useToast } from "@/hooks/useToast";
+import { ToastContainer } from "@/components/Toast";
+import { RendaFixaPrivada } from "@/types/aplicacoes";
 
 export default function RendaFixaPage() {
-    const [titulos, setTitulos] = useState(mockRendaFixaPrivada);
+    const { titulos, loading, error, insertTitulo, deleteTitulo } = useTitulosRendaFixa();
+    const { toasts, toast, removeToast } = useToast();
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const handleDeleteTitulo = (id: string) => {
-        setTitulos(prev => prev.filter(t => t.id !== id));
+    const handleDeleteTitulo = async (id: string) => {
+        try {
+            await deleteTitulo(id);
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : "Erro ao excluir título");
+        }
     };
 
     // Totais
@@ -41,7 +49,7 @@ export default function RendaFixaPage() {
                     <div>
                         <h1 className="text-3xl font-bold text-foreground">CDB / LCI / LCA</h1>
                         <p className="text-muted mt-1">
-                            Renda Fixa privada com garantia do FGC
+                            {loading ? "Carregando seus títulos..." : "Renda Fixa privada com garantia do FGC"}
                         </p>
                     </div>
                     <div className="flex items-center gap-3">
@@ -58,6 +66,12 @@ export default function RendaFixaPage() {
                         </button>
                     </div>
                 </header>
+
+                {error && (
+                    <div className="mb-6 rounded-xl border p-4 text-sm text-red-300" style={{ borderColor: "rgba(248, 113, 113, 0.24)", background: "rgba(239, 68, 68, 0.08)" }}>
+                        Não foi possível carregar seus títulos: {error}
+                    </div>
+                )}
 
                 {/* Resumo */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
@@ -79,7 +93,7 @@ export default function RendaFixaPage() {
                         icone={<AlertTriangle size={24} />}
                         corGrafico={vencimentosProximos > 0 ? "from-orange-600 to-orange-400" : "from-blue-600 to-blue-400"}
                         subtexto={vencimentosProximos > 0
-                            ? `<span class="text-orange-400 font-bold">Atenção!</span> Títulos vencendo em < 30 dias`
+                            ? <><span className="text-orange-400 font-bold">Atenção!</span> Títulos vencendo em {"<"} 30 dias</>
                             : `Nenhum título vencendo nos próximos 30 dias`
                         }
                     />
@@ -98,8 +112,17 @@ export default function RendaFixaPage() {
             <NovoTituloRFModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                onSave={(titulo) => setTitulos((prev) => [titulo, ...prev])}
+                onSave={async (titulo: RendaFixaPrivada) => {
+                    try {
+                        await insertTitulo(titulo);
+                        toast.success("Título registrado com sucesso.");
+                    } catch (err) {
+                        toast.error(err instanceof Error ? err.message : "Erro ao salvar título");
+                    }
+                }}
             />
+
+            <ToastContainer toasts={toasts} onRemove={removeToast} />
         </div>
     );
 }

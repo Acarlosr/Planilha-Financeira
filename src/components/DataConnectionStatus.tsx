@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CheckCircle2, Database, PlugZap, Wallet2 } from "lucide-react";
+import { CheckCircle2, Database, PlugZap } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 type Status = "checking" | "ok" | "warning";
@@ -17,7 +17,6 @@ export default function DataConnectionStatus() {
     const [items, setItems] = useState<StatusItem[]>([
         { label: "Supabase", value: "Verificando dados", status: "checking", icon: <Database size={18} /> },
         { label: "Cotações", value: "Rota interna ativa", status: "ok", icon: <PlugZap size={18} /> },
-        { label: "Wallet Web3", value: "Não conectado", status: "warning", icon: <Wallet2 size={18} /> },
     ]);
 
     useEffect(() => {
@@ -27,7 +26,6 @@ export default function DataConnectionStatus() {
             const nextItems: StatusItem[] = [
                 { label: "Supabase", value: "Verificando dados", status: "checking", icon: <Database size={18} /> },
                 { label: "Cotações", value: "Rota interna ativa", status: "ok", icon: <PlugZap size={18} /> },
-                { label: "Wallet Web3", value: "Não conectado", status: "warning", icon: <Wallet2 size={18} /> },
             ];
 
             try {
@@ -46,14 +44,6 @@ export default function DataConnectionStatus() {
                     icon: <Database size={18} />,
                 };
             }
-
-            const hasWallet = typeof window !== "undefined" && Boolean((window as Window & { ethereum?: unknown }).ethereum);
-            nextItems[2] = {
-                label: "Wallet Web3",
-                value: hasWallet ? "Carteira detectada" : "MetaMask não detectada",
-                status: hasWallet ? "ok" : "warning",
-                icon: <Wallet2 size={18} />,
-            };
 
             if (mounted) setItems(nextItems);
         }
@@ -76,12 +66,12 @@ export default function DataConnectionStatus() {
             <div className="mb-4 flex items-center justify-between gap-3">
                 <div>
                     <h2 className="text-lg font-bold text-foreground">Conexões e dados</h2>
-                    <p className="text-sm text-muted">Status rápido do app, mercado e camada Web3.</p>
+                    <p className="text-sm text-muted">Status rápido do app e dos dados de mercado.</p>
                 </div>
                 <CheckCircle2 size={22} style={{ color: "var(--accent)" }} />
             </div>
 
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 {items.map((item) => (
                     <div
                         key={item.label}

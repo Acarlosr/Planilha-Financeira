@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase";
 import { useDashboardOverview, type RecentTransaction } from "@/hooks/useDashboardOverview";
 import { useToast } from "@/hooks/useToast";
 import { ToastContainer } from "@/components/Toast";
+import { useConfirm } from "@/hooks/useConfirm";
 
 const PAGE_SIZE = 8;
 
@@ -111,6 +112,7 @@ function ValueLabel({ transaction }: { transaction: RecentTransaction }) {
 export default function TransactionsTable() {
     const { recentTransactions: transactions, loading, refetch } = useDashboardOverview();
     const { toasts, toast, removeToast } = useToast();
+    const { confirm, ConfirmDialog } = useConfirm();
     const [filter, setFilter] = useState<TypeFilter>("todas");
     const [filterOpen, setFilterOpen] = useState(false);
     const [page, setPage] = useState(1);
@@ -164,8 +166,8 @@ export default function TransactionsTable() {
 
     const deleteButton = (transaction: RecentTransaction, alwaysVisible = false) => (
         <button
-            onClick={() => {
-                if (confirm(`Excluir "${transaction.description}"?`)) {
+            onClick={async () => {
+                if (await confirm(`Excluir "${transaction.description}"?`)) {
                     handleDelete(transaction.id);
                 }
             }}
@@ -465,6 +467,7 @@ export default function TransactionsTable() {
             )}
         </div>
         <ToastContainer toasts={toasts} onRemove={removeToast} />
+        {ConfirmDialog}
         </>
     );
 }

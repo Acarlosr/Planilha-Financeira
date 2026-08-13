@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/useToast";
 import { ToastContainer } from "@/components/Toast";
+import { useConfirm } from "@/hooks/useConfirm";
 import {
     AreaChart,
     Area,
@@ -89,6 +90,7 @@ function PoupancaContent() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const { toasts, toast, removeToast } = useToast();
+    const { confirm, ConfirmDialog } = useConfirm();
 
     const loadSavings = useCallback(async () => {
         try {
@@ -482,8 +484,8 @@ function PoupancaContent() {
                                             {isDeposito ? "+" : "-"} R$ {transacao.valor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                                         </span>
                                         <button
-                                            onClick={() => {
-                                                if (confirm(`Excluir "${transacao.descricao}"?`)) {
+                                            onClick={async () => {
+                                                if (await confirm(`Excluir "${transacao.descricao}"?`)) {
                                                     handleDeleteTransaction(transacao.id);
                                                 }
                                             }}
@@ -513,6 +515,7 @@ function PoupancaContent() {
                 metas={metas.map(m => ({ id: m.id, nome: m.nome, icone: m.icone }))}
             />
             <ToastContainer toasts={toasts} onRemove={removeToast} />
+            {ConfirmDialog}
         </div>
     );
 }

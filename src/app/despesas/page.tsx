@@ -9,10 +9,12 @@ import { supabase } from "@/lib/supabase";
 import { useCartoes } from "@/hooks/useCartoes";
 import { useCategorias } from "@/hooks/useCategorias";
 import { useDespesas } from "@/hooks/useDespesas";
+import { useContas } from "@/hooks/useContas";
 import PrintExportButtons from "@/components/PrintExportButtons";
 import { v4 as uuidv4 } from 'uuid';
 import { useToast } from "@/hooks/useToast";
 import { ToastContainer } from "@/components/Toast";
+import { useConfirm } from "@/hooks/useConfirm";
 import {
     Plus,
     Edit,
@@ -186,9 +188,11 @@ function DespesasContent() {
     const [editingExpense, setEditingExpense] = useState<ExpenseItem | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { toasts, toast, removeToast } = useToast();
+    const { confirm, ConfirmDialog } = useConfirm();
     const { despesas, loading: loadingDespesas, error, refetch } = useDespesas(currentMonth, currentYear, statementScope);
     const { cartoes } = useCartoes();
     const { categorias, loading: loadingCategorias } = useCategorias();
+    const { contas } = useContas();
     const databaseUnavailable = Boolean(error?.includes("Could not find the table") || error?.includes("schema cache"));
     const formatIsoDate = (value: string) => {
         const [year, month, day] = value.split("-");
@@ -617,8 +621,8 @@ function DespesasContent() {
                                                 <Edit size={16} className="text-muted" />
                                             </button>
                                             <button
-                                                onClick={() => {
-                                                    if (confirm(`Excluir "${item.description}"?`)) {
+                                                onClick={async () => {
+                                                    if (await confirm(`Excluir "${item.description}"?`)) {
                                                         handleDeleteExpense(item.id);
                                                     }
                                                 }}
@@ -656,10 +660,12 @@ function DespesasContent() {
                 onSaveLocal={databaseUnavailable ? handleSaveLocalExpenses : undefined}
                 cartoes={cartoes}
                 categorias={categorySource as any}
+                contas={contas.map((c) => ({ id: c.id, nome: c.nome, icone: c.icone }))}
                 initialCategoryId={selectedCategoryForModal}
                 initialExpense={editingExpense}
             />
             <ToastContainer toasts={toasts} onRemove={removeToast} />
+            {ConfirmDialog}
         </div>
     );
 }

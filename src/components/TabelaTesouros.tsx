@@ -2,6 +2,7 @@
 
 import { TesouroDireto } from "@/types/aplicacoes";
 import { Trash2 } from "lucide-react";
+import { useConfirm } from "@/hooks/useConfirm";
 
 interface TabelaTesourosProps {
     titulos: TesouroDireto[];
@@ -9,6 +10,7 @@ interface TabelaTesourosProps {
 }
 
 export default function TabelaTesouros({ titulos, onDelete }: TabelaTesourosProps) {
+    const { confirm, ConfirmDialog } = useConfirm();
     const getTipoBadge = (tipo: string) => {
         switch (tipo) {
             case 'selic': return <span className="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs font-medium rounded-md border border-blue-500/30">Pós-fixado (Selic)</span>;
@@ -55,8 +57,8 @@ export default function TabelaTesouros({ titulos, onDelete }: TabelaTesourosProp
                             {onDelete && (
                                 <td className="py-4 px-4 text-center">
                                     <button
-                                        onClick={() => {
-                                            if (confirm(`Excluir "${t.titulo}"?`)) {
+                                        onClick={async () => {
+                                            if (await confirm(`Excluir "${t.titulo}"?`)) {
                                                 onDelete(t.id);
                                             }
                                         }}
@@ -76,6 +78,7 @@ export default function TabelaTesouros({ titulos, onDelete }: TabelaTesourosProp
                     )}
                 </tbody>
             </table>
+            {ConfirmDialog}
         </div>
     );
 }

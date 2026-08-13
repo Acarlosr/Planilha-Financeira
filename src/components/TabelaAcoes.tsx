@@ -1,14 +1,18 @@
 "use client";
 
 import { Acao } from "@/types/aplicacoes";
-import { Trash2 } from "lucide-react";
+import { Trash2, ArrowDownCircle } from "lucide-react";
+import { useConfirm } from "@/hooks/useConfirm";
 
 interface TabelaAcoesProps {
     acoes: Acao[];
     onDelete?: (id: string) => void;
+    onSell?: (acao: Acao) => void;
 }
 
-export default function TabelaAcoes({ acoes, onDelete }: TabelaAcoesProps) {
+export default function TabelaAcoes({ acoes, onDelete, onSell }: TabelaAcoesProps) {
+    const hasActions = Boolean(onDelete || onSell);
+    const { confirm, ConfirmDialog } = useConfirm();
     return (
         <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
@@ -20,7 +24,7 @@ export default function TabelaAcoes({ acoes, onDelete }: TabelaAcoesProps) {
                         <th className="pb-3 px-4 font-medium text-right hidden sm:table-cell">Preço Médio</th>
                         <th className="pb-3 px-4 font-medium text-right">Valor Atual</th>
                         <th className="pb-3 px-4 font-medium text-right">Variação</th>
-                        {onDelete && <th className="pb-3 px-4 font-medium text-center w-16"></th>}
+                        {hasActions && <th className="pb-3 px-4 font-medium text-center w-24"></th>}
                     </tr>
                 </thead>
                 <tbody className="text-sm">
@@ -48,19 +52,32 @@ export default function TabelaAcoes({ acoes, onDelete }: TabelaAcoesProps) {
                                         <span>{isPositivo ? '+' : ''}{variacaoPerc.toFixed(2)}%</span>
                                     </div>
                                 </td>
-                                {onDelete && (
-                                    <td className="py-4 px-4 text-center">
-                                        <button
-                                            onClick={() => {
-                                                if (confirm(`Excluir "${acao.ticker} - ${acao.empresa}"?`)) {
-                                                    onDelete(acao.id);
-                                                }
-                                            }}
-                                            className="p-2 hover:bg-red-500/10 rounded-lg transition-all opacity-0 group-hover:opacity-100"
-                                            title="Excluir"
-                                        >
-                                            <Trash2 size={16} className="text-red-500" />
-                                        </button>
+                                {hasActions && (
+                                    <td className="py-4 px-4">
+                                        <div className="flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                                            {onSell && (
+                                                <button
+                                                    onClick={() => onSell(acao)}
+                                                    className="p-2 hover:bg-amber-500/10 rounded-lg transition-all"
+                                                    title="Vender"
+                                                >
+                                                    <ArrowDownCircle size={16} className="text-amber-500" />
+                                                </button>
+                                            )}
+                                            {onDelete && (
+                                                <button
+                                                    onClick={async () => {
+                                                        if (await confirm(`Excluir "${acao.ticker} - ${acao.empresa}"?`)) {
+                                                            onDelete(acao.id);
+                                                        }
+                                                    }}
+                                                    className="p-2 hover:bg-red-500/10 rounded-lg transition-all"
+                                                    title="Excluir"
+                                                >
+                                                    <Trash2 size={16} className="text-red-500" />
+                                                </button>
+                                            )}
+                                        </div>
                                     </td>
                                 )}
                             </tr>
@@ -68,11 +85,12 @@ export default function TabelaAcoes({ acoes, onDelete }: TabelaAcoesProps) {
                     })}
                     {acoes.length === 0 && (
                         <tr>
-                            <td colSpan={onDelete ? 7 : 6} className="py-8 text-center text-muted">Nenhuma ação cadastrada.</td>
+                            <td colSpan={hasActions ? 7 : 6} className="py-8 text-center text-muted">Nenhuma ação cadastrada.</td>
                         </tr>
                     )}
                 </tbody>
             </table>
+            {ConfirmDialog}
         </div>
     );
 }

@@ -2,6 +2,7 @@
 
 import { Dividendo } from "@/types/aplicacoes";
 import { Trash2 } from "lucide-react";
+import { useConfirm } from "@/hooks/useConfirm";
 
 interface TabelaDividendosProps {
     dividendos: Dividendo[];
@@ -9,6 +10,7 @@ interface TabelaDividendosProps {
 }
 
 export default function TabelaDividendos({ dividendos, onDelete }: TabelaDividendosProps) {
+    const { confirm, ConfirmDialog } = useConfirm();
     const getTipoBadge = (tipo: string) => {
         switch (tipo) {
             case 'dividendo': return <span className="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs font-medium rounded-full">Dividendo</span>;
@@ -54,8 +56,8 @@ export default function TabelaDividendos({ dividendos, onDelete }: TabelaDividen
                             {onDelete && (
                                 <td className="py-4 px-4 text-center">
                                     <button
-                                        onClick={() => {
-                                            if (confirm(`Excluir provento de "${div.ticker}"?`)) {
+                                        onClick={async () => {
+                                            if (await confirm(`Excluir provento de "${div.ticker}"?`)) {
                                                 onDelete(div.id);
                                             }
                                         }}
@@ -75,6 +77,7 @@ export default function TabelaDividendos({ dividendos, onDelete }: TabelaDividen
                     )}
                 </tbody>
             </table>
+            {ConfirmDialog}
         </div>
     );
 }

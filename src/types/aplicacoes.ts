@@ -55,3 +55,19 @@ export interface RendaFixaPrivada {
     valorAplicado: number;
     rendimentoAcumulado: number;
 }
+
+export interface VendaAtivo {
+    id: string;
+    classe: 'acao' | 'fii';
+    ticker: string;
+    modalidade: 'swing_trade' | 'day_trade';
+    quantidade: number;
+    precoVenda: number; // R$ por cota/ação
+    precoCusto: number; // preço médio da posição no momento da venda
+    taxas: number;
+    valorVenda: number; // quantidade * precoVenda - taxas
+    valorCusto: number; // quantidade * precoCusto
+    resultado: number;  // valorVenda - valorCusto (lucro ou prejuízo)
+    dataVenda: string; // YYYY-MM-DD
+    posicaoId?: string;
+}
